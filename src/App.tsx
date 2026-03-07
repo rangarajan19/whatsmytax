@@ -184,64 +184,58 @@ export default function App() {
   // ── Input screen ─────────────────────────────────────────────────
   if (step === 'input') {
     return (
-      <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#c7ff0c', fontFamily: 'Inter, sans-serif' }}>
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-6 py-4">
-          <span className="text-sm font-bold text-[#003f31]/60">WhatsMyTax</span>
-          <span className="text-xs text-[#003f31]/40">FY 2025–26</span>
-        </div>
+      <div className="min-h-screen flex flex-col relative" style={{ backgroundColor: '#c7ff0c', fontFamily: 'Inter, sans-serif' }}>
 
-        {/* Main content */}
-        <div className="flex-1 flex flex-col justify-center px-6 max-w-lg mx-auto w-full pb-20">
-          <h1 className="text-4xl sm:text-5xl font-black text-[#003f31] leading-tight mb-2">
-            What's your<br />annual salary?
-          </h1>
-          <p className="text-sm text-[#003f31]/50 mb-8">
-            Calculate your income tax and take home for FY 2025–26
-          </p>
+        {/* Main content — left-aligned at 64px, vertically centered */}
+        <div className="flex-1 flex flex-col justify-center pl-16 pr-8">
+          <div className="w-full max-w-[581px]">
 
-          {/* Input — matches Figma: lime bg, 3px border, no radius */}
-          <div className="flex items-center border-[3px] border-[#003f31] bg-[#c7ff0c] mb-3">
-            <span className="pl-3 pr-1 text-2xl font-medium text-[#003f31]/50 shrink-0 select-none">₹</span>
-            <input
-              type="number"
-              min={0}
-              autoFocus
-              placeholder="e.g. 12,00,000"
-              value={salary}
-              onChange={e => setSalary(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent border-none outline-none py-3.5 pr-3
-                         text-2xl font-medium text-[#003f31] placeholder:text-[#003f31]/50
-                         focus:ring-0
-                         [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            />
+            <h1 className="text-[28px] font-bold text-[#003f31] mb-4 whitespace-nowrap">
+              What's your annual salary?
+            </h1>
+
+            {/* Input — asymmetric border per Figma: 3px top/left, 8px bottom/right */}
+            <div className="flex items-center bg-[#c7ff0c]
+                            border-t-[3px] border-l-[3px] border-b-[8px] border-r-[8px]
+                            border-[#003f31]">
+              <span className="pl-2 pr-1 text-[24px] font-medium text-[#003f31]/50 shrink-0 select-none">₹</span>
+              <input
+                type="number"
+                min={0}
+                autoFocus
+                placeholder="e.g. 12,00,000"
+                value={salary}
+                onChange={e => setSalary(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="flex-1 bg-transparent border-none outline-none py-3 pr-3
+                           text-[24px] font-medium text-[#003f31] placeholder:text-[#003f31]/50
+                           focus:ring-0
+                           [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+            </div>
+
+            {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+
+            {/* Percentile hint */}
+            {percentile && !error && (
+              <p className="text-[20px] font-medium text-[#003f31]/50 mt-3">
+                You are in {percentile} of income group
+              </p>
+            )}
+
           </div>
-
-          {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
-
-          {/* Percentile hint */}
-          {percentile && !error && (
-            <p className="text-sm text-[#003f31]/60 mb-4">
-              You are in the <strong className="text-[#003f31]">{percentile}</strong> of income earners in India
-            </p>
-          )}
-
-          {/* Calculate button */}
-          <button
-            disabled={!result || !!error}
-            onClick={() => { if (result && !error) { setStep('results'); setShowBreakdown(false); } }}
-            className="mt-2 w-full py-4 rounded-xl font-bold text-base
-                       bg-[#003f31] text-[#c7ff0c] disabled:opacity-40
-                       hover:bg-[#003f31]/90 active:scale-[0.98] transition-all"
-          >
-            Calculate →
-          </button>
-
-          {result && !error && (
-            <p className="text-center text-xs text-[#003f31]/40 mt-3">⏎ Press Enter to continue</p>
-          )}
         </div>
+
+        {/* Press Enter — centered at bottom */}
+        <button
+          disabled={!result || !!error}
+          onClick={() => { if (result && !error) { setStep('results'); setShowBreakdown(false); } }}
+          className="pb-16 text-center w-full text-[20px] font-bold text-[#003f31]/50
+                     disabled:opacity-30 hover:text-[#003f31]/70 transition-colors"
+        >
+          ↩ Press Enter to continue
+        </button>
+
       </div>
     );
   }
