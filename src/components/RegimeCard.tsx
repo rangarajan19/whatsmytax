@@ -7,6 +7,7 @@ interface Props {
   result: RegimeResult;
   isHigher: boolean;
   gross: number;
+  epf: number;
 }
 
 const ACCENT = {
@@ -14,8 +15,18 @@ const ACCENT = {
   new: { title: 'text-emerald-600', total: 'text-emerald-600', border: 'border-emerald-200' },
 };
 
-export default function RegimeCard({ regime, label, result, isHigher, gross }: Props) {
-  const colors = ACCENT[regime];
+function surchargeRate(income: number, regime: 'old' | 'new'): number {
+  if (income > 50_000_000) return regime === 'new' ? 25 : 37; // New Regime capped at 25%
+  if (income > 20_000_000) return 25;
+  if (income > 10_000_000) return 15;
+  if (income > 5_000_000)  return 10;
+  return 0;
+}
+
+export default function RegimeCard({ regime, label, result, isHigher, gross, epf }: Props) {
+  const colors        = ACCENT[regime];
+  const sRate         = surchargeRate(result.taxableIncome, regime);
+  const monthlyInHand = Math.round(Math.max(0, gross - result.total - epf) / 12);
 
   const cardClass  = isHigher
     ? 'bg-red-50 border-2 border-red-300 rounded-2xl p-6 relative shadow-md'
@@ -37,11 +48,30 @@ export default function RegimeCard({ regime, label, result, isHigher, gross }: P
         </span>
       )}
 
-      <p className={titleClass}>{regime === 'old' ? 'Old Regime' : 'New Regime'}</p>
+      <p className={`${titleClass} flex items-center gap-2`}>
+        {regime === 'old' ? 'Old Regime' : 'New Regime'}
+        {sRate > 0 && (
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 normal-case tracking-normal">
+            +{sRate}% Surcharge
+          </span>
+        )}
+      </p>
       <h3 className="text-sm text-gray-500 mb-4 mt-0.5">{label}</h3>
 
       <p className={totalClass}>{fmt(result.total)}</p>
-      <p className="text-sm text-gray-400 mb-5">Effective rate: {pct(result.total, gross)}</p>
+      <p className="text-sm text-gray-400 mb-4">Effective rate: {pct(result.total, gross)}</p>
+
+      {/* Monthly in-hand */}
+      <div className="bg-gray-50 rounded-xl px-4 py-3 mb-5">
+        <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Monthly In-Hand</p>
+        <p className={`text-2xl font-bold ${colors.total}`}>{fmt(monthlyInHand)}</p>
+        {epf > 0 && (
+          <p className="text-xs text-gray-400 mt-0.5">after tax + EPF ({fmt(Math.round(epf / 12))}/mo)</p>
+        )}
+        {epf === 0 && (
+          <p className="text-xs text-gray-400 mt-0.5">after tax</p>
+        )}
+      </div>
 
       {/* Slab breakdown */}
       <div className="border-t border-gray-100 pt-4 space-y-1.5">
@@ -154,7 +184,7 @@ export default function RegimeCard({ regime, label, result, isHigher, gross }: P
         )}
         {result.surcharge > 0 && (
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Surcharge</span>
+            <span className="text-gray-500">Surcharge ({sRate}%)</span>
             <span className="text-gray-700">{fmt(result.surcharge)}</span>
           </div>
         )}

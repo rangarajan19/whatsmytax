@@ -422,12 +422,13 @@ const OLD_SLABS: Slab[] = [
 ];
 
 const NEW_SLABS: Slab[] = [
-  { limit: 300_000,   rate: 0    },
-  { limit: 700_000,   rate: 0.05 },
-  { limit: 1_000_000, rate: 0.10 },
-  { limit: 1_200_000, rate: 0.15 },
-  { limit: 1_500_000, rate: 0.20 },
-  { limit: Infinity,  rate: 0.30 },
+  { limit:   400_000, rate: 0    },  // ₹0 – ₹4L:   0%
+  { limit:   800_000, rate: 0.05 },  // ₹4L – ₹8L:  5%
+  { limit: 1_200_000, rate: 0.10 },  // ₹8L – ₹12L: 10%
+  { limit: 1_600_000, rate: 0.15 },  // ₹12L – ₹16L: 15%
+  { limit: 2_000_000, rate: 0.20 },  // ₹16L – ₹20L: 20%
+  { limit: 2_400_000, rate: 0.25 },  // ₹20L – ₹24L: 25%
+  { limit: Infinity,  rate: 0.30 },  // Above ₹24L: 30%
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────
@@ -455,12 +456,12 @@ function calcSlabTax(income: number, slabs: Slab[]): { tax: number; rows: SlabRo
 
 function rebate87A(tax: number, income: number, regime: 'old' | 'new'): number {
   if (regime === 'old' && income <= 500_000) return Math.min(tax, 12_500);
-  if (regime === 'new' && income <= 700_000) return Math.min(tax, 25_000);
+  if (regime === 'new' && income <= 1_200_000) return Math.min(tax, 60_000); // Budget 2025: full rebate up to ₹12L taxable
   return 0;
 }
 
-function calcSurcharge(tax: number, income: number): number {
-  if (income > 50_000_000) return tax * 0.37;
+function calcSurcharge(tax: number, income: number, regime: 'old' | 'new'): number {
+  if (income > 50_000_000) return tax * (regime === 'new' ? 0.25 : 0.37); // New Regime capped at 25%
   if (income > 20_000_000) return tax * 0.25;
   if (income > 10_000_000) return tax * 0.15;
   if (income > 5_000_000)  return tax * 0.10;
@@ -494,7 +495,7 @@ export function calcOldRegime(
   const { tax: baseTax, rows } = calcSlabTax(income, OLD_SLABS);
   const rebate         = rebate87A(baseTax, income, 'old');
   const taxAfterRebate = baseTax - rebate;
-  const surcharge      = calcSurcharge(taxAfterRebate, income);
+  const surcharge      = calcSurcharge(taxAfterRebate, income, 'old');
   const cess           = (taxAfterRebate + surcharge + oiResult.totalSpecialTax) * CESS;
   const specialTax     = oiResult.totalSpecialTax;
 
@@ -532,7 +533,7 @@ export function calcNewRegime(
   const { tax: baseTax, rows } = calcSlabTax(income, NEW_SLABS);
   const rebate         = rebate87A(baseTax, income, 'new');
   const taxAfterRebate = baseTax - rebate;
-  const surcharge      = calcSurcharge(taxAfterRebate, income);
+  const surcharge      = calcSurcharge(taxAfterRebate, income, 'new');
   const specialTax     = oiResult.totalSpecialTax;
   const cess           = (taxAfterRebate + surcharge + specialTax) * CESS;
 

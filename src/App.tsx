@@ -329,6 +329,7 @@ export default function App() {
                 result={result.old}
                 isHigher={oldHigher}
                 gross={result.gross}
+                epf={deductions.section80C.epf}
               />
               <RegimeCard
                 regime="new"
@@ -336,6 +337,7 @@ export default function App() {
                 result={result.new}
                 isHigher={newHigher}
                 gross={result.gross}
+                epf={deductions.section80C.epf}
               />
             </div>
 
