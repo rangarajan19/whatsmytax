@@ -31,6 +31,19 @@ function incomePercentile(annual: number): string | null {
   return null;
 }
 
+function funFact(annual: number): string {
+  if (annual <= 0)           return 'Fun Fact — Only 2% of Indians pay income tax.';
+  if (annual <= 500_000)     return 'Fun Fact — You pay zero tax! Income up to ₹5L is fully exempt under the 87A rebate.';
+  if (annual <= 700_000)     return 'Fun Fact — Under New Regime, incomes up to ₹7L attract zero tax thanks to the 87A rebate.';
+  if (annual <= 1_000_000)   return 'Fun Fact — A ₹75,000 standard deduction is automatically applied under the New Regime.';
+  if (annual <= 1_500_000)   return 'Fun Fact — Your EPF contribution counts towards 80C and can cut Old Regime tax significantly.';
+  if (annual <= 2_000_000)   return 'Fun Fact — Maxing out 80C (₹1.5L) + NPS 80CCD(1B) (₹50K) can save up to ₹62,400 in Old Regime.';
+  if (annual <= 5_000_000)   return 'Fun Fact — You earn more than 80% of India. Your taxes fund roads, schools & hospitals.';
+  if (annual <= 10_000_000)  return 'Fun Fact — You\'re in the top 5% of earners. Only 2% of Indians file income tax returns.';
+  if (annual <= 50_000_000)  return 'Fun Fact — Incomes above ₹50L attract a 10% surcharge on top of your slab tax.';
+  return 'Fun Fact — Above ₹5 Cr, the New Regime caps surcharge at 25% while Old Regime charges 37%.';
+}
+
 export default function App() {
   const [step, setStep]                     = useState<Step>('input');
   const [salary, setSalary]                 = useState('');
@@ -220,6 +233,13 @@ export default function App() {
             {percentile && !error && (
               <p className="text-[20px] font-medium text-[#003f31]/50 mt-3">
                 You are in {percentile} of income group
+              </p>
+            )}
+
+            {/* Fun fact — dynamic based on salary */}
+            {!error && (
+              <p className="text-[20px] font-medium text-[#003f31]/50 mt-6">
+                {funFact(salaryNum)}
               </p>
             )}
 
