@@ -211,7 +211,7 @@ export default function App() {
               value={salary}
               onChange={e => setSalary(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full pl-10 pr-4 py-4 text-xl font-bold text-[#003f31] rounded-xl
+              className="w-full pl-10 pr-4 py-4 text-xl font-bold text-[#003f31] rounded-none
                          border-2 border-[#003f31] bg-white/80 placeholder:text-[#003f31]/30
                          focus:outline-none focus:bg-white focus:ring-0"
             />
