@@ -200,9 +200,9 @@ export default function App() {
             Calculate your income tax and take home for FY 2025–26
           </p>
 
-          {/* Input */}
-          <div className="relative mb-3">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#003f31] text-xl font-bold z-10">₹</span>
+          {/* Input — matches Figma: lime bg, 3px border, no radius */}
+          <div className="flex items-center border-[3px] border-[#003f31] bg-[#c7ff0c] mb-3">
+            <span className="pl-3 pr-1 text-2xl font-medium text-[#003f31]/50 shrink-0 select-none">₹</span>
             <input
               type="number"
               min={0}
@@ -211,9 +211,9 @@ export default function App() {
               value={salary}
               onChange={e => setSalary(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full pl-10 pr-4 py-4 text-xl font-bold text-[#003f31] rounded-none
-                         border border-[#003f31] bg-white/80 placeholder:text-[#003f31]/30
-                         focus:outline-none focus:bg-white focus:ring-0
+              className="flex-1 bg-transparent border-none outline-none py-3.5 pr-3
+                         text-2xl font-medium text-[#003f31] placeholder:text-[#003f31]/50
+                         focus:ring-0
                          [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
