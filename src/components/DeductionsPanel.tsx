@@ -1,5 +1,9 @@
 import type { Deductions80C, EPFInput } from '../tax';
 import { total80C, MAX_80C, fmt, calcEPFContribution, epfBreakdown, EPF_RATE } from '../tax';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 // ─── EPF sub-panel ────────────────────────────────────────────────
 
@@ -28,12 +32,12 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Basic Salary input */}
         <div>
-          <label className="block text-xs font-semibold text-indigo-700 mb-1.5">
+          <Label className="block text-xs font-semibold text-indigo-700 mb-1.5">
             Annual Basic Salary
-          </label>
+          </Label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₹</span>
-            <input
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold z-10">₹</span>
+            <Input
               type="number"
               min={0}
               placeholder="e.g. 600000"
@@ -43,8 +47,8 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
                 basicSalary: parseFloat(e.target.value) || 0,
                 useCustomAmount: false,
               })}
-              className="w-full border border-indigo-200 rounded-lg pl-7 pr-3 py-2.5 text-sm font-medium bg-white
-                         focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition"
+              className="pl-7 pr-3 py-2.5 h-auto text-sm font-medium rounded-lg border-indigo-200
+                         focus-visible:ring-indigo-400"
             />
           </div>
           <p className="text-xs text-indigo-500 mt-1">
@@ -54,9 +58,9 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
 
         {/* Auto-result or manual override */}
         <div>
-          <label className="block text-xs font-semibold text-indigo-700 mb-1.5">
+          <Label className="block text-xs font-semibold text-indigo-700 mb-1.5">
             Annual EPF Contribution
-          </label>
+          </Label>
 
           {!epfInput.useCustomAmount ? (
             <>
@@ -80,33 +84,35 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
                   )}
                 </p>
               )}
-              <button
-                className="text-xs text-indigo-600 underline mt-1.5 hover:text-indigo-800"
+              <Button
+                variant="link"
+                className="text-xs text-indigo-600 p-0 h-auto underline mt-1.5 hover:text-indigo-800"
                 onClick={() => onEPFChange({ ...epfInput, useCustomAmount: true, customAmount: contribution })}
               >
                 Enter custom amount instead
-              </button>
+              </Button>
             </>
           ) : (
             <>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₹</span>
-                <input
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold z-10">₹</span>
+                <Input
                   type="number"
                   min={0}
                   placeholder="Custom EPF amount"
                   value={epfInput.customAmount === 0 ? '' : epfInput.customAmount}
                   onChange={e => onEPFChange({ ...epfInput, customAmount: parseFloat(e.target.value) || 0 })}
-                  className="w-full border border-indigo-200 rounded-lg pl-7 pr-3 py-2.5 text-sm font-medium bg-white
-                             focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition"
+                  className="pl-7 pr-3 py-2.5 h-auto text-sm font-medium rounded-lg border-indigo-200
+                             focus-visible:ring-indigo-400"
                 />
               </div>
-              <button
-                className="text-xs text-indigo-600 underline mt-1.5 hover:text-indigo-800"
+              <Button
+                variant="link"
+                className="text-xs text-indigo-600 p-0 h-auto underline mt-1.5 hover:text-indigo-800"
                 onClick={() => onEPFChange({ ...epfInput, useCustomAmount: false, customAmount: 0 })}
               >
                 ← Use auto-calculated (12% of basic)
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -175,7 +181,8 @@ export default function DeductionsPanel({ epfInput, onEPFChange, values, onChang
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7 mb-7">
+    <Card className="mb-7">
+      <CardContent className="p-7">
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
         <div>
@@ -221,22 +228,21 @@ export default function DeductionsPanel({ epfInput, onEPFChange, values, onChang
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {FIELDS.map(({ key, label, description, icon }) => (
           <div key={key}>
-            <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 mb-1.5">
+            <Label className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 mb-1.5">
               <span>{icon}</span>
               <span>{label}</span>
               <span className="font-normal text-gray-400">(per year)</span>
-            </label>
+            </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₹</span>
-              <input
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold z-10">₹</span>
+              <Input
                 type="number"
                 min={0}
                 placeholder="0"
                 value={values[key] === 0 ? '' : values[key]}
                 onChange={e => handleChange(key, e.target.value)}
-                className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm font-medium
-                           focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent
-                           transition placeholder:text-gray-300"
+                className="pl-7 pr-3 py-2.5 h-auto text-sm font-medium rounded-lg
+                           focus-visible:ring-indigo-400 placeholder:text-gray-300"
               />
             </div>
             <p className="text-xs text-gray-400 mt-1">{description}</p>
@@ -251,6 +257,7 @@ export default function DeductionsPanel({ epfInput, onEPFChange, values, onChang
           Only ₹1,50,000 will be applied as a deduction.
         </div>
       )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }

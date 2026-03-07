@@ -1,5 +1,7 @@
 import type { RegimeResult } from '../tax';
 import { fmt, pct } from '../tax';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface Props {
   regime: 'old' | 'new';
@@ -41,19 +43,19 @@ export default function RegimeCard({ regime, label, result, isHigher, gross, epf
   const tagApplied  = regime === 'old' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-400';
 
   return (
-    <div className={cardClass}>
+    <Card className={cardClass}>
       {isHigher && (
-        <span className="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full tracking-wide">
+        <Badge variant="destructive" className="absolute top-4 right-4 rounded-full px-3 py-1 text-xs font-bold tracking-wide">
           HIGHER TAX
-        </span>
+        </Badge>
       )}
 
       <p className={`${titleClass} flex items-center gap-2`}>
         {regime === 'old' ? 'Old Regime' : 'New Regime'}
         {sRate > 0 && (
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 normal-case tracking-normal">
+          <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 normal-case tracking-normal">
             +{sRate}% Surcharge
-          </span>
+          </Badge>
         )}
       </p>
       <h3 className="text-sm text-gray-500 mb-4 mt-0.5">{label}</h3>
@@ -198,7 +200,7 @@ export default function RegimeCard({ regime, label, result, isHigher, gross, epf
           <span className={totalFooter}>{fmt(result.total)}</span>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
 
