@@ -212,8 +212,9 @@ export default function App() {
               onChange={e => setSalary(e.target.value)}
               onKeyDown={handleKeyDown}
               className="w-full pl-10 pr-4 py-4 text-xl font-bold text-[#003f31] rounded-none
-                         border-2 border-[#003f31] bg-white/80 placeholder:text-[#003f31]/30
-                         focus:outline-none focus:bg-white focus:ring-0"
+                         border border-[#003f31] bg-white/80 placeholder:text-[#003f31]/30
+                         focus:outline-none focus:bg-white focus:ring-0
+                         [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
 
