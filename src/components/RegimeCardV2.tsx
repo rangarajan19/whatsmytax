@@ -1,13 +1,13 @@
+import { useState } from 'react';
 import type { RegimeResult } from '../tax';
-import { fmt, pct } from '../tax';
+import { fmt } from '../tax';
 
 interface Props {
   regime: 'old' | 'new';
   result: RegimeResult;
-  isHigher: boolean;
   gross: number;
   epf: number;
-  showBreakdown: boolean;
+  saving?: number; // shown as tag above new regime card
 }
 
 function surchargeRate(income: number, regime: 'old' | 'new'): number {
@@ -18,122 +18,124 @@ function surchargeRate(income: number, regime: 'old' | 'new'): number {
   return 0;
 }
 
-export default function RegimeCardV2({ regime, result, isHigher, gross, epf, showBreakdown }: Props) {
+export default function RegimeCardV2({ regime, result, gross, epf, saving }: Props) {
+  const [open, setOpen] = useState(false);
   const sRate = surchargeRate(result.taxableIncome, regime);
   const monthlyTax = Math.round(result.total / 12);
   const monthlyInHand = Math.round(Math.max(0, gross - result.total - epf) / 12);
-  const label = regime === 'new' ? 'New Regime' : 'Old Regime';
+  const isNew = regime === 'new';
 
   return (
-    <div
-      className={`rounded-2xl border-2 overflow-hidden font-sans
-        ${isHigher ? 'border-[#003f31] opacity-80' : 'border-[#003f31]'}`}
-      style={{ backgroundColor: '#fff' }}
-    >
-      {/* Card header */}
-      <div className="px-5 pt-5 pb-4">
-        <div className="flex items-start justify-between mb-1">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#003f31]/60">
-            {label}
-            {isHigher && (
-              <span className="ml-2 bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold tracking-normal">
-                HIGHER TAX
-              </span>
-            )}
-          </span>
-          {sRate > 0 && (
-            <span className="text-[10px] bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">
-              +{sRate}% Surcharge
-            </span>
-          )}
-        </div>
+    // Outer wrapper — New Regime gets the dark offset shadow
+    <div className="relative">
+      {isNew && (
+        <div
+          className="absolute bg-[#003f31]"
+          style={{ top: 5, left: 6, right: -6, bottom: -5 }}
+        />
+      )}
 
-        {/* Tax total */}
-        <div className="flex items-baseline justify-between mt-2">
-          <p className="text-3xl font-black text-[#003f31] tracking-tight">{fmt(result.total)}</p>
-          <p className="text-sm text-[#003f31]/50 font-medium">{fmt(monthlyTax)}<span className="text-xs">/mo</span></p>
-        </div>
-        <p className="text-xs text-[#003f31]/40 mt-0.5">Effective rate: {pct(result.total, gross)}</p>
-      </div>
-
-      {/* Take home — dark row */}
-      <div className="bg-[#003f31] px-5 py-3 flex items-center justify-between">
-        <span className="text-xs font-semibold text-[#c7ff0c]/70 uppercase tracking-wider">Take home</span>
-        <div className="text-right">
-          <span className="text-lg font-black text-[#c7ff0c]">{fmt(monthlyInHand)}</span>
-          <span className="text-xs text-[#c7ff0c]/60 ml-1">/mo</span>
-          {epf > 0 && (
-            <p className="text-[10px] text-[#c7ff0c]/40">after tax + EPF</p>
-          )}
-        </div>
-      </div>
-
-      {/* Breakdown (toggled) */}
-      {showBreakdown && (
-        <div className="px-5 py-4 border-t border-[#003f31]/10 space-y-1.5 text-sm">
-
-          {/* Slab rows */}
-          {result.rows.map((row, i) => (
-            <div key={i} className="flex justify-between">
-              <span className="text-[#003f31]/50">{row.range} @ {row.rate}</span>
-              <span className="font-medium text-[#003f31]">{fmt(row.tax)}</span>
-            </div>
-          ))}
-
-          <div className="border-t border-[#003f31]/10 pt-2 mt-2 space-y-1.5">
-            {/* Deductions */}
-            {result.stdDeduction > 0 && (
-              <BRow label="Std. Deduction" value={`− ${fmt(result.stdDeduction)}`} />
-            )}
-            {regime === 'old' && result.deduction80C > 0 && (
-              <BRow label="Sec. 80C" value={`− ${fmt(result.deduction80C)}`} />
-            )}
-            {regime === 'old' && result.deductionHRA > 0 && (
-              <BRow label="HRA Exemption" value={`− ${fmt(result.deductionHRA)}`} />
-            )}
-            {regime === 'old' && result.deduction80D > 0 && (
-              <BRow label="Sec. 80D" value={`− ${fmt(result.deduction80D)}`} />
-            )}
-            {regime === 'old' && result.deductionNPS > 0 && (
-              <BRow label="NPS 80CCD(1B)" value={`− ${fmt(result.deductionNPS)}`} />
-            )}
-            {regime === 'old' && result.deductionHomeLoan > 0 && (
-              <BRow label="Home Loan 24b" value={`− ${fmt(result.deductionHomeLoan)}`} />
-            )}
-            {regime === 'new' && (
-              <p className="text-xs text-[#003f31]/40 italic">No other deductions in New Regime</p>
-            )}
-
-            {result.otherIncomeAdded > 0 && (
-              <BRow label="Other Income" value={`+ ${fmt(result.otherIncomeAdded)}`} accent />
-            )}
-            {result.specialTax > 0 && (
-              <BRow label="Capital Gains Tax" value={`+ ${fmt(result.specialTax)}`} accent />
-            )}
-
-            <div className="border-t border-[#003f31]/10 pt-2 mt-1">
-              <BRow label="Taxable Income" value={fmt(result.taxableIncome)} bold />
-              <BRow label="Base Tax" value={fmt(result.baseTax)} />
-              {result.rebate > 0 && <BRow label="Rebate u/s 87A" value={`− ${fmt(result.rebate)}`} />}
-              {result.surcharge > 0 && <BRow label={`Surcharge (${sRate}%)`} value={fmt(result.surcharge)} />}
-              <BRow label="Health & Ed. Cess (4%)" value={fmt(result.cess)} />
-            </div>
-
-            <div className="border-t border-[#003f31] pt-2 mt-1">
-              <BRow label="Total Tax" value={fmt(result.total)} bold />
-            </div>
+      {/* Savings tag — above New Regime card */}
+      {isNew && saving && saving > 0 && (
+        <div
+          className="absolute flex items-center z-10"
+          style={{ top: -21, left: 100 }}
+        >
+          <div className="bg-[#c7ff0c] border border-[#003f31] px-2 flex items-center h-[21px]">
+            <p className="text-[14px] font-medium text-[#003f31] whitespace-nowrap leading-none">
+              You save <span className="font-bold">₹{saving.toLocaleString('en-IN')}</span> by choosing new regime
+            </p>
           </div>
         </div>
       )}
+
+      {/* Card */}
+      <div
+        className="relative bg-[#c7ff0c] border-[3px] border-[#003f31] p-3 flex flex-col gap-6"
+        style={{ minWidth: 0 }}
+      >
+        {/* Header: regime label + chevron toggle */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[14px] font-semibold text-[#003f31] uppercase tracking-wide">
+              {isNew ? 'New Regime' : 'Old Regime'}
+              {sRate > 0 && (
+                <span className="ml-2 text-[11px] font-medium normal-case bg-amber-100 text-amber-700 px-1.5 py-0.5">
+                  +{sRate}% surcharge
+                </span>
+              )}
+            </p>
+            <button
+              onClick={() => setOpen(o => !o)}
+              className="text-[14px] text-[#003f31]/60 hover:text-[#003f31] transition-colors leading-none"
+              title={open ? 'Hide breakdown' : 'Show breakdown'}
+            >
+              {open ? '▲' : '▼'}
+            </button>
+          </div>
+          <div className="flex items-end justify-between">
+            <p className="text-[42px] font-bold text-[#003f31] leading-none">
+              {fmt(result.total)}
+            </p>
+            <p className="text-[16px] font-medium text-[#003f31] text-right leading-none pb-1">
+              {fmt(monthlyTax)}/<span className="text-[14px]">m</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t-[3px] border-[#003f31] -mx-3" />
+
+        {/* Take home row */}
+        <div className="bg-[#003f31] -mx-3 -mb-3 px-2 py-1 flex items-baseline justify-between">
+          <span className={`text-[20px] text-[#c7ff0c] ${isNew ? 'font-bold' : 'font-medium'}`}>Take home</span>
+          <span className={`text-[20px] text-[#c7ff0c] ${isNew ? 'font-bold' : 'font-medium'} whitespace-nowrap`}>
+            {fmt(monthlyInHand)}
+          </span>
+        </div>
+
+        {/* Breakdown (toggled via chevron in header) */}
+        {open && (
+          <div className="border-t-[3px] border-[#003f31] -mx-3 px-3 pt-3 mt-[-24px] space-y-1.5 text-sm text-[#003f31]">
+            {result.rows.map((row, i) => (
+              <div key={i} className="flex justify-between">
+                <span className="opacity-60">{row.range} @ {row.rate}</span>
+                <span className="font-medium">{fmt(row.tax)}</span>
+              </div>
+            ))}
+            <div className="border-t border-[#003f31]/20 pt-2 space-y-1.5">
+              <BRow label="Std. Deduction" value={`− ${fmt(result.stdDeduction)}`} />
+              {regime === 'old' && result.deduction80C > 0     && <BRow label="Sec. 80C" value={`− ${fmt(result.deduction80C)}`} />}
+              {regime === 'old' && result.deductionHRA > 0     && <BRow label="HRA" value={`− ${fmt(result.deductionHRA)}`} />}
+              {regime === 'old' && result.deduction80D > 0     && <BRow label="Sec. 80D" value={`− ${fmt(result.deduction80D)}`} />}
+              {regime === 'old' && result.deductionNPS > 0     && <BRow label="NPS 80CCD(1B)" value={`− ${fmt(result.deductionNPS)}`} />}
+              {regime === 'old' && result.deductionHomeLoan > 0 && <BRow label="Home Loan 24b" value={`− ${fmt(result.deductionHomeLoan)}`} />}
+              {regime === 'new' && <p className="opacity-40 italic text-xs">No other deductions in New Regime</p>}
+              {result.otherIncomeAdded > 0 && <BRow label="Other Income" value={`+ ${fmt(result.otherIncomeAdded)}`} accent />}
+              {result.specialTax > 0      && <BRow label="Capital Gains Tax" value={`+ ${fmt(result.specialTax)}`} accent />}
+            </div>
+            <div className="border-t border-[#003f31]/20 pt-2 space-y-1.5">
+              <BRow label="Taxable Income" value={fmt(result.taxableIncome)} bold />
+              <BRow label="Base Tax" value={fmt(result.baseTax)} />
+              {result.rebate > 0    && <BRow label="Rebate u/s 87A" value={`− ${fmt(result.rebate)}`} />}
+              {result.surcharge > 0 && <BRow label={`Surcharge (${sRate}%)`} value={fmt(result.surcharge)} />}
+              <BRow label="Cess (4%)" value={fmt(result.cess)} />
+            </div>
+            <div className="border-t-[3px] border-[#003f31] pt-2">
+              <BRow label="Total Tax" value={fmt(result.total)} bold />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 function BRow({ label, value, bold, accent }: { label: string; value: string; bold?: boolean; accent?: boolean }) {
   return (
-    <div className={`flex justify-between ${bold ? 'font-bold text-[#003f31]' : ''}`}>
-      <span className={accent ? 'text-purple-600' : 'text-[#003f31]/50'}>{label}</span>
-      <span className={accent ? 'font-semibold text-purple-700' : bold ? 'text-[#003f31]' : 'text-[#003f31]/80'}>{value}</span>
+    <div className={`flex justify-between text-sm ${bold ? 'font-bold text-[#003f31]' : ''}`}>
+      <span className={accent ? 'text-purple-700' : 'text-[#003f31]/60'}>{label}</span>
+      <span className={accent ? 'font-semibold text-purple-700' : bold ? '' : 'text-[#003f31]/80'}>{value}</span>
     </div>
   );
 }
