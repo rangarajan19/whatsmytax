@@ -179,7 +179,7 @@ export default function DeductionsPanel({ epfInput, onEPFChange, values, onChang
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
         <div>
-          <h2 className="text-base font-semibold text-gray-700">
+          <h2 className="text-base font-semibold text-[#003F31]">
             Section 80C Investments
             <span className="ml-2 text-xs font-medium bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
               Old Regime Only

@@ -27,7 +27,7 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
       {/* Header */}
       <div className="flex items-center gap-2 mb-1">
         <span className="text-xl">💹</span>
-        <h2 className="text-base font-semibold text-gray-700">Other Income Sources</h2>
+        <h2 className="text-base font-semibold text-[#003F31]">Other Income Sources</h2>
         <span className="ml-1 text-xs font-medium bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
           Both Regimes
         </span>

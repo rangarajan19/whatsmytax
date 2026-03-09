@@ -78,7 +78,7 @@ export default function RegimeCard({ regime, label, result, isHigher, gross, epf
         {result.rows.map((row, i) => (
           <div key={i} className="flex justify-between text-sm">
             <span className="text-gray-500">{row.range} @ {row.rate}</span>
-            <span className="font-medium text-gray-700">{fmt(row.tax)}</span>
+            <span className="font-medium text-[#003F31]">{fmt(row.tax)}</span>
           </div>
         ))}
       </div>
@@ -168,33 +168,33 @@ export default function RegimeCard({ regime, label, result, isHigher, gross, epf
         {/* Taxable Income */}
         <div className="flex justify-between text-sm pt-1">
           <span className="text-gray-500">Taxable Income</span>
-          <span className="font-semibold text-gray-800">{fmt(result.taxableIncome)}</span>
+          <span className="font-semibold text-[#003F31]">{fmt(result.taxableIncome)}</span>
         </div>
 
         <div className="flex justify-between text-sm">
           <span className="text-gray-500">Base Tax</span>
-          <span className="text-gray-700">{fmt(result.baseTax)}</span>
+          <span className="text-[#003F31]">{fmt(result.baseTax)}</span>
         </div>
 
         {result.rebate > 0 && (
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Rebate u/s 87A</span>
-            <span className="text-gray-700">− {fmt(result.rebate)}</span>
+            <span className="text-[#003F31]">− {fmt(result.rebate)}</span>
           </div>
         )}
         {result.surcharge > 0 && (
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Surcharge ({sRate}%)</span>
-            <span className="text-gray-700">{fmt(result.surcharge)}</span>
+            <span className="text-[#003F31]">{fmt(result.surcharge)}</span>
           </div>
         )}
         <div className="flex justify-between text-sm">
           <span className="text-gray-500">Health & Ed. Cess (4%)</span>
-          <span className="text-gray-700">{fmt(result.cess)}</span>
+          <span className="text-[#003F31]">{fmt(result.cess)}</span>
         </div>
 
         <div className="flex justify-between text-sm font-bold border-t border-gray-200 pt-2 mt-1">
-          <span className="text-gray-800">Total Tax</span>
+          <span className="text-[#003F31]">Total Tax</span>
           <span className={totalFooter}>{fmt(result.total)}</span>
         </div>
       </div>

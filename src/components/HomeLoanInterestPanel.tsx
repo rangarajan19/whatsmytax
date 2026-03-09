@@ -18,7 +18,7 @@ export default function HomeLoanInterestPanel({ value, onChange }: Props) {
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7 mb-7">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-xl">🏡</span>
-        <h2 className="text-base font-semibold text-gray-700">
+        <h2 className="text-base font-semibold text-[#003F31]">
           Section 24b — Home Loan Interest
           <span className="ml-2 text-xs font-medium bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
             Old Regime Only
@@ -121,7 +121,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between text-sm">
       <span className="text-gray-500">{label}</span>
-      <span className="font-medium text-gray-700">{value}</span>
+      <span className="font-medium text-[#003F31]">{value}</span>
     </div>
   );
 }

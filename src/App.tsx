@@ -18,6 +18,7 @@ import Section80DPanel from './components/Section80DPanel';
 import NPSPanel from './components/NPSPanel';
 import HomeLoanInterestPanel from './components/HomeLoanInterestPanel';
 import OtherIncomePanel from './components/OtherIncomePanel';
+import { RippleButton } from './components/ui/ripple-button';
 
 // Annual basic = 50% of annual gross
 function inferAnnualBasic(grossAnnual: number): number {
@@ -188,7 +189,7 @@ export default function App() {
   const oiResult         = result ? result.otherIncomeResult : calcOtherIncome(EMPTY_OTHER_INCOME);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-800 font-sans">
+    <div className="min-h-screen bg-slate-50 text-[#003F31] font-sans">
 
       {/* ── Sticky mini-header ─────────────────────────────────────── */}
       <div
@@ -200,7 +201,7 @@ export default function App() {
       >
         <div className="bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-md px-4 py-3">
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-            <span className="text-sm font-bold text-gray-700 hidden sm:block">WhatsMyTax</span>
+            <span className="text-sm font-bold text-[#003F31] hidden sm:block">What's my Tax?</span>
             <div className="flex items-center gap-3 flex-1 sm:flex-none justify-center sm:justify-end">
               <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all ${oldHigher ? 'bg-red-50 border-red-300' : 'bg-cyan-50 border-cyan-200'}`}>
                 <div>
@@ -233,9 +234,9 @@ export default function App() {
       </div>
 
       {/* ── Main header ── */}
-      <header className="bg-indigo-600 text-white text-center py-5 px-4 shadow-lg">
-        <h1 className="text-3xl font-bold tracking-tight">WhatsMyTax</h1>
-        <p className="text-indigo-200 text-sm mt-1">
+      <header className="bg-[#C7FF0C] text-[#003F31] text-center py-5 px-4 shadow-lg">
+        <h1 className="text-3xl font-bold tracking-tight">What's my Tax?</h1>
+        <p className="text-[#003F31]/60 text-sm mt-1">
           Indian Income Tax Calculator — FY 2024–25 (AY 2025–26)
         </p>
       </header>
@@ -258,7 +259,7 @@ export default function App() {
                   value={salary}
                   onChange={e => setSalary(e.target.value)}
                   className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3.5 text-lg font-semibold
-                             focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent
+                             focus:outline-none focus:ring-2 focus:ring-[#003F31]/50 focus:border-transparent
                              transition placeholder:font-normal placeholder:text-base placeholder:text-gray-300"
                 />
               </div>
@@ -303,13 +304,13 @@ export default function App() {
                 <SummaryItem
                   label="Old Regime Tax"
                   value={fmt(result.old.total)}
-                  valueClass={oldHigher ? 'text-red-600' : 'text-gray-800'}
+                  valueClass={oldHigher ? 'text-red-600' : 'text-[#003F31]'}
                   sub={`Effective ${pct(result.old.total, result.gross)}`}
                 />
                 <SummaryItem
                   label="New Regime Tax"
                   value={fmt(result.new.total)}
-                  valueClass={newHigher ? 'text-red-600' : 'text-gray-800'}
+                  valueClass={newHigher ? 'text-red-600' : 'text-[#003F31]'}
                   sub={`Effective ${pct(result.new.total, result.gross)}`}
                 />
                 <SummaryItem
@@ -347,15 +348,17 @@ export default function App() {
                 <p className="text-sm text-gray-400">
                   Have investments, EPF, HRA or insurance? Reduce your Old Regime tax further.
                 </p>
-                <button
+                <RippleButton
                   onClick={handleAddDetails}
                   className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-indigo-300 text-indigo-600
                              font-semibold rounded-xl hover:bg-indigo-50 hover:border-indigo-400
                              active:scale-95 transition-all shadow-sm"
+                  rippleColor="rgba(99, 102, 241, 0.25)"
+                  duration={600}
                 >
                   <span className="text-lg">＋</span>
                   Add more details
-                </button>
+                </RippleButton>
               </div>
             )}
 
@@ -485,7 +488,7 @@ function SectionHeader({
         {step}
       </div>
       <div>
-        <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+        <p className="text-sm font-semibold text-[#003F31] flex items-center gap-1.5">
           <span>{icon}</span>
           <span>{title}</span>
         </p>
@@ -496,7 +499,7 @@ function SectionHeader({
 }
 
 function SummaryItem({
-  label, value, valueClass = 'text-gray-800', sub,
+  label, value, valueClass = 'text-[#003F31]', sub,
 }: {
   label: string; value: string; valueClass?: string; sub?: string;
 }) {

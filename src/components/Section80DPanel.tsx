@@ -26,7 +26,7 @@ export default function Section80DPanel({ value, onChange }: Props) {
       {/* Header */}
       <div className="flex items-center gap-2 mb-1">
         <span className="text-xl">🏥</span>
-        <h2 className="text-base font-semibold text-gray-700">
+        <h2 className="text-base font-semibold text-[#003F31]">
           Section 80D — Health Insurance
           <span className="ml-2 text-xs font-medium bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
             Old Regime Only
