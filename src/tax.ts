@@ -172,6 +172,94 @@ export function calcNPS80CCD1B(input: NPS80CCD1BInput): number {
   return Math.min(input.amount, MAX_NPS_80CCD1B);
 }
 
+// ─── Section 80E — Education Loan Interest ───────────────────────
+
+/**
+ * Section 80E: Interest on education loan — Old Regime only.
+ * No upper cap; full interest paid is deductible.
+ * Available for 8 years from the year of first repayment.
+ */
+export interface EducationLoanInput {
+  interestPaid: number;   // annual interest paid on education loan
+}
+
+export const EMPTY_EDUCATION_LOAN: EducationLoanInput = { interestPaid: 0 };
+
+export function calcEducationLoanDeduction(input: EducationLoanInput): number {
+  return Math.max(0, input.interestPaid);
+}
+
+// ─── Perquisite Allowances (Both Regimes) ────────────────────────
+
+/**
+ * Employer-provided perquisites governed by Rule 3 of IT Rules — Section 17(2).
+ * NOT Chapter VI-A deductions, so they apply to BOTH Old and New regimes.
+ *
+ *  Telephone/Internet — Rule 3(7)(ix):
+ *    NIL perquisite value. Full employer reimbursement is exempt.
+ *
+ *  Car + Petrol — Rule 3(2) (employer-owned/leased car, mixed use):
+ *    Fixed taxable perquisite regardless of actual cost:
+ *      ≤ 1600cc: ₹1,800/month (₹21,600/year) is TAXABLE
+ *      > 1600cc: ₹2,400/month (₹28,800/year) is TAXABLE
+ *    Exempt amount = actual cost in CTC − taxable perquisite value
+ *
+ *  Driver Salary — Rule 3(2):
+ *    ₹900/month (₹10,800/year) is TAXABLE perquisite.
+ *    Exempt amount = actual driver salary in CTC − ₹10,800
+ */
+
+/** Taxable perquisite for car (mixed official+personal use) — Rule 3(2) */
+export const CAR_PERQUISITE_SMALL = 21_600;  // ≤1600cc: ₹1,800/mo × 12
+export const CAR_PERQUISITE_LARGE = 28_800;  // >1600cc: ₹2,400/mo × 12
+/** Taxable perquisite for driver — Rule 3(2) */
+export const DRIVER_PERQUISITE    = 10_800;  // ₹900/mo × 12
+
+export type CarEngineSize = 'small' | 'large'; // ≤1600cc or >1600cc
+
+export interface PerquisiteAllowances {
+  telephoneInternet: number;        // annual telephone/internet reimbursement
+  petrolAllowance:   number;        // annual fuel/petrol cost in CTC (company car)
+  carEngineSize:     CarEngineSize; // determines taxable perquisite for car
+  driverSalary:      number;        // annual driver salary in CTC
+}
+
+export const EMPTY_PERQUISITES: PerquisiteAllowances = {
+  telephoneInternet: 0,
+  petrolAllowance:   0,
+  carEngineSize:     'large',
+  driverSalary:      0,
+};
+
+/**
+ * Returns the net EXEMPT deduction from taxable income.
+ * Telephone: fully exempt (NIL perquisite).
+ * Petrol/car: exempt = max(0, actual − car perquisite value).
+ * Driver: exempt = max(0, actual − driver perquisite value).
+ */
+export function calcPerquisiteDeduction(p: PerquisiteAllowances): number {
+  const carPerquisite = p.carEngineSize === 'large' ? CAR_PERQUISITE_LARGE : CAR_PERQUISITE_SMALL;
+  const petrolExempt  = p.petrolAllowance > 0 ? Math.max(0, p.petrolAllowance - carPerquisite) : 0;
+  const driverExempt  = p.driverSalary    > 0 ? Math.max(0, p.driverSalary    - DRIVER_PERQUISITE) : 0;
+  return Math.max(0, p.telephoneInternet) + petrolExempt + driverExempt;
+}
+
+/** Breakdown for UI display */
+export function perquisiteBreakdown(p: PerquisiteAllowances) {
+  const carPerquisite = p.carEngineSize === 'large' ? CAR_PERQUISITE_LARGE : CAR_PERQUISITE_SMALL;
+  const petrolTaxable = p.petrolAllowance > 0 ? Math.min(p.petrolAllowance, carPerquisite) : 0;
+  const petrolExempt  = p.petrolAllowance > 0 ? Math.max(0, p.petrolAllowance - carPerquisite) : 0;
+  const driverTaxable = p.driverSalary    > 0 ? Math.min(p.driverSalary,    DRIVER_PERQUISITE) : 0;
+  const driverExempt  = p.driverSalary    > 0 ? Math.max(0, p.driverSalary    - DRIVER_PERQUISITE) : 0;
+  return {
+    telephoneExempt: Math.max(0, p.telephoneInternet),
+    petrolTaxable, petrolExempt,
+    driverTaxable,  driverExempt,
+    totalExempt: Math.max(0, p.telephoneInternet) + petrolExempt + driverExempt,
+    totalTaxable: petrolTaxable + driverTaxable,
+  };
+}
+
 // ─── Section 24b — Home Loan Interest ────────────────────────────
 
 /** Max home loan interest deduction for self-occupied property */
@@ -340,12 +428,14 @@ export function calcOtherIncome(o: OtherIncome): OtherIncomeResult {
 }
 
 export interface Deductions {
-  epfInput: EPFInput;
-  section80C: Deductions80C;
-  hraInput: HRAInput;
-  section80D: Section80DInput;
-  nps80CCD1B: NPS80CCD1BInput;
-  homeLoanInterest: HomeLoanInterestInput;
+  epfInput:           EPFInput;
+  section80C:         Deductions80C;
+  hraInput:           HRAInput;
+  section80D:         Section80DInput;
+  nps80CCD1B:         NPS80CCD1BInput;
+  homeLoanInterest:   HomeLoanInterestInput;
+  educationLoan:      EducationLoanInput;      // Old regime only
+  perquisites:        PerquisiteAllowances;    // Both regimes
 }
 
 export const EMPTY_80C: Deductions80C = {
@@ -361,6 +451,8 @@ export const EMPTY_DEDUCTIONS: Deductions = {
   section80D:       { ...EMPTY_80D },
   nps80CCD1B:       { ...EMPTY_NPS },
   homeLoanInterest: { ...EMPTY_HOME_LOAN },
+  educationLoan:    { ...EMPTY_EDUCATION_LOAN },
+  perquisites:      { ...EMPTY_PERQUISITES },
 };
 
 export const EMPTY_OTHER_INCOME_RESULT: OtherIncomeResult = calcOtherIncome(EMPTY_OTHER_INCOME);
@@ -390,6 +482,8 @@ export interface RegimeResult {
   deduction80D: number;
   deductionNPS: number;
   deductionHomeLoan: number;
+  deductionEducationLoan: number; // Old regime only (Sec 80E)
+  deductionPerquisites: number;   // Both regimes (telephone + petrol + driver)
   otherIncomeAdded: number;       // other income added to slab base
   specialTax: number;             // LTCG + STCG flat tax
   taxableIncome: number;
@@ -477,19 +571,21 @@ export function calcOldRegime(
   deductions: Deductions = EMPTY_DEDUCTIONS,
   otherIncome: OtherIncome = EMPTY_OTHER_INCOME,
 ): RegimeResult {
-  const STD         = 50_000;
-  const ded80C      = effective80C(deductions.section80C);
-  const hra         = calcHRAExemption(deductions.hraInput);
-  const dedHRA      = hra.exemption;
-  const ded80D      = calc80DDeduction(deductions.section80D).total;
-  const dedNPS      = calcNPS80CCD1B(deductions.nps80CCD1B);
-  const dedHomeLoan = calcHomeLoanInterestDeduction(deductions.homeLoanInterest);
-  const oiResult    = calcOtherIncome(otherIncome);
+  const STD          = 50_000;
+  const ded80C       = effective80C(deductions.section80C);
+  const hra          = calcHRAExemption(deductions.hraInput);
+  const dedHRA       = hra.exemption;
+  const ded80D       = calc80DDeduction(deductions.section80D).total;
+  const dedNPS       = calcNPS80CCD1B(deductions.nps80CCD1B);
+  const dedHomeLoan  = calcHomeLoanInterestDeduction(deductions.homeLoanInterest);
+  const dedEduLoan   = calcEducationLoanDeduction(deductions.educationLoan);
+  const dedPerqs     = calcPerquisiteDeduction(deductions.perquisites);
+  const oiResult     = calcOtherIncome(otherIncome);
 
   const income = Math.max(0,
     gross
     + oiResult.totalAddedToIncome
-    - STD - ded80C - dedHRA - ded80D - dedNPS - dedHomeLoan
+    - STD - ded80C - dedHRA - ded80D - dedNPS - dedHomeLoan - dedEduLoan - dedPerqs
   );
 
   const { tax: baseTax, rows } = calcSlabTax(income, OLD_SLABS);
@@ -500,15 +596,17 @@ export function calcOldRegime(
   const specialTax     = oiResult.totalSpecialTax;
 
   return {
-    stdDeduction:      STD,
-    deduction80C:      ded80C,
-    deductionHRA:      dedHRA,
-    deduction80D:      ded80D,
-    deductionNPS:      dedNPS,
-    deductionHomeLoan: dedHomeLoan,
-    otherIncomeAdded:  oiResult.totalAddedToIncome,
+    stdDeduction:           STD,
+    deduction80C:           ded80C,
+    deductionHRA:           dedHRA,
+    deduction80D:           ded80D,
+    deductionNPS:           dedNPS,
+    deductionHomeLoan:      dedHomeLoan,
+    deductionEducationLoan: dedEduLoan,
+    deductionPerquisites:   dedPerqs,
+    otherIncomeAdded:       oiResult.totalAddedToIncome,
     specialTax,
-    taxableIncome:     income,
+    taxableIncome:          income,
     baseTax,
     rebate,
     surcharge,
@@ -521,14 +619,16 @@ export function calcOldRegime(
 export function calcNewRegime(
   gross: number,
   otherIncome: OtherIncome = EMPTY_OTHER_INCOME,
+  perquisites: PerquisiteAllowances = EMPTY_PERQUISITES,
 ): RegimeResult {
   const STD      = 75_000;
+  const dedPerqs = calcPerquisiteDeduction(perquisites);
   const oiResult = calcOtherIncome(otherIncome);
   // Note: 80TTA deduction NOT available in New Regime — savings interest fully taxable
   const otherAdded = otherIncome.savingsInterest + otherIncome.fdInterest
     + otherIncome.dividends
     + Math.max(0, otherIncome.rentalIncome - Math.round(otherIncome.rentalIncome * 0.30));
-  const income = Math.max(0, gross + otherAdded - STD);
+  const income = Math.max(0, gross + otherAdded - STD - dedPerqs);
 
   const { tax: baseTax, rows } = calcSlabTax(income, NEW_SLABS);
   const rebate         = rebate87A(baseTax, income, 'new');
@@ -538,15 +638,17 @@ export function calcNewRegime(
   const cess           = (taxAfterRebate + surcharge + specialTax) * CESS;
 
   return {
-    stdDeduction:      STD,
-    deduction80C:      0,
-    deductionHRA:      0,
-    deduction80D:      0,
-    deductionNPS:      0,
-    deductionHomeLoan: 0,
-    otherIncomeAdded:  otherAdded,
+    stdDeduction:           STD,
+    deduction80C:           0,
+    deductionHRA:           0,
+    deduction80D:           0,
+    deductionNPS:           0,
+    deductionHomeLoan:      0,
+    deductionEducationLoan: 0,
+    deductionPerquisites:   dedPerqs,
+    otherIncomeAdded:       otherAdded,
     specialTax,
-    taxableIncome:     income,
+    taxableIncome:          income,
     baseTax,
     rebate,
     surcharge,
