@@ -3,12 +3,14 @@ import {
   calcOldRegime, calcNewRegime, fmt, pct,
   effective80C, calcEPFContribution, calcHRAExemption,
   calc80DDeduction, calcNPS80CCD1B, calcHomeLoanInterestDeduction,
+  calcEducationLoanDeduction, calcPerquisiteDeduction,
   calcOtherIncome,
   EMPTY_DEDUCTIONS, EMPTY_OTHER_INCOME,
 } from './tax';
 import type {
   TaxResult, Deductions, Deductions80C, EPFInput, HRAInput,
   Section80DInput, NPS80CCD1BInput, HomeLoanInterestInput,
+  EducationLoanInput, PerquisiteAllowances,
   OtherIncome,
 } from './tax';
 import RegimeCard from './components/RegimeCard';
@@ -17,8 +19,14 @@ import HRAPanel from './components/HRAPanel';
 import Section80DPanel from './components/Section80DPanel';
 import NPSPanel from './components/NPSPanel';
 import HomeLoanInterestPanel from './components/HomeLoanInterestPanel';
+import EducationLoanPanel from './components/EducationLoanPanel';
+import PerquisiteAllowancesPanel from './components/PerquisiteAllowancesPanel';
 import OtherIncomePanel from './components/OtherIncomePanel';
 import { RippleButton } from './components/ui/ripple-button';
+import { Card, CardContent } from './components/ui/card';
+import { Input } from './components/ui/input';
+import { Label } from './components/ui/label';
+import { Separator } from './components/ui/separator';
 
 // Annual basic = 50% of annual gross
 function inferAnnualBasic(grossAnnual: number): number {
@@ -60,7 +68,7 @@ export default function App() {
       otherIncome: oi,
       otherIncomeResult: oiResult,
       old: calcOldRegime(gross, ded, oi),
-      new: calcNewRegime(gross, oi),
+      new: calcNewRegime(gross, oi, ded.perquisites),
     });
   }, []);
 
@@ -166,6 +174,18 @@ export default function App() {
     if (result) recalculate(result.gross, updated, otherIncomeRef.current);
   }
 
+  function handleEducationLoanChange(educationLoan: EducationLoanInput) {
+    const updated: Deductions = { ...deductions, educationLoan };
+    setDeductions(updated);
+    if (result) recalculate(result.gross, updated, otherIncomeRef.current);
+  }
+
+  function handlePerquisitesChange(perquisites: PerquisiteAllowances) {
+    const updated: Deductions = { ...deductions, perquisites };
+    setDeductions(updated);
+    if (result) recalculate(result.gross, updated, otherIncomeRef.current);
+  }
+
   function handleOtherIncomeChange(oi: OtherIncome) {
     otherIncomeRef.current = oi;
     setOtherIncome(oi);
@@ -185,7 +205,9 @@ export default function App() {
   const has80D           = result ? calc80DDeduction(result.deductions.section80D).total > 0 : false;
   const hasNPS           = result ? calcNPS80CCD1B(result.deductions.nps80CCD1B) > 0 : false;
   const hasHomeLoan      = result ? calcHomeLoanInterestDeduction(result.deductions.homeLoanInterest) > 0 : false;
-  const anyDeduction     = has80C || hasHRA || has80D || hasNPS || hasHomeLoan;
+  const hasEduLoan       = result ? calcEducationLoanDeduction(result.deductions.educationLoan) > 0 : false;
+  const hasPerquisites   = result ? calcPerquisiteDeduction(result.deductions.perquisites) > 0 : false;
+  const anyDeduction     = has80C || hasHRA || has80D || hasNPS || hasHomeLoan || hasEduLoan || hasPerquisites;
   const oiResult         = result ? result.otherIncomeResult : calcOtherIncome(EMPTY_OTHER_INCOME);
 
   return (
@@ -244,34 +266,34 @@ export default function App() {
       <div className="max-w-4xl mx-auto px-4 py-8">
 
         {/* ── Salary input ── */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7 mb-6">
-          <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
-            Gross Annual Salary (CTC)
-          </label>
-          <div className="flex flex-wrap gap-3 items-start">
-            <div className="flex-1 min-w-52">
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-lg">₹</span>
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="e.g. 1200000"
-                  value={salary}
-                  onChange={e => setSalary(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3.5 text-lg font-semibold
-                             focus:outline-none focus:ring-2 focus:ring-[#003F31]/50 focus:border-transparent
-                             transition placeholder:font-normal placeholder:text-base placeholder:text-gray-300"
-                />
+        <Card className="mb-6">
+          <CardContent className="p-7">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2 block">
+              Gross Annual Salary (CTC)
+            </Label>
+            <div className="flex flex-wrap gap-3 items-start">
+              <div className="flex-1 min-w-52">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-lg pointer-events-none">₹</span>
+                  <Input
+                    type="number"
+                    min={0}
+                    placeholder="e.g. 1200000"
+                    value={salary}
+                    onChange={e => setSalary(e.target.value)}
+                    className="pl-9 h-auto py-3.5 text-lg font-semibold rounded-xl placeholder:font-normal placeholder:text-base"
+                  />
+                </div>
+                {error && <p className="text-destructive text-xs mt-1.5">{error}</p>}
+                {!error && salary && (
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    {fmt(parseFloat(salary) / 12)}/month · Basic assumed at {fmt(inferAnnualBasic(parseFloat(salary)))}/year (50%)
+                  </p>
+                )}
               </div>
-              {error && <p className="text-red-500 text-xs mt-1.5">{error}</p>}
-              {!error && salary && (
-                <p className="text-xs text-gray-400 mt-1.5">
-                  {fmt(parseFloat(salary) / 12)}/month · Basic assumed at {fmt(inferAnnualBasic(parseFloat(salary)))}/year (50%)
-                </p>
-              )}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* ── Results ── */}
         {!result ? (
@@ -297,30 +319,32 @@ export default function App() {
             )}
 
             {/* Summary */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Tax Summary</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <SummaryItem label="Gross Salary" value={fmt(result.gross)} />
-                <SummaryItem
-                  label="Old Regime Tax"
-                  value={fmt(result.old.total)}
-                  valueClass={oldHigher ? 'text-red-600' : 'text-[#003F31]'}
-                  sub={`Effective ${pct(result.old.total, result.gross)}`}
-                />
-                <SummaryItem
-                  label="New Regime Tax"
-                  value={fmt(result.new.total)}
-                  valueClass={newHigher ? 'text-red-600' : 'text-[#003F31]'}
-                  sub={`Effective ${pct(result.new.total, result.gross)}`}
-                />
-                <SummaryItem
-                  label={betterRegime ? `Choose ${betterRegime}` : 'Both equal'}
-                  value={fmt(saving)}
-                  valueClass="text-emerald-600"
-                  sub="you save this much"
-                />
-              </div>
-            </div>
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-4">Tax Summary</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <SummaryItem label="Gross Salary" value={fmt(result.gross)} />
+                  <SummaryItem
+                    label="Old Regime Tax"
+                    value={fmt(result.old.total)}
+                    valueClass={oldHigher ? 'text-red-600' : 'text-[#003F31]'}
+                    sub={`Effective ${pct(result.old.total, result.gross)}`}
+                  />
+                  <SummaryItem
+                    label="New Regime Tax"
+                    value={fmt(result.new.total)}
+                    valueClass={newHigher ? 'text-red-600' : 'text-[#003F31]'}
+                    sub={`Effective ${pct(result.new.total, result.gross)}`}
+                  />
+                  <SummaryItem
+                    label={betterRegime ? `Choose ${betterRegime}` : 'Both equal'}
+                    value={fmt(saving)}
+                    valueClass="text-emerald-600"
+                    sub="you save this much"
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Regime cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
@@ -346,7 +370,7 @@ export default function App() {
             {!showDeductions && (
               <div className="flex flex-col items-center gap-2 py-6 mb-4">
                 <p className="text-sm text-gray-400">
-                  Have investments, EPF, HRA or insurance? Reduce your Old Regime tax further.
+                  Have EPF, HRA, investments, insurance or perquisite allowances? Fine-tune your tax.
                 </p>
                 <RippleButton
                   onClick={handleAddDetails}
@@ -365,8 +389,9 @@ export default function App() {
             {/* Disclaimer */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 text-xs text-amber-800 leading-relaxed">
               <strong>Note:</strong> Deductions applied: Standard deduction (Old: ₹50K | New: ₹75K),
-              Sec. 80C investments, HRA exemption, 80D health insurance, NPS 80CCD(1B), and Home Loan Interest (Sec. 24b).
-              Other deductions like LTA, gratuity, professional tax etc. are not included.
+              Sec. 80C investments, HRA exemption, 80D health insurance, NPS 80CCD(1B), Home Loan Interest (Sec. 24b),
+              Education Loan Interest (Sec. 80E), and employer-provided perquisites (telephone/internet, petrol, driver — Rule 3, both regimes).
+              Other items like LTA, gratuity, professional tax etc. are not included.
               Consult a CA for precise tax planning.
             </div>
           </div>
@@ -376,9 +401,22 @@ export default function App() {
         {showDeductions && (
           <div ref={detailsRef} className="mt-8 space-y-2">
 
-            <SectionDivider label="Other Income" />
+            <SectionDivider label="Both Regimes" />
 
-            {/* Other income — above deductions, applies to both regimes */}
+            {/* Perquisite Allowances — applies to both regimes */}
+            <SectionHeader
+              step="★"
+              icon="🏢"
+              title="Perquisite Allowances"
+              subtitle="Employer-provided telephone, petrol & driver — Rule 3, applies to both Old and New Regime"
+            />
+            <PerquisiteAllowancesPanel
+              values={deductions.perquisites}
+              onChange={handlePerquisitesChange}
+            />
+
+
+            {/* Other income — applies to both regimes */}
             <SectionHeader
               step="+"
               icon="💹"
@@ -455,6 +493,18 @@ export default function App() {
               onChange={handleHomeLoanChange}
             />
 
+            {/* Education Loan */}
+            <SectionHeader
+              step={6}
+              icon="🎓"
+              title="Section 80E — Education Loan Interest"
+              subtitle="Full interest deductible, no cap · Old Regime only"
+            />
+            <EducationLoanPanel
+              values={deductions.educationLoan}
+              onChange={handleEducationLoanChange}
+            />
+
           </div>
         )}
 
@@ -468,11 +518,11 @@ export default function App() {
 function SectionDivider({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3 mb-2 mt-2">
-      <div className="flex-1 h-px bg-gray-200" />
-      <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest whitespace-nowrap">
+      <Separator className="flex-1" />
+      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest whitespace-nowrap">
         {label}
       </span>
-      <div className="flex-1 h-px bg-gray-200" />
+      <Separator className="flex-1" />
     </div>
   );
 }
@@ -504,10 +554,12 @@ function SummaryItem({
   label: string; value: string; valueClass?: string; sub?: string;
 }) {
   return (
-    <div className="border border-gray-100 rounded-xl p-4 bg-slate-50">
-      <p className="text-xs text-gray-400 mb-1">{label}</p>
-      <p className={`text-lg font-bold ${valueClass}`}>{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
-    </div>
+    <Card className="rounded-xl">
+      <CardContent className="p-4">
+        <p className="text-xs text-muted-foreground mb-1">{label}</p>
+        <p className={`text-lg font-bold ${valueClass}`}>{value}</p>
+        {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
+      </CardContent>
+    </Card>
   );
 }
