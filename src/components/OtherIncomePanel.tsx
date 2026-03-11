@@ -29,7 +29,7 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
 
   return (
     <Card className="mb-7">
-      <CardContent className="p-7">
+      <CardContent className="p-4 sm:p-7">
         {/* Header */}
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">💹</span>
@@ -218,7 +218,7 @@ function IncomeRow({
     }`}>
       <div className="flex flex-wrap items-start gap-4">
         {/* Input */}
-        <div className="flex-1 min-w-48">
+        <div className="flex-1 min-w-0">
           <Label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground mb-1.5">
             <span>{icon}</span>
             <span>{label}</span>

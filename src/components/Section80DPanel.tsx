@@ -28,7 +28,7 @@ export default function Section80DPanel({ value, onChange }: Props) {
 
   return (
     <Card className="mb-7">
-      <CardContent className="p-7">
+      <CardContent className="p-4 sm:p-7">
         {/* Header */}
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">🏥</span>
@@ -43,7 +43,7 @@ export default function Section80DPanel({ value, onChange }: Props) {
           Premiums paid for health insurance. Limit is ₹25,000 (or ₹50,000 if senior citizen 60+) each for self/family and parents.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
 
           {/* Self & Family */}
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">

@@ -13,7 +13,7 @@ interface Props {
 export default function EducationLoanPanel({ values, onChange }: Props) {
   return (
     <Card className="mb-7">
-      <CardContent className="p-7">
+      <CardContent className="p-4 sm:p-7">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
           <div>
             <h2 className="text-base font-semibold text-[#003F31] flex items-center flex-wrap gap-2">

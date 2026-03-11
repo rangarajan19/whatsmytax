@@ -18,7 +18,7 @@ export default function NPSPanel({ value, onChange }: Props) {
 
   return (
     <Card className="mb-7">
-      <CardContent className="p-7">
+      <CardContent className="p-4 sm:p-7">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">🏛️</span>
           <h2 className="text-base font-semibold text-[#003F31] flex items-center flex-wrap gap-2">
@@ -33,7 +33,7 @@ export default function NPSPanel({ value, onChange }: Props) {
           Extra deduction of up to ₹50,000 exclusively for NPS (Tier I account).
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-start">
           {/* Input */}
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2 block">

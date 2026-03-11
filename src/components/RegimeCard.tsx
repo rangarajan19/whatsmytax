@@ -49,7 +49,7 @@ export default function RegimeCard({ regime, label, result, isHigher, gross, epf
         </p>
         <h3 className="text-sm text-muted-foreground mb-4 mt-0.5">{label}</h3>
 
-        <p className={`text-4xl font-bold mb-1 ${isHigher ? 'text-red-600' : colors.total}`}>{fmt(result.total)}</p>
+        <p className={`text-3xl sm:text-4xl font-bold mb-1 ${isHigher ? 'text-red-600' : colors.total}`}>{fmt(result.total)}</p>
         <p className="text-sm text-muted-foreground mb-4">Effective rate: {pct(result.total, gross)}</p>
 
         {/* Monthly in-hand */}

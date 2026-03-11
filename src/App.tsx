@@ -263,7 +263,7 @@ export default function App() {
         </p>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-4 sm:py-8">
 
         {/* ── Salary input ── */}
         <Card className="mb-6">
@@ -272,7 +272,7 @@ export default function App() {
               Gross Annual Salary (CTC)
             </Label>
             <div className="flex flex-wrap gap-3 items-start">
-              <div className="flex-1 min-w-52">
+              <div className="flex-1 min-w-0">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-lg pointer-events-none">₹</span>
                   <Input
@@ -320,7 +320,7 @@ export default function App() {
 
             {/* Summary */}
             <Card className="mb-6">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-4">Tax Summary</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <SummaryItem label="Gross Salary" value={fmt(result.gross)} />
@@ -532,7 +532,7 @@ function SectionHeader({
 }) {
   return (
     <div className="flex items-start gap-3 mb-3 mt-6">
-      <div className="flex items-center justify-center w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold shrink-0 mt-0.5">
+      <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#003F31] text-white text-xs font-bold shrink-0 mt-0.5">
         {step}
       </div>
       <div>

@@ -49,7 +49,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
 
   return (
     <Card className="mb-7">
-      <CardContent className="p-7">
+      <CardContent className="p-4 sm:p-7">
 
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-3 mb-2">

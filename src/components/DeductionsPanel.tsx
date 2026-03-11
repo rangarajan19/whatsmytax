@@ -121,7 +121,7 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
 
       {/* Stat pills */}
       {contribution > 0 && (
-        <div className="grid grid-cols-3 gap-3 mt-4">
+        <div className="grid grid-cols-3 gap-2 mt-4">
           <Stat label="Monthly deduction" value={fmt(Math.round(bd.monthlyContrib))} />
           <Stat label="Annual contribution" value={fmt(bd.annualContrib)} />
           <Stat label="% of basic" value={`${bd.pctOfBasic.toFixed(1)}%`} />
@@ -183,7 +183,7 @@ export default function DeductionsPanel({ epfInput, onEPFChange, values, onChang
 
   return (
     <Card className="mb-7">
-      <CardContent className="p-7">
+      <CardContent className="p-4 sm:p-7">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
           <div>

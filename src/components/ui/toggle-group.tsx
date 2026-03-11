@@ -53,7 +53,7 @@ function ToggleGroupItem({ value, className, children, disabled }: ToggleGroupIt
       data-state={isSelected ? "on" : "off"}
       onClick={() => ctx.onValueChange(value)}
       className={cn(
-        "flex-1 px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset disabled:pointer-events-none disabled:opacity-50",
+        "flex-1 min-h-[44px] px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset disabled:pointer-events-none disabled:opacity-50",
         isSelected
           ? "bg-primary text-primary-foreground"
           : "bg-background text-foreground hover:bg-muted",
