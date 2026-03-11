@@ -22,7 +22,7 @@ import HomeLoanInterestPanel from './components/HomeLoanInterestPanel';
 import EducationLoanPanel from './components/EducationLoanPanel';
 import PerquisiteAllowancesPanel from './components/PerquisiteAllowancesPanel';
 import OtherIncomePanel from './components/OtherIncomePanel';
-import { RippleButton } from './components/ui/ripple-button';
+import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
 import { Input } from './components/ui/input';
 import { Label } from './components/ui/label';
@@ -372,17 +372,15 @@ export default function App() {
                 <p className="text-sm text-gray-400">
                   Have EPF, HRA, investments, insurance or perquisite allowances? Fine-tune your tax.
                 </p>
-                <RippleButton
+                <Button
                   onClick={handleAddDetails}
-                  className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-indigo-300 text-indigo-600
-                             font-semibold rounded-xl hover:bg-indigo-50 hover:border-indigo-400
-                             active:scale-95 transition-all shadow-sm"
-                  rippleColor="rgba(99, 102, 241, 0.25)"
-                  duration={600}
+                  variant="outline"
+                  size="lg"
+                  className="rounded-xl shadow-sm active:scale-95"
                 >
                   <span className="text-lg">＋</span>
                   Add more details
-                </RippleButton>
+                </Button>
               </div>
             )}
 

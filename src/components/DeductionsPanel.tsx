@@ -4,6 +4,7 @@ import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 
 // ─── EPF sub-panel ────────────────────────────────────────────────
 
@@ -83,12 +84,14 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
                   )}
                 </p>
               )}
-              <button
-                className="text-xs text-indigo-600 underline mt-1.5 hover:text-indigo-800"
+              <Button
+                variant="link"
+                size="sm"
+                className="mt-1.5 h-auto px-0 text-xs text-indigo-600 hover:text-indigo-800"
                 onClick={() => onEPFChange({ ...epfInput, useCustomAmount: true, customAmount: contribution })}
               >
                 Enter custom amount instead
-              </button>
+              </Button>
             </>
           ) : (
             <>
@@ -103,12 +106,14 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
                   className="pl-7 h-auto py-2.5 text-sm font-medium bg-white border-indigo-200 focus-visible:ring-indigo-400"
                 />
               </div>
-              <button
-                className="text-xs text-indigo-600 underline mt-1.5 hover:text-indigo-800"
+              <Button
+                variant="link"
+                size="sm"
+                className="mt-1.5 h-auto px-0 text-xs text-indigo-600 hover:text-indigo-800"
                 onClick={() => onEPFChange({ ...epfInput, useCustomAmount: false, customAmount: 0 })}
               >
                 ← Use auto-calculated (12% of basic)
-              </button>
+              </Button>
             </>
           )}
         </div>

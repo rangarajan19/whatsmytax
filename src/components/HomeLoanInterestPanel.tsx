@@ -4,6 +4,7 @@ import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Badge } from './ui/badge';
+import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
 
 interface Props {
   value: HomeLoanInterestInput;
@@ -44,27 +45,20 @@ export default function HomeLoanInterestPanel({ value, onChange }: Props) {
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2 block">
                 Property Type
               </Label>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { val: true,  label: '🏠 Self-Occupied', cap: `Cap: ${fmt(MAX_HOME_LOAN_INTEREST)}` },
-                  { val: false, label: '🏘️ Let-Out',       cap: 'No cap' },
-                ].map(opt => (
-                  <button
-                    key={String(opt.val)}
-                    onClick={() => update({ isSelfOccupied: opt.val })}
-                    className={`py-2.5 px-3 rounded-xl text-sm font-semibold border transition-all text-left ${
-                      value.isSelfOccupied === opt.val
-                        ? 'bg-[#003F31] border-[#003F31] text-white shadow-sm'
-                        : 'bg-white border-border text-muted-foreground hover:border-[#003F31]/40'
-                    }`}
-                  >
-                    <div>{opt.label}</div>
-                    <div className={`text-xs font-normal mt-0.5 ${value.isSelfOccupied === opt.val ? 'text-white/70' : 'text-muted-foreground'}`}>
-                      {opt.cap}
-                    </div>
-                  </button>
-                ))}
-              </div>
+              <ToggleGroup
+                value={value.isSelfOccupied ? 'self' : 'letout'}
+                onValueChange={v => v && update({ isSelfOccupied: v === 'self' })}
+                className="w-full"
+              >
+                <ToggleGroupItem value="self" className="flex-col py-2.5 px-3 h-auto text-sm font-semibold">
+                  <span>🏠 Self-Occupied</span>
+                  <span className="text-xs font-normal opacity-70">Cap: {fmt(MAX_HOME_LOAN_INTEREST)}</span>
+                </ToggleGroupItem>
+                <ToggleGroupItem value="letout" className="flex-col py-2.5 px-3 h-auto text-sm font-semibold">
+                  <span>🏘️ Let-Out</span>
+                  <span className="text-xs font-normal opacity-70">No cap</span>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
 
             {/* Interest input */}

@@ -10,6 +10,7 @@ import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Badge } from './ui/badge';
+import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
 
 interface Props {
   values: PerquisiteAllowances;
@@ -135,24 +136,20 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
             {/* Car engine size toggle */}
             <div className="mb-4">
               <p className="text-xs font-semibold text-muted-foreground mb-2">Car Engine Capacity</p>
-              <div className="flex gap-2">
-                {(['small', 'large'] as CarEngineSize[]).map(size => (
-                  <button
-                    key={size}
-                    onClick={() => setField('carEngineSize', size)}
-                    className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold border transition-all ${
-                      values.carEngineSize === size
-                        ? 'bg-[#003F31] text-white border-[#003F31]'
-                        : 'bg-card text-muted-foreground border-border hover:border-[#003F31]/40'
-                    }`}
-                  >
-                    {size === 'small' ? '≤ 1600cc' : '> 1600cc'}
-                    <span className={`block text-xs font-normal mt-0.5 ${values.carEngineSize === size ? 'text-white/70' : 'text-muted-foreground'}`}>
-                      ₹{(( size === 'small' ? CAR_PERQUISITE_SMALL : CAR_PERQUISITE_LARGE) / 1000).toFixed(1)}K/yr taxable
-                    </span>
-                  </button>
-                ))}
-              </div>
+              <ToggleGroup
+                value={values.carEngineSize}
+                onValueChange={v => v && setField('carEngineSize', v as CarEngineSize)}
+                className="w-full"
+              >
+                <ToggleGroupItem value="small" className="flex-col py-2 px-3 h-auto text-xs font-semibold">
+                  <span>≤ 1600cc</span>
+                  <span className="font-normal opacity-70">₹{(CAR_PERQUISITE_SMALL / 1000).toFixed(1)}K/yr taxable</span>
+                </ToggleGroupItem>
+                <ToggleGroupItem value="large" className="flex-col py-2 px-3 h-auto text-xs font-semibold">
+                  <span>&gt; 1600cc</span>
+                  <span className="font-normal opacity-70">₹{(CAR_PERQUISITE_LARGE / 1000).toFixed(1)}K/yr taxable</span>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">

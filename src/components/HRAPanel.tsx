@@ -4,6 +4,7 @@ import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Badge } from './ui/badge';
+import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
 
 interface Props {
   hraInput: HRAInput;
@@ -47,21 +48,18 @@ export default function HRAPanel({ hraInput, onChange }: Props) {
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2 block">
               City Type
             </Label>
-            <div className="grid grid-cols-2 gap-2">
-              {(['metro', 'non-metro'] as CityType[]).map(ct => (
-                <button
-                  key={ct}
-                  onClick={() => update({ cityType: ct })}
-                  className={`py-2.5 rounded-lg text-sm font-semibold border transition-all ${
-                    hraInput.cityType === ct
-                      ? 'bg-[#003F31] border-[#003F31] text-white shadow-sm'
-                      : 'bg-card border-border text-muted-foreground hover:border-[#003F31]/40'
-                  }`}
-                >
-                  {ct === 'metro' ? '🌆 Metro' : '🏙️ Non-Metro'}
-                </button>
-              ))}
-            </div>
+            <ToggleGroup
+              value={hraInput.cityType}
+              onValueChange={v => v && update({ cityType: v as CityType })}
+              className="w-full"
+            >
+              <ToggleGroupItem value="metro" className="py-2.5 text-sm font-semibold">
+                🌆 Metro
+              </ToggleGroupItem>
+              <ToggleGroupItem value="non-metro" className="py-2.5 text-sm font-semibold">
+                🏙️ Non-Metro
+              </ToggleGroupItem>
+            </ToggleGroup>
             <p className="text-xs text-muted-foreground mt-2">
               {hraInput.cityType === 'metro'
                 ? `Metro cities (${METRO_CITIES.join(', ')}) → 50% of basic`
