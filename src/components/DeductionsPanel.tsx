@@ -19,12 +19,12 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
 
   return (
     <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5 mb-2">
+      <Badge className="bg-indigo-200 text-indigo-700 border-indigo-300 text-xs font-semibold mb-2">
+        Auto-calculated
+      </Badge>
       <div className="flex items-center gap-2 mb-1">
         <span className="text-lg">🏦</span>
         <h3 className="text-sm font-semibold text-indigo-800">EPF — Employee Provident Fund</h3>
-        <Badge className="ml-auto bg-indigo-200 text-indigo-700 border-indigo-300 text-xs font-semibold">
-          Auto-calculated
-        </Badge>
       </div>
       <p className="text-xs text-indigo-600 mb-4">
         Employee contributes {(EPF_RATE * 100).toFixed(0)}% of basic salary. Counts towards your 80C limit.

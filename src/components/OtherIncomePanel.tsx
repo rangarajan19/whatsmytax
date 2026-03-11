@@ -216,17 +216,17 @@ function IncomeRow({
     <div className={`rounded-xl border p-4 transition-all ${
       hasValue ? 'border-purple-200 bg-purple-50/40' : 'border-border bg-muted/20'
     }`}>
+      {isSpecial && (
+        <Badge className="bg-orange-100 text-orange-600 border-orange-200 mb-2">
+          Flat rate
+        </Badge>
+      )}
       <div className="flex flex-wrap items-start gap-4">
         {/* Input */}
         <div className="flex-1 min-w-0">
           <Label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground mb-1.5">
             <span>{icon}</span>
             <span>{label}</span>
-            {isSpecial && (
-              <Badge className="bg-orange-100 text-orange-600 border-orange-200 ml-1">
-                Flat rate
-              </Badge>
-            )}
           </Label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-sm pointer-events-none">₹</span>

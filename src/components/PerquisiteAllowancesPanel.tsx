@@ -86,15 +86,15 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
 
           {/* ── Telephone / Internet ── */}
           <div className="border border-border rounded-xl p-4">
+            <Badge className="bg-teal-100 text-teal-700 border-teal-200 font-semibold mb-2">
+              NIL perquisite
+            </Badge>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">📱</span>
               <div>
                 <p className="text-sm font-semibold text-[#003F31]">Telephone / Internet Reimbursement</p>
                 <p className="text-xs text-muted-foreground">Mobile phone &amp; internet bills paid/reimbursed by employer</p>
               </div>
-              <Badge className="ml-auto bg-teal-100 text-teal-700 border-teal-200 font-semibold shrink-0">
-                NIL perquisite
-              </Badge>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
