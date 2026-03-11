@@ -30,13 +30,13 @@ export default function Section80DPanel({ value, onChange }: Props) {
     <Card className="mb-7">
       <CardContent className="p-4 sm:p-7">
         {/* Header */}
+        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 font-medium mb-2">
+          Old Regime Only
+        </Badge>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">🏥</span>
-          <h2 className="text-base font-semibold text-[#003F31] flex items-center flex-wrap gap-2">
+          <h2 className="text-base font-semibold text-[#003F31]">
             Section 80D — Health Insurance
-            <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 font-medium">
-              Old Regime Only
-            </Badge>
           </h2>
         </div>
         <p className="text-xs text-muted-foreground mb-6">

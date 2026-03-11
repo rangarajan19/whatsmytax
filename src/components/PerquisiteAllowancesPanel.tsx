@@ -54,11 +54,11 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
           <div>
-            <h2 className="text-base font-semibold text-[#003F31] flex items-center flex-wrap gap-2">
+            <Badge className="bg-teal-100 text-teal-700 border-teal-200 font-medium mb-2">
+              Both Regimes
+            </Badge>
+            <h2 className="text-base font-semibold text-[#003F31]">
               Perquisite Allowances
-              <Badge className="bg-teal-100 text-teal-700 border-teal-200 font-medium">
-                Both Regimes
-              </Badge>
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
               Employer-provided perquisites under Rule 3, Sec. 17(2) — not Chapter VI-A, so applicable in both regimes.

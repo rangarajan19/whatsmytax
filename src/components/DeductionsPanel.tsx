@@ -187,11 +187,11 @@ export default function DeductionsPanel({ epfInput, onEPFChange, values, onChang
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
           <div>
-            <h2 className="text-base font-semibold text-[#003F31] flex items-center flex-wrap gap-2">
+            <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 font-medium mb-2">
+              Old Regime Only
+            </Badge>
+            <h2 className="text-base font-semibold text-[#003F31]">
               Section 80C Investments
-              <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 font-medium">
-                Old Regime Only
-              </Badge>
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
               Max deduction: ₹1,50,000 combined across all instruments.

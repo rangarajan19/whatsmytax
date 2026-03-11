@@ -16,11 +16,11 @@ export default function EducationLoanPanel({ values, onChange }: Props) {
       <CardContent className="p-4 sm:p-7">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
           <div>
-            <h2 className="text-base font-semibold text-[#003F31] flex items-center flex-wrap gap-2">
+            <Badge className="bg-orange-100 text-orange-700 border-orange-200 font-medium mb-2">
+              Old Regime Only
+            </Badge>
+            <h2 className="text-base font-semibold text-[#003F31]">
               Section 80E — Education Loan Interest
-              <Badge className="bg-orange-100 text-orange-700 border-orange-200 font-medium">
-                Old Regime Only
-              </Badge>
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
               Full interest deductible — no upper cap. Available for up to 8 years from first repayment.

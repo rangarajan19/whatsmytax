@@ -31,13 +31,13 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
     <Card className="mb-7">
       <CardContent className="p-4 sm:p-7">
         {/* Header */}
+        <Badge className="bg-purple-100 text-purple-700 border-purple-200 font-medium mb-2">
+          Both Regimes
+        </Badge>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">💹</span>
-          <h2 className="text-base font-semibold text-[#003F31] flex items-center flex-wrap gap-2">
+          <h2 className="text-base font-semibold text-[#003F31]">
             Other Income Sources
-            <Badge className="bg-purple-100 text-purple-700 border-purple-200 font-medium">
-              Both Regimes
-            </Badge>
           </h2>
         </div>
         <p className="text-xs text-muted-foreground mb-6">
