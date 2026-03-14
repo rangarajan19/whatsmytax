@@ -221,9 +221,9 @@ function IncomeRow({
           Flat rate
         </Badge>
       )}
-      <div className="flex flex-wrap items-start gap-4">
+      <div className="flex flex-col gap-3">
         {/* Input */}
-        <div className="flex-1 min-w-0">
+        <div>
           <Label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground mb-1.5">
             <span>{icon}</span>
             <span>{label}</span>
@@ -247,9 +247,9 @@ function IncomeRow({
           )}
         </div>
 
-        {/* Breakdown chips */}
+        {/* Breakdown chips — stacked below input */}
         {hasValue && (
-          <div className="flex flex-col gap-1.5 text-xs shrink-0 min-w-36">
+          <div className="flex flex-wrap gap-1.5 text-xs">
             {isOverThreshold && threshold !== undefined && !isSpecial && (
               <Chip
                 label={`Over threshold`}

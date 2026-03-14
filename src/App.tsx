@@ -20,8 +20,10 @@ import PerquisiteAllowancesPanel from './components/PerquisiteAllowancesPanel';
 import OtherIncomePanel from './components/OtherIncomePanel';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 
 const DETAIL_TABS = [
+  { id: 'perquisites',  label: 'Perquisites' },
   { id: 'other-income', label: 'Other Income Source' },
   { id: '80c',          label: '80C' },
   { id: 'hra',          label: 'HRA' },
@@ -29,7 +31,6 @@ const DETAIL_TABS = [
   { id: 'nps',          label: 'NPS' },
   { id: 'home-loan',    label: 'Home Loan 24b' },
   { id: 'edu-loan',     label: 'Education Loan' },
-  { id: 'perquisites',  label: 'Perquisites' },
 ];
 
 function inferAnnualBasic(grossAnnual: number): number {
@@ -189,9 +190,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background text-[#004030] font-sans">
+      <div className="md:max-w-[35vw] mx-auto">
 
       {/* ── Header ── */}
-      <header className="bg-[#B6FF00] px-4 pt-4 pb-4">
+      <header className="bg-[#B6FF00] px-4 pt-4 pb-8 rounded-b-[40px]">
         {viewMode === 'detail' ? (
           <div className="flex items-center justify-between">
             <button
@@ -258,14 +260,16 @@ export default function App() {
             <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-3">
               Tax & In-hand Salary
             </p>
-            <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} />
-            <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} />
+            <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" />
+            <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" />
             {saving > 0 && betterLabel && (
-              <p className="text-xs text-[#C44A3A] mt-2 font-medium">
-                {activeTaxTab === 'new'
-                  ? `By choosing New Regime, you save ${fmt(saving)}`
-                  : `You save ${fmt(saving)} in new regime`}
-              </p>
+              <div className="bg-card rounded-xl px-4 py-2 mt-2 ring-1 ring-foreground/10">
+                <p className="text-xs text-[#C44A3A] font-medium">
+                  {activeTaxTab === 'new'
+                    ? `By choosing New Regime, you save ${fmt(saving)}`
+                    : `You save ${fmt(saving)} in new regime`}
+                </p>
+              </div>
             )}
           </div>
 
@@ -273,34 +277,54 @@ export default function App() {
           <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider px-4 pt-4 pb-2">
             Tax Calculations
           </p>
-          <div className="flex border-b px-4">
-            <TabButton id="old" label="Old Regime" active={activeTaxTab === 'old'} onClick={setActiveTaxTab} />
-            <TabButton id="new" label="New Regime" active={activeTaxTab === 'new'} onClick={setActiveTaxTab} />
-          </div>
-          <div className="px-4 py-4 pb-28">
-            <RegimeBreakdown
-              regime={activeTaxTab}
-              label={activeTaxTab === 'old'
-                ? 'Pre-2020 slabs with deductions'
-                : 'Simplified slabs, higher std. deduction (₹75K)'}
-              result={activeTaxTab === 'old' ? result.old : result.new}
-              isHigher={activeTaxTab === 'old' ? oldHigher : newHigher}
-              gross={result.gross}
-              epf={epf}
-            />
+          <div className="mx-4 bg-card rounded-xl ring-1 ring-foreground/10 overflow-hidden">
+            <Tabs
+              value={activeTaxTab}
+              onValueChange={(v) => setActiveTaxTab(v as 'old' | 'new')}
+              className="w-full"
+            >
+              <div className="border-b px-4">
+                <TabsList variant="line" className="w-full">
+                  <TabsTrigger value="old">Old Regime</TabsTrigger>
+                  <TabsTrigger value="new">New Regime</TabsTrigger>
+                </TabsList>
+              </div>
+              <TabsContent value="old" className="px-4 py-4 pb-28 mt-0">
+                <RegimeBreakdown
+                  regime="old"
+                  label="Pre-2020 slabs with deductions"
+                  result={result.old}
+                  isHigher={oldHigher}
+                  gross={result.gross}
+                  epf={epf}
+                />
+              </TabsContent>
+              <TabsContent value="new" className="px-4 py-4 pb-28 mt-0">
+                <RegimeBreakdown
+                  regime="new"
+                  label="Simplified slabs, higher std. deduction (₹75K)"
+                  result={result.new}
+                  isHigher={newHigher}
+                  gross={result.gross}
+                  epf={epf}
+                />
+              </TabsContent>
+            </Tabs>
           </div>
 
           {/* Fixed CTA */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t px-4 py-3">
-            <Button
-              className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
-              onClick={() => {
-                setActiveDetailTab(activeTaxTab === 'old' ? '80c' : 'perquisites');
-                setViewMode('detail');
-              }}
-            >
-              {activeTaxTab === 'old' ? '+ Add Investment Details' : '+ Add Perquisite Allowances'}
-            </Button>
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+            <div className="md:max-w-[35vw] mx-auto px-4 py-3">
+              <Button
+                className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
+                onClick={() => {
+                  setActiveDetailTab('perquisites');
+                  setViewMode('detail');
+                }}
+              >
+                Next →
+              </Button>
+            </div>
           </div>
         </>
       )}
@@ -308,24 +332,27 @@ export default function App() {
       {/* ── Detail view ── */}
       {viewMode === 'detail' && (
         <>
-          {/* Horizontal tab bar */}
-          <div className="flex overflow-x-auto gap-2 px-4 py-3 border-b [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {/* Horizontal tab bar — underline style matching Figma */}
+          <div className="flex overflow-x-auto border-b border-border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {DETAIL_TABS.map(tab => (
               <button
                 key={tab.id}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                className={`relative shrink-0 px-3 py-3 text-sm transition-colors whitespace-nowrap ${
                   activeDetailTab === tab.id
-                    ? 'bg-[#004030] text-white border-[#004030]'
-                    : 'bg-white text-[#004030] border-[#004030]/30'
+                    ? 'font-semibold text-[#004030]'
+                    : 'font-medium text-[#004030]/50'
                 }`}
                 onClick={() => setActiveDetailTab(tab.id)}
               >
                 {tab.label}
+                {activeDetailTab === tab.id && (
+                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#004030]" />
+                )}
               </button>
             ))}
           </div>
 
-          {/* Panel content */}
+          {/* Panel content — strip card bg/ring so panels sit on page bg */}
           <div className="overflow-y-auto pb-24 px-4 pt-4">
             {activeDetailTab === 'other-income' && (
               <OtherIncomePanel value={otherIncome} result={oiResult} onChange={handleOtherIncomeChange} />
@@ -359,31 +386,39 @@ export default function App() {
           </div>
 
           {/* Fixed Next/Done */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t px-4 py-3">
-            <Button
-              className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
-              onClick={() => {
-                const i = DETAIL_TABS.findIndex(t => t.id === activeDetailTab);
-                if (i < DETAIL_TABS.length - 1) setActiveDetailTab(DETAIL_TABS[i + 1].id);
-                else setViewMode('main');
-              }}
-            >
-              {activeDetailTab === DETAIL_TABS.at(-1)?.id ? 'Done' : 'Next →'}
-            </Button>
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+            <div className="md:max-w-[35vw] mx-auto px-4 py-3">
+              <Button
+                className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
+                onClick={() => {
+                  const i = DETAIL_TABS.findIndex(t => t.id === activeDetailTab);
+                  if (i < DETAIL_TABS.length - 1) {
+                    setActiveDetailTab(DETAIL_TABS[i + 1].id);
+                  } else {
+                    setActiveTaxTab('old');
+                    setViewMode('main');
+                  }
+                }}
+              >
+                {activeDetailTab === DETAIL_TABS.at(-1)?.id ? 'Done' : 'Next →'}
+              </Button>
+            </div>
           </div>
         </>
       )}
+      </div>
     </div>
   );
 }
 
 // ─── Helper components ─────────────────────────────────────────────────────
 
-function TaxRow({ label, tax, inHand, isHigher }: {
-  label: string; tax: number; inHand: number; isHigher: boolean;
+function TaxRow({ label, tax, inHand, isHigher, regime }: {
+  label: string; tax: number; inHand: number; isHigher: boolean; regime: 'old' | 'new';
 }) {
+  const bg = regime === 'new' ? 'bg-[rgba(0,128,0,0.05)]' : 'bg-card ring-1 ring-foreground/10';
   return (
-    <div className="grid grid-cols-2 gap-2 mb-3 last:mb-0">
+    <div className={`grid grid-cols-2 gap-2 mb-2 last:mb-0 rounded-xl px-4 py-4 ${bg}`}>
       <div>
         <p className="text-xs text-[#004030]/50 font-medium mb-1">{label}</p>
         <p className={`text-xl font-bold ${isHigher ? 'text-[#C44A3A]' : 'text-[#004030]'}`}>
@@ -398,19 +433,3 @@ function TaxRow({ label, tax, inHand, isHigher }: {
   );
 }
 
-function TabButton({ id, label, active, onClick }: {
-  id: 'old' | 'new'; label: string; active: boolean; onClick: (id: 'old' | 'new') => void;
-}) {
-  return (
-    <button
-      className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${
-        active
-          ? 'border-[#004030] text-[#004030]'
-          : 'border-transparent text-[#004030]/40 hover:text-[#004030]/70'
-      }`}
-      onClick={() => onClick(id)}
-    >
-      {label}
-    </button>
-  );
-}
