@@ -12,7 +12,7 @@
 }
 
 :root {
-  --background: oklch(1 0 0);            /* white */
+  --background: oklch(0.97 0 0);         /* near-white — lets white cards stand out */
   --foreground: oklch(0.24 0.065 166);   /* ≈ #004030 dark green */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.24 0.065 166);

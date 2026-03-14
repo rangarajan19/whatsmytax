@@ -188,7 +188,7 @@ export default function App() {
   const showFullHeader = isEditing || !result;
 
   return (
-    <div className="min-h-screen bg-white text-[#004030] font-sans">
+    <div className="min-h-screen bg-background text-[#004030] font-sans">
 
       {/* ── Header ── */}
       <header className="bg-[#B6FF00] px-4 pt-4 pb-4">
