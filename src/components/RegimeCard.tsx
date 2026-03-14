@@ -32,7 +32,7 @@ export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf }:
 
   return (
     <>
-      <p className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${isHigher ? 'text-red-600' : colors.title}`}>
+      <p className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${isHigher ? 'text-[#C44A3A]' : colors.title}`}>
         {regime === 'old' ? 'Old Regime' : 'New Regime'}
         {sRate > 0 && (
           <Badge className="bg-amber-100 text-amber-700 border-amber-200 font-semibold normal-case tracking-normal">
@@ -42,13 +42,13 @@ export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf }:
       </p>
       <h3 className="text-sm text-muted-foreground mb-4 mt-0.5">{label}</h3>
 
-      <p className={`text-3xl sm:text-4xl font-bold mb-1 ${isHigher ? 'text-red-600' : colors.total}`}>{fmt(result.total)}</p>
+      <p className={`text-3xl sm:text-4xl font-bold mb-1 ${isHigher ? 'text-[#C44A3A]' : colors.total}`}>{fmt(result.total)}</p>
       <p className="text-sm text-muted-foreground mb-4">Effective rate: {pct(result.total, gross)}</p>
 
       {/* Monthly in-hand */}
       <div className="bg-muted/50 rounded-xl px-4 py-3 mb-5">
         <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Monthly In-Hand</p>
-        <p className={`text-2xl font-bold ${isHigher ? 'text-red-600' : colors.total}`}>{fmt(monthlyInHand)}</p>
+        <p className={`text-2xl font-bold ${isHigher ? 'text-[#C44A3A]' : colors.total}`}>{fmt(monthlyInHand)}</p>
         {epf > 0 ? (
           <p className="text-xs text-muted-foreground mt-0.5">after tax + EPF ({fmt(Math.round(epf / 12))}/mo)</p>
         ) : (
@@ -139,7 +139,7 @@ export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf }:
           <span className="text-[#004030]">{fmt(result.cess)}</span>
         </div>
 
-        <div className={`flex justify-between text-sm font-bold border-t border-border pt-2 mt-1 ${isHigher ? 'text-red-600' : colors.total}`}>
+        <div className={`flex justify-between text-sm font-bold border-t border-border pt-2 mt-1 ${isHigher ? 'text-[#C44A3A]' : colors.total}`}>
           <span className="text-[#004030]">Total Tax</span>
           <span>{fmt(result.total)}</span>
         </div>
@@ -151,10 +151,10 @@ export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf }:
 export default function RegimeCard({ regime, label, result, isHigher, gross, epf }: RegimeBreakdownProps) {
   const colors = ACCENT[regime];
   return (
-    <Card className={`relative ${isHigher ? 'border-2 border-red-300 bg-red-50' : `border-2 ${colors.border}`}`}>
+    <Card className={`relative ${isHigher ? 'border-2 border-[#C44A3A]/40 bg-[#C44A3A]/5' : `border-2 ${colors.border}`}`}>
       <CardContent className="p-6">
         {isHigher && (
-          <Badge className="absolute top-4 right-4 bg-red-600 text-white border-red-600 font-bold tracking-wide">
+          <Badge className="absolute top-4 right-4 bg-[#C44A3A] text-white border-[#C44A3A] font-bold tracking-wide">
             HIGHER TAX
           </Badge>
         )}

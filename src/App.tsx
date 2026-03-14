@@ -20,7 +20,7 @@ import PerquisiteAllowancesPanel from './components/PerquisiteAllowancesPanel';
 import OtherIncomePanel from './components/OtherIncomePanel';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
+import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
 
 const DETAIL_TABS = [
   { id: 'perquisites',  label: 'Perquisites' },
@@ -46,9 +46,7 @@ export default function App() {
   const [viewMode, setViewMode]       = useState<'main' | 'detail'>('main');
   const [activeDetailTab, setActiveDetailTab] = useState<string>('other-income');
   const [activeTaxTab, setActiveTaxTab]       = useState<'old' | 'new'>('new');
-  const [isEditing, setIsEditing]     = useState(true);
 
-  const salaryInputRef    = useRef<HTMLInputElement>(null);
   const lastInferredBasic = useRef<number>(0);
   const prefillTimer      = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestSalaryVal   = useRef<number>(0);
@@ -73,7 +71,6 @@ export default function App() {
     if (!raw || isNaN(val) || val <= 0) {
       setError(raw && val <= 0 ? 'Please enter a positive salary.' : '');
       setResult(null);
-      setIsEditing(true);
       latestSalaryVal.current = 0;
       if (prefillTimer.current) clearTimeout(prefillTimer.current);
       return;
@@ -180,13 +177,9 @@ export default function App() {
   const epf         = deductions.section80C.epf;
   const oldHigher   = result !== null && result.old.total > result.new.total;
   const newHigher   = result !== null && result.new.total > result.old.total;
-  const saving      = result ? Math.abs(result.old.total - result.new.total) : 0;
-  const betterLabel = oldHigher ? 'new regime' : newHigher ? 'old regime' : null;
   const newInHand   = result ? Math.round(Math.max(0, result.gross - result.new.total - epf) / 12) : 0;
   const oldInHand   = result ? Math.round(Math.max(0, result.gross - result.old.total - epf) / 12) : 0;
   const oiResult    = result ? result.otherIncomeResult : calcOtherIncome(EMPTY_OTHER_INCOME);
-
-  const showFullHeader = isEditing || !result;
 
   return (
     <div className="min-h-screen bg-background text-[#004030] font-sans">
@@ -206,7 +199,7 @@ export default function App() {
               Old Regime {result ? fmt(result.old.total) : ''}
             </span>
           </div>
-        ) : showFullHeader ? (
+        ) : (
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
@@ -216,38 +209,15 @@ export default function App() {
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#004030] font-semibold pointer-events-none">₹</span>
               <Input
-                ref={salaryInputRef}
                 type="number"
                 min={0}
                 placeholder="0"
                 value={salary}
                 onChange={e => setSalary(e.target.value)}
-                onBlur={() => { if (result) setIsEditing(false); }}
                 className="pl-7 h-auto py-3 text-base font-semibold bg-white border-[#004030]/20 focus-visible:ring-[#004030]/40"
               />
             </div>
             {error && <p className="text-destructive text-xs mt-1.5">{error}</p>}
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-[#004030]/60 uppercase tracking-widest">Annual Salary</p>
-              <p className="text-2xl font-bold text-[#004030] truncate mt-0.5">
-                ₹{parseInt(salary || '0').toLocaleString('en-IN')}
-              </p>
-            </div>
-            <button
-              className="p-2 rounded-lg hover:bg-[#004030]/10 transition-colors shrink-0"
-              onClick={() => {
-                setIsEditing(true);
-                setTimeout(() => salaryInputRef.current?.focus(), 50);
-              }}
-              aria-label="Edit salary"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11.333 2a1.885 1.885 0 0 1 2.667 2.667L4.667 14H2v-2.667L11.333 2Z" stroke="#004030" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
           </div>
         )}
       </header>
@@ -262,15 +232,6 @@ export default function App() {
             </p>
             <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" />
             <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" />
-            {saving > 0 && betterLabel && (
-              <div className="bg-card rounded-xl px-4 py-2 mt-2 ring-1 ring-foreground/10">
-                <p className="text-xs text-[#C44A3A] font-medium">
-                  {activeTaxTab === 'new'
-                    ? `By choosing New Regime, you save ${fmt(saving)}`
-                    : `You save ${fmt(saving)} in new regime`}
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Tax Calculations */}
@@ -278,18 +239,23 @@ export default function App() {
             Tax Calculations
           </p>
           <div className="mx-4 bg-card rounded-xl ring-1 ring-foreground/10 overflow-hidden">
-            <Tabs
-              value={activeTaxTab}
-              onValueChange={(v) => setActiveTaxTab(v as 'old' | 'new')}
-              className="w-full"
-            >
-              <div className="border-b px-4">
-                <TabsList variant="line" className="w-full">
-                  <TabsTrigger value="old">Old Regime</TabsTrigger>
-                  <TabsTrigger value="new">New Regime</TabsTrigger>
-                </TabsList>
-              </div>
-              <TabsContent value="old" className="px-4 py-4 pb-28 mt-0">
+            <div className="border-b px-4 py-3">
+              <ToggleGroup
+                value={activeTaxTab}
+                onValueChange={(v) => {
+                  if (v) {
+                    setActiveTaxTab(v as 'old' | 'new');
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                  }
+                }}
+                className="w-full"
+              >
+                <ToggleGroupItem value="old">Old Regime</ToggleGroupItem>
+                <ToggleGroupItem value="new">New Regime</ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+            <div className="px-4 py-4 pb-28">
+              {activeTaxTab === 'old' && (
                 <RegimeBreakdown
                   regime="old"
                   label="Pre-2020 slabs with deductions"
@@ -298,8 +264,8 @@ export default function App() {
                   gross={result.gross}
                   epf={epf}
                 />
-              </TabsContent>
-              <TabsContent value="new" className="px-4 py-4 pb-28 mt-0">
+              )}
+              {activeTaxTab === 'new' && (
                 <RegimeBreakdown
                   regime="new"
                   label="Simplified slabs, higher std. deduction (₹75K)"
@@ -308,8 +274,8 @@ export default function App() {
                   gross={result.gross}
                   epf={epf}
                 />
-              </TabsContent>
-            </Tabs>
+              )}
+            </div>
           </div>
 
           {/* Fixed CTA */}
