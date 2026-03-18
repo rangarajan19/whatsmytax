@@ -37,12 +37,23 @@ function inferAnnualBasic(grossAnnual: number): number {
   return Math.round(grossAnnual * 0.5);
 }
 
+const STORAGE_KEY = 'whatsmytax_v1';
+
+function loadStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as { salary: string; deductions: Deductions; otherIncome: OtherIncome };
+  } catch { return null; }
+}
+
 export default function App() {
-  const [salary, setSalary]           = useState('');
+  const saved = loadStorage();
+  const [salary, setSalary]           = useState(saved?.salary ?? '');
   const [result, setResult]           = useState<TaxResult | null>(null);
   const [error, setError]             = useState('');
-  const [deductions, setDeductions]   = useState<Deductions>({ ...EMPTY_DEDUCTIONS });
-  const [otherIncome, setOtherIncome] = useState<OtherIncome>({ ...EMPTY_OTHER_INCOME });
+  const [deductions, setDeductions]   = useState<Deductions>(saved?.deductions ?? { ...EMPTY_DEDUCTIONS });
+  const [otherIncome, setOtherIncome] = useState<OtherIncome>(saved?.otherIncome ?? { ...EMPTY_OTHER_INCOME });
   const [viewMode, setViewMode]       = useState<'main' | 'detail'>('main');
   const [activeDetailTab, setActiveDetailTab] = useState<string>('other-income');
   const [activeTaxTab, setActiveTaxTab]       = useState<'old' | 'new'>('new');
@@ -50,7 +61,14 @@ export default function App() {
   const lastInferredBasic = useRef<number>(0);
   const prefillTimer      = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestSalaryVal   = useRef<number>(0);
-  const otherIncomeRef    = useRef<OtherIncome>(EMPTY_OTHER_INCOME);
+  const otherIncomeRef    = useRef<OtherIncome>(saved?.otherIncome ?? EMPTY_OTHER_INCOME);
+
+  // ── Persist state to localStorage ────────────────────────────────
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ salary, deductions, otherIncome }));
+    } catch { /* storage full — ignore */ }
+  }, [salary, deductions, otherIncome]);
 
   // ── Live recalculation ───────────────────────────────────────────
   const recalculate = useCallback((gross: number, ded: Deductions, oi: OtherIncome) => {
@@ -353,9 +371,23 @@ export default function App() {
 
           {/* Fixed Next/Done */}
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
-            <div className="md:max-w-[35vw] mx-auto px-4 py-3">
+            <div className="md:max-w-[35vw] mx-auto px-4 py-3 flex gap-3">
               <Button
-                className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
+                variant="outline"
+                className="h-12 px-5 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 active:scale-[0.98]"
+                onClick={() => {
+                  const i = DETAIL_TABS.findIndex(t => t.id === activeDetailTab);
+                  if (i > 0) {
+                    setActiveDetailTab(DETAIL_TABS[i - 1].id);
+                  } else {
+                    setViewMode('main');
+                  }
+                }}
+              >
+                ← Back
+              </Button>
+              <Button
+                className="flex-1 h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
                 onClick={() => {
                   const i = DETAIL_TABS.findIndex(t => t.id === activeDetailTab);
                   if (i < DETAIL_TABS.length - 1) {
