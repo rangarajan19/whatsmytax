@@ -323,6 +323,8 @@ export interface OtherIncome {
   rentalIncome: number;        // gross annual rent received
   ltcgEquity: number;          // long-term capital gains on listed equity / equity MFs
   stcgEquity: number;          // short-term capital gains on listed equity / equity MFs
+  ltcgOther: number;           // LTCG on property / gold / unlisted — flat 12.5% (post Budget 2024)
+  stcgOther: number;           // STCG on debt MFs / property / other assets — taxed at slab rate
   isSenior: boolean;           // 60+ — changes 80TTB limit and FD TDS threshold
 }
 
@@ -333,6 +335,8 @@ export const EMPTY_OTHER_INCOME: OtherIncome = {
   rentalIncome: 0,
   ltcgEquity: 0,
   stcgEquity: 0,
+  ltcgOther: 0,
+  stcgOther: 0,
   isSenior: false,
 };
 
@@ -359,8 +363,13 @@ export interface OtherIncomeResult {
   stcgEquity: number;              // raw STCG — taxed at flat 20% (separate from slabs)
   stcgTax: number;
 
+  ltcgOther: number;               // raw LTCG on property/gold/unlisted — flat 12.5%
+  ltcgOtherTax: number;
+  stcgOther: number;               // raw STCG on debt/other — added to slab income
+  taxableStcgOther: number;
+
   totalAddedToIncome: number;      // amount added to slab-taxed income
-  totalSpecialTax: number;         // LTCG + STCG flat tax (outside slabs)
+  totalSpecialTax: number;         // all flat-rate capital gains tax (outside slabs)
 }
 
 export function calcOtherIncome(o: OtherIncome): OtherIncomeResult {
@@ -400,10 +409,16 @@ export function calcOtherIncome(o: OtherIncome): OtherIncomeResult {
   // STCG on listed equity — flat 20% (post Budget 2024)
   const stcgTax = Math.round(o.stcgEquity * 0.20);
 
-  const totalAddedToIncome =
-    effectiveSavingsTaxable + taxableFDInterest + taxableDividends + taxableRental;
+  // LTCG on other assets (property / gold / unlisted shares) — flat 12.5% (post Budget 2024, no indexation)
+  const ltcgOtherTax = Math.round(o.ltcgOther * 0.125);
 
-  const totalSpecialTax = ltcgTax + stcgTax;
+  // STCG on other assets (debt MFs / property held < 2 yrs / other) — at slab rate
+  const taxableStcgOther = o.stcgOther;
+
+  const totalAddedToIncome =
+    effectiveSavingsTaxable + taxableFDInterest + taxableDividends + taxableRental + taxableStcgOther;
+
+  const totalSpecialTax = ltcgTax + stcgTax + ltcgOtherTax;
 
   return {
     savingsInterest:      o.savingsInterest,
@@ -422,6 +437,10 @@ export function calcOtherIncome(o: OtherIncome): OtherIncomeResult {
     ltcgTax,
     stcgEquity:           o.stcgEquity,
     stcgTax,
+    ltcgOther:            o.ltcgOther,
+    ltcgOtherTax,
+    stcgOther:            o.stcgOther,
+    taxableStcgOther,
     totalAddedToIncome,
     totalSpecialTax,
   };

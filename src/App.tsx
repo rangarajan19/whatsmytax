@@ -18,19 +18,21 @@ import HomeLoanInterestPanel from './components/HomeLoanInterestPanel';
 import EducationLoanPanel from './components/EducationLoanPanel';
 import PerquisiteAllowancesPanel from './components/PerquisiteAllowancesPanel';
 import OtherIncomePanel from './components/OtherIncomePanel';
+import CapitalGainsPanel from './components/CapitalGainsPanel';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
 
 const DETAIL_TABS = [
-  { id: 'perquisites',  label: 'Perquisites' },
-  { id: 'other-income', label: 'Other Income Source' },
-  { id: '80c',          label: '80C' },
-  { id: 'hra',          label: 'HRA' },
-  { id: '80d',          label: '80D' },
-  { id: 'nps',          label: 'NPS' },
-  { id: 'home-loan',    label: 'Home Loan 24b' },
-  { id: 'edu-loan',     label: 'Education Loan' },
+  { id: 'perquisites',    label: 'Perquisites' },
+  { id: 'other-income',  label: 'Other Income' },
+  { id: 'capital-gains', label: 'Capital Gains' },
+  { id: '80c',           label: '80C' },
+  { id: 'hra',           label: 'HRA' },
+  { id: '80d',           label: '80D' },
+  { id: 'nps',           label: 'NPS' },
+  { id: 'home-loan',     label: 'Home Loan 24b' },
+  { id: 'edu-loan',      label: 'Education Loan' },
 ];
 
 function inferAnnualBasic(grossAnnual: number): number {
@@ -243,6 +245,11 @@ export default function App() {
       {/* ── Main view ── */}
       {result && viewMode === 'main' && (
         <>
+          {/* Finance Act label */}
+          <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-1">
+            FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
+          </p>
+
           {/* Tax & In-hand Salary */}
           <div className="px-4 py-4 border-b">
             <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-3">
@@ -316,6 +323,24 @@ export default function App() {
       {/* ── Detail view ── */}
       {viewMode === 'detail' && (
         <>
+          {/* Progress indicator */}
+          {(() => {
+            const i = DETAIL_TABS.findIndex(t => t.id === activeDetailTab);
+            return (
+              <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+                <div className="flex-1 h-1 bg-[#004030]/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#004030] rounded-full transition-all duration-300"
+                    style={{ width: `${((i + 1) / DETAIL_TABS.length) * 100}%` }}
+                  />
+                </div>
+                <span className="text-[10px] font-semibold text-[#004030]/50 shrink-0">
+                  {i + 1} / {DETAIL_TABS.length}
+                </span>
+              </div>
+            );
+          })()}
+
           {/* Horizontal tab bar — underline style matching Figma */}
           <div className="flex overflow-x-auto border-b border-border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {DETAIL_TABS.map(tab => (
@@ -340,6 +365,9 @@ export default function App() {
           <div className="overflow-y-auto pb-24 px-4 pt-4">
             {activeDetailTab === 'other-income' && (
               <OtherIncomePanel value={otherIncome} result={oiResult} onChange={handleOtherIncomeChange} />
+            )}
+            {activeDetailTab === 'capital-gains' && (
+              <CapitalGainsPanel value={otherIncome} result={oiResult} onChange={handleOtherIncomeChange} />
             )}
             {activeDetailTab === '80c' && (
               <DeductionsPanel

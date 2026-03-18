@@ -3,7 +3,6 @@ import {
   MAX_80TTA, MAX_80TTB,
   FD_TDS_THRESHOLD, FD_TDS_THRESHOLD_SENIOR,
   DIVIDEND_TDS_THRESHOLD,
-  LTCG_EQUITY_EXEMPTION,
   fmt,
 } from '../tax';
 import { Card, CardContent } from './ui/card';
@@ -24,8 +23,7 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
   }
 
   const hasAny = value.savingsInterest > 0 || value.fdInterest > 0
-    || value.dividends > 0 || value.rentalIncome > 0
-    || value.ltcgEquity > 0 || value.stcgEquity > 0;
+    || value.dividends > 0 || value.rentalIncome > 0;
 
   return (
     <Card className="mb-7">
@@ -126,40 +124,11 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
             tdsNote={undefined}
           />
 
-          {/* LTCG */}
-          <IncomeRow
-            icon="📊"
-            label="LTCG — Listed Equity / Equity MFs"
-            value={value.ltcgEquity}
-            onChange={v => update({ ltcgEquity: v })}
-            taxable={result.taxableLTCG}
-            deduction={result.ltcgExemption}
-            specialTax={result.ltcgTax}
-            info={`First ${fmt(LTCG_EQUITY_EXEMPTION)}/year is exempt. Gains above that taxed at flat 12.5% — does NOT go through income slabs`}
-            threshold={LTCG_EQUITY_EXEMPTION}
-            tdsNote={undefined}
-            isSpecial
-          />
-
-          {/* STCG */}
-          <IncomeRow
-            icon="⚡"
-            label="STCG — Listed Equity / Equity MFs"
-            value={value.stcgEquity}
-            onChange={v => update({ stcgEquity: v })}
-            taxable={value.stcgEquity}
-            deduction={0}
-            specialTax={result.stcgTax}
-            info={`Taxed at flat 20% regardless of your income slab (post Budget 2024) — does NOT go through income slabs`}
-            threshold={undefined}
-            tdsNote={undefined}
-            isSpecial
-          />
         </div>
 
         {/* Summary */}
         {hasAny && (
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="mt-6">
             <div className="bg-purple-50 border border-purple-200 rounded-xl px-4 py-3">
               <p className="text-xs font-semibold text-purple-600 uppercase tracking-wider mb-1">
                 Added to slab income
@@ -167,15 +136,6 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
               <p className="text-xl font-bold text-purple-800">{fmt(result.totalAddedToIncome)}</p>
               <p className="text-xs text-purple-500 mt-0.5">Taxed at your applicable slab rate</p>
             </div>
-            {result.totalSpecialTax > 0 && (
-              <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
-                <p className="text-xs font-semibold text-orange-600 uppercase tracking-wider mb-1">
-                  Capital gains flat tax
-                </p>
-                <p className="text-xl font-bold text-orange-800">{fmt(result.totalSpecialTax)}</p>
-                <p className="text-xs text-orange-500 mt-0.5">LTCG @ 12.5% + STCG @ 20% (+ 4% cess)</p>
-              </div>
-            )}
           </div>
         )}
 
