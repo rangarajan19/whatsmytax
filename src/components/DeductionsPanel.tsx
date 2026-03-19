@@ -1,10 +1,9 @@
 import type { Deductions80C, EPFInput } from '../tax';
-import { total80C, MAX_80C, fmt, calcEPFContribution, epfBreakdown, EPF_RATE } from '../tax';
+import { total80C, MAX_80C, fmt, calcEPFContribution, EPF_RATE } from '../tax';
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Badge } from './ui/badge';
-import { Button } from './ui/button';
 
 // ─── EPF sub-panel ────────────────────────────────────────────────
 
@@ -14,14 +13,24 @@ interface EPFPanelProps {
 }
 
 export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
-  const bd = epfBreakdown(epfInput);
+  const autoContrib = epfInput.basicSalary > 0
+    ? Math.round(epfInput.basicSalary * EPF_RATE)
+    : 0;
   const contribution = calcEPFContribution(epfInput);
+  const displayedEPF = epfInput.useCustomAmount ? epfInput.customAmount : autoContrib;
+
+  function handleBasicChange(val: number) {
+    onEPFChange({ ...epfInput, basicSalary: val, useCustomAmount: false, customAmount: 0 });
+  }
+
+  function handleEPFAmountChange(val: number) {
+    // If the user typed the same value as auto-calc, treat as non-custom
+    const isAutoValue = epfInput.basicSalary > 0 && val === autoContrib;
+    onEPFChange({ ...epfInput, customAmount: val, useCustomAmount: !isAutoValue && val > 0 });
+  }
 
   return (
     <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5 mb-2">
-      <Badge className="bg-indigo-200 text-indigo-700 border-indigo-300 text-xs font-semibold mb-2">
-        Auto-calculated
-      </Badge>
       <div className="flex items-center gap-2 mb-1">
         <span className="text-lg">🏦</span>
         <h3 className="text-sm font-semibold text-indigo-800">EPF — Employee Provident Fund</h3>
@@ -41,90 +50,59 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
             <Input
               type="number"
               min={0}
-              placeholder="e.g. 600000"
+              placeholder="e.g. 480000"
               value={epfInput.basicSalary === 0 ? '' : epfInput.basicSalary}
-              onChange={e => onEPFChange({
-                ...epfInput,
-                basicSalary: parseFloat(e.target.value) || 0,
-                useCustomAmount: false,
-              })}
+              onChange={e => handleBasicChange(parseFloat(e.target.value) || 0)}
               className="pl-7 h-auto py-2.5 text-sm font-medium bg-white border-indigo-200 focus-visible:ring-indigo-400"
             />
           </div>
           <p className="text-xs text-indigo-500 mt-1">
-            Usually 40–50% of gross CTC
+            Auto-set to 40% of gross — edit if yours differs
           </p>
         </div>
 
-        {/* Auto-result or manual override */}
+        {/* EPF Contribution — always editable */}
         <div>
-          <Label className="text-xs font-semibold text-indigo-700 mb-1.5 block">
+          <Label className="text-xs font-semibold text-indigo-700 mb-1.5 flex items-center gap-1.5">
             Annual EPF Contribution
+            {epfInput.useCustomAmount && (
+              <span className="bg-amber-100 text-amber-700 border border-amber-200 text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                Custom
+              </span>
+            )}
           </Label>
-
-          {!epfInput.useCustomAmount ? (
-            <>
-              <div className="bg-white border border-indigo-200 rounded-lg px-4 py-2.5 flex items-center justify-between">
-                <span className="text-sm font-bold text-indigo-700">
-                  {contribution > 0 ? fmt(contribution) : '—'}
-                </span>
-                {contribution > 0 && (
-                  <span className="text-xs text-indigo-500">
-                    {fmt(Math.round(contribution / 12))}/mo
-                  </span>
-                )}
-              </div>
-              {contribution > 0 && (
-                <p className="text-xs text-indigo-500 mt-1">
-                  {(EPF_RATE * 100).toFixed(0)}% × {fmt(epfInput.basicSalary)} annual basic
-                  {bd.isCapped && (
-                    <span className="text-amber-600 ml-1">
-                      · Basic &gt; ₹15K/mo ceiling; EPF still auto-deducted
-                    </span>
-                  )}
-                </p>
-              )}
-              <Button
-                variant="link"
-                size="sm"
-                className="mt-1.5 h-auto px-0 text-xs text-indigo-600 hover:text-indigo-800"
-                onClick={() => onEPFChange({ ...epfInput, useCustomAmount: true, customAmount: contribution })}
-              >
-                Enter custom amount instead
-              </Button>
-            </>
-          ) : (
-            <>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-semibold pointer-events-none">₹</span>
-                <Input
-                  type="number"
-                  min={0}
-                  placeholder="Custom EPF amount"
-                  value={epfInput.customAmount === 0 ? '' : epfInput.customAmount}
-                  onChange={e => onEPFChange({ ...epfInput, customAmount: parseFloat(e.target.value) || 0 })}
-                  className="pl-7 h-auto py-2.5 text-sm font-medium bg-white border-indigo-200 focus-visible:ring-indigo-400"
-                />
-              </div>
-              <Button
-                variant="link"
-                size="sm"
-                className="mt-1.5 h-auto px-0 text-xs text-indigo-600 hover:text-indigo-800"
-                onClick={() => onEPFChange({ ...epfInput, useCustomAmount: false, customAmount: 0 })}
-              >
-                ← Use auto-calculated (12% of basic)
-              </Button>
-            </>
-          )}
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-semibold pointer-events-none">₹</span>
+            <Input
+              type="number"
+              min={0}
+              placeholder={autoContrib > 0 ? String(autoContrib) : '0'}
+              value={displayedEPF === 0 ? '' : displayedEPF}
+              onChange={e => handleEPFAmountChange(parseFloat(e.target.value) || 0)}
+              className="pl-7 h-auto py-2.5 text-sm font-medium bg-white border-indigo-200 focus-visible:ring-indigo-400"
+            />
+          </div>
+          <p className="text-xs text-indigo-500 mt-1">
+            {epfInput.useCustomAmount
+              ? <button
+                  type="button"
+                  className="underline text-indigo-600 hover:text-indigo-800"
+                  onClick={() => onEPFChange({ ...epfInput, useCustomAmount: false, customAmount: 0 })}
+                >Reset to auto ({autoContrib > 0 ? fmt(autoContrib) : '12% of basic'})</button>
+              : autoContrib > 0
+                ? `Auto: ${(EPF_RATE * 100).toFixed(0)}% × ${fmt(epfInput.basicSalary)}`
+                : 'Enter basic salary to auto-calculate'
+            }
+          </p>
         </div>
       </div>
 
       {/* Stat pills */}
       {contribution > 0 && (
         <div className="grid grid-cols-3 gap-2 mt-4">
-          <Stat label="Monthly deduction" value={fmt(Math.round(bd.monthlyContrib))} />
-          <Stat label="Annual contribution" value={fmt(bd.annualContrib)} />
-          <Stat label="% of basic" value={`${bd.pctOfBasic.toFixed(1)}%`} />
+          <Stat label="Monthly deduction" value={fmt(Math.round(contribution / 12))} />
+          <Stat label="Annual contribution" value={fmt(contribution)} />
+          <Stat label="% of basic" value={epfInput.basicSalary > 0 ? `${((contribution / epfInput.basicSalary) * 100).toFixed(1)}%` : '—'} />
         </div>
       )}
     </div>

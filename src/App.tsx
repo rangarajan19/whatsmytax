@@ -36,7 +36,7 @@ const DETAIL_TABS = [
 ];
 
 function inferAnnualBasic(grossAnnual: number): number {
-  return Math.round(grossAnnual * 0.5);
+  return Math.round(grossAnnual * 0.40);
 }
 
 const STORAGE_KEY = 'whatsmytax_v1';
