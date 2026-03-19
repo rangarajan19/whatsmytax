@@ -19,6 +19,7 @@ import EducationLoanPanel from './components/EducationLoanPanel';
 import PerquisiteAllowancesPanel from './components/PerquisiteAllowancesPanel';
 import OtherIncomePanel from './components/OtherIncomePanel';
 import CapitalGainsPanel from './components/CapitalGainsPanel';
+import CTCHelper from './components/CTCHelper';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
@@ -238,6 +239,7 @@ export default function App() {
               />
             </div>
             {error && <p className="text-destructive text-xs mt-1.5">{error}</p>}
+            <CTCHelper onUseGross={gross => setSalary(String(gross))} />
           </div>
         )}
       </header>
