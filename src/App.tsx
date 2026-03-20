@@ -250,7 +250,20 @@ export default function App() {
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
               Income Tax Calculator — FY 2024–25 (AY 2025–26)
             </p>
-            <p className="text-xs font-semibold text-[#004030]/70 mb-1.5">Gross Annual Salary <span className="font-normal opacity-60">(enter 0 if freelance only)</span></p>
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-xs font-semibold text-[#004030]/70">Gross Annual Salary</p>
+              <button
+                type="button"
+                className="text-xs font-semibold text-[#004030] underline underline-offset-2 hover:opacity-70"
+                onClick={() => {
+                  setSalary('0');
+                  setActiveDetailTab('freelance');
+                  setViewMode('detail');
+                }}
+              >
+                Freelance only? →
+              </button>
+            </div>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#004030] font-semibold pointer-events-none">₹</span>
               <Input
@@ -329,21 +342,30 @@ export default function App() {
             </div>
           </div>
 
-          {/* Fixed CTA */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
-            <div className="md:max-w-[35vw] mx-auto px-4 py-3">
-              <Button
-                className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
-                onClick={() => {
-                  setActiveDetailTab('perquisites');
-                  setViewMode('detail');
-                }}
-              >
-                Next →
-              </Button>
-            </div>
-          </div>
         </>
+      )}
+
+      {/* Fixed CTA — always visible on main view */}
+      {viewMode === 'main' && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+          <div className="md:max-w-[35vw] mx-auto px-4 py-3">
+            <Button
+              className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
+              onClick={() => {
+                if (!result) {
+                  // Pure freelancer — set salary to 0, go straight to Freelance tab
+                  setSalary('0');
+                  setActiveDetailTab('freelance');
+                } else {
+                  setActiveDetailTab('perquisites');
+                }
+                setViewMode('detail');
+              }}
+            >
+              {result ? 'Next →' : 'Add income details →'}
+            </Button>
+          </div>
+        </div>
       )}
 
       {/* ── Detail view ── */}
