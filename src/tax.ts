@@ -476,6 +476,54 @@ export const EMPTY_DEDUCTIONS: Deductions = {
 
 export const EMPTY_OTHER_INCOME_RESULT: OtherIncomeResult = calcOtherIncome(EMPTY_OTHER_INCOME);
 
+// ─── Freelance / Self-employed Income ────────────────────────────
+
+export type FreelanceScheme = '44ADA' | '44AD' | 'manual' | 'none';
+
+export interface FreelanceIncome {
+  scheme: FreelanceScheme;
+  grossReceipts: number;  // 44ADA: professional receipts; 44AD: business turnover
+  digitalPct: number;     // 44AD only: % received digitally (6% rate vs 8% for cash)
+  manualProfit: number;   // manual: actual declared net profit
+}
+
+export const EMPTY_FREELANCE: FreelanceIncome = {
+  scheme: 'none',
+  grossReceipts: 0,
+  digitalPct: 100,
+  manualProfit: 0,
+};
+
+export interface FreelanceResult {
+  scheme: FreelanceScheme;
+  taxableIncome: number;   // amount added to slab income
+  limitExceeded: boolean;  // receipts exceeded scheme eligibility limit
+  limit: number;
+}
+
+export function calcFreelanceIncome(f: FreelanceIncome): FreelanceResult {
+  switch (f.scheme) {
+    case '44ADA': {
+      const limit = 7_500_000;                        // ₹75L (FY 2024-25)
+      const limitExceeded = f.grossReceipts > limit;
+      const taxableIncome = Math.round(f.grossReceipts * 0.50); // 50% presumptive always shown; warn if over limit
+      return { scheme: '44ADA', taxableIncome, limitExceeded, limit };
+    }
+    case '44AD': {
+      const limit = 30_000_000;                       // ₹3Cr (digital-heavy)
+      const limitExceeded = f.grossReceipts > limit;
+      const digitalAmt = Math.round(f.grossReceipts * (f.digitalPct / 100));
+      const cashAmt    = f.grossReceipts - digitalAmt;
+      const taxableIncome = Math.round(digitalAmt * 0.06 + cashAmt * 0.08);
+      return { scheme: '44AD', taxableIncome, limitExceeded, limit };
+    }
+    case 'manual':
+      return { scheme: 'manual', taxableIncome: f.manualProfit, limitExceeded: false, limit: 0 };
+    default:
+      return { scheme: 'none', taxableIncome: 0, limitExceeded: false, limit: 0 };
+  }
+}
+
 /** Max allowed under Section 80C */
 export const MAX_80C = 150_000;
 
@@ -504,6 +552,7 @@ export interface RegimeResult {
   deductionEducationLoan: number; // Old regime only (Sec 80E)
   deductionPerquisites: number;   // Both regimes (telephone + petrol + driver)
   otherIncomeAdded: number;       // other income added to slab base
+  freelanceIncomeAdded: number;   // freelance / self-employed income added to slab base
   specialTax: number;             // LTCG + STCG flat tax
   taxableIncome: number;
   baseTax: number;
@@ -519,6 +568,8 @@ export interface TaxResult {
   deductions: Deductions;
   otherIncome: OtherIncome;
   otherIncomeResult: OtherIncomeResult;
+  freelanceIncome: FreelanceIncome;
+  freelanceResult: FreelanceResult;
   old: RegimeResult;
   new: RegimeResult;
 }
@@ -589,8 +640,10 @@ export function calcOldRegime(
   gross: number,
   deductions: Deductions = EMPTY_DEDUCTIONS,
   otherIncome: OtherIncome = EMPTY_OTHER_INCOME,
+  freelance: FreelanceIncome = EMPTY_FREELANCE,
 ): RegimeResult {
-  const STD          = 50_000;
+  // Standard deduction only applies to salary/pension income (not freelance)
+  const STD          = gross > 0 ? 50_000 : 0;
   const ded80C       = effective80C(deductions.section80C);
   const hra          = calcHRAExemption(deductions.hraInput);
   const dedHRA       = hra.exemption;
@@ -600,10 +653,12 @@ export function calcOldRegime(
   const dedEduLoan   = calcEducationLoanDeduction(deductions.educationLoan);
   const dedPerqs     = calcPerquisiteDeduction(deductions.perquisites);
   const oiResult     = calcOtherIncome(otherIncome);
+  const flResult     = calcFreelanceIncome(freelance);
 
   const income = Math.max(0,
     gross
     + oiResult.totalAddedToIncome
+    + flResult.taxableIncome
     - STD - ded80C - dedHRA - ded80D - dedNPS - dedHomeLoan - dedEduLoan - dedPerqs
   );
 
@@ -624,6 +679,7 @@ export function calcOldRegime(
     deductionEducationLoan: dedEduLoan,
     deductionPerquisites:   dedPerqs,
     otherIncomeAdded:       oiResult.totalAddedToIncome,
+    freelanceIncomeAdded:   flResult.taxableIncome,
     specialTax,
     taxableIncome:          income,
     baseTax,
@@ -639,15 +695,19 @@ export function calcNewRegime(
   gross: number,
   otherIncome: OtherIncome = EMPTY_OTHER_INCOME,
   perquisites: PerquisiteAllowances = EMPTY_PERQUISITES,
+  freelance: FreelanceIncome = EMPTY_FREELANCE,
 ): RegimeResult {
-  const STD      = 75_000;
+  // Standard deduction only applies to salary/pension income (not freelance)
+  const STD      = gross > 0 ? 75_000 : 0;
   const dedPerqs = calcPerquisiteDeduction(perquisites);
   const oiResult = calcOtherIncome(otherIncome);
+  const flResult = calcFreelanceIncome(freelance);
   // Note: 80TTA deduction NOT available in New Regime — savings interest fully taxable
   const otherAdded = otherIncome.savingsInterest + otherIncome.fdInterest
     + otherIncome.dividends
-    + Math.max(0, otherIncome.rentalIncome - Math.round(otherIncome.rentalIncome * 0.30));
-  const income = Math.max(0, gross + otherAdded - STD - dedPerqs);
+    + Math.max(0, otherIncome.rentalIncome - Math.round(otherIncome.rentalIncome * 0.30))
+    + otherIncome.stcgOther; // STCG other at slab rate
+  const income = Math.max(0, gross + otherAdded + flResult.taxableIncome - STD - dedPerqs);
 
   const { tax: baseTax, rows } = calcSlabTax(income, NEW_SLABS);
   const rebate         = rebate87A(baseTax, income, 'new');
@@ -666,6 +726,7 @@ export function calcNewRegime(
     deductionEducationLoan: 0,
     deductionPerquisites:   dedPerqs,
     otherIncomeAdded:       otherAdded,
+    freelanceIncomeAdded:   flResult.taxableIncome,
     specialTax,
     taxableIncome:          income,
     baseTax,

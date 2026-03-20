@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   calcOldRegime, calcNewRegime, fmt,
-  calcEPFContribution, calcOtherIncome,
-  EMPTY_DEDUCTIONS, EMPTY_OTHER_INCOME,
+  calcEPFContribution, calcOtherIncome, calcFreelanceIncome,
+  EMPTY_DEDUCTIONS, EMPTY_OTHER_INCOME, EMPTY_FREELANCE,
 } from './tax';
 import type {
   TaxResult, Deductions, Deductions80C, EPFInput, HRAInput,
   Section80DInput, NPS80CCD1BInput, HomeLoanInterestInput,
-  EducationLoanInput, PerquisiteAllowances, OtherIncome,
+  EducationLoanInput, PerquisiteAllowances, OtherIncome, FreelanceIncome,
 } from './tax';
 import { RegimeBreakdown } from './components/RegimeCard';
 import DeductionsPanel from './components/DeductionsPanel';
@@ -19,6 +19,7 @@ import EducationLoanPanel from './components/EducationLoanPanel';
 import PerquisiteAllowancesPanel from './components/PerquisiteAllowancesPanel';
 import OtherIncomePanel from './components/OtherIncomePanel';
 import CapitalGainsPanel from './components/CapitalGainsPanel';
+import FreelancePanel from './components/FreelancePanel';
 import CTCHelper from './components/CTCHelper';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -28,6 +29,7 @@ const DETAIL_TABS = [
   { id: 'perquisites',    label: 'Perquisites' },
   { id: 'other-income',  label: 'Other Income' },
   { id: 'capital-gains', label: 'Capital Gains' },
+  { id: 'freelance',     label: 'Freelance' },
   { id: '80c',           label: '80C' },
   { id: 'hra',           label: 'HRA' },
   { id: '80d',           label: '80D' },
@@ -52,45 +54,58 @@ function loadStorage() {
 
 export default function App() {
   const saved = loadStorage();
-  const [salary, setSalary]           = useState(saved?.salary ?? '');
-  const [result, setResult]           = useState<TaxResult | null>(null);
-  const [error, setError]             = useState('');
-  const [deductions, setDeductions]   = useState<Deductions>(saved?.deductions ?? { ...EMPTY_DEDUCTIONS });
-  const [otherIncome, setOtherIncome] = useState<OtherIncome>(saved?.otherIncome ?? { ...EMPTY_OTHER_INCOME });
-  const [viewMode, setViewMode]       = useState<'main' | 'detail'>('main');
+  const [salary, setSalary]               = useState(saved?.salary ?? '');
+  const [result, setResult]               = useState<TaxResult | null>(null);
+  const [error, setError]                 = useState('');
+  const [deductions, setDeductions]       = useState<Deductions>(saved?.deductions ?? { ...EMPTY_DEDUCTIONS });
+  const [otherIncome, setOtherIncome]     = useState<OtherIncome>(saved?.otherIncome ?? { ...EMPTY_OTHER_INCOME });
+  const [freelanceIncome, setFreelanceIncome] = useState<FreelanceIncome>(saved?.freelanceIncome ?? { ...EMPTY_FREELANCE });
+  const [viewMode, setViewMode]           = useState<'main' | 'detail'>('main');
   const [activeDetailTab, setActiveDetailTab] = useState<string>('other-income');
   const [activeTaxTab, setActiveTaxTab]       = useState<'old' | 'new'>('new');
 
-  const lastInferredBasic = useRef<number>(0);
-  const prefillTimer      = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const latestSalaryVal   = useRef<number>(0);
-  const otherIncomeRef    = useRef<OtherIncome>(saved?.otherIncome ?? EMPTY_OTHER_INCOME);
+  const lastInferredBasic  = useRef<number>(0);
+  const prefillTimer       = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latestSalaryVal    = useRef<number>(0);
+  const otherIncomeRef     = useRef<OtherIncome>(saved?.otherIncome ?? EMPTY_OTHER_INCOME);
+  const freelanceIncomeRef = useRef<FreelanceIncome>(saved?.freelanceIncome ?? EMPTY_FREELANCE);
 
   // ── Persist state to localStorage ────────────────────────────────
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ salary, deductions, otherIncome }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ salary, deductions, otherIncome, freelanceIncome }));
     } catch { /* storage full — ignore */ }
-  }, [salary, deductions, otherIncome]);
+  }, [salary, deductions, otherIncome, freelanceIncome]);
 
   // ── Live recalculation ───────────────────────────────────────────
-  const recalculate = useCallback((gross: number, ded: Deductions, oi: OtherIncome) => {
+  const recalculate = useCallback((gross: number, ded: Deductions, oi: OtherIncome, fl: FreelanceIncome) => {
     const oiResult = calcOtherIncome(oi);
+    const flResult = calcFreelanceIncome(fl);
     setResult({
       gross,
       deductions: ded,
       otherIncome: oi,
       otherIncomeResult: oiResult,
-      old: calcOldRegime(gross, ded, oi),
-      new: calcNewRegime(gross, oi, ded.perquisites),
+      freelanceIncome: fl,
+      freelanceResult: flResult,
+      old: calcOldRegime(gross, ded, oi, fl),
+      new: calcNewRegime(gross, oi, ded.perquisites, fl),
     });
   }, []);
 
   useEffect(() => {
     const raw = salary.replace(/,/g, '').trim();
-    const val = parseFloat(raw);
-    if (!raw || isNaN(val) || val <= 0) {
-      setError(raw && val <= 0 ? 'Please enter a positive salary.' : '');
+    const val = parseFloat(raw) || 0; // allow 0 for pure freelancers
+    if (raw && isNaN(parseFloat(raw))) {
+      setError('Please enter a valid amount.');
+      setResult(null);
+      return;
+    }
+    // Show results if salary > 0 OR freelance income is set
+    const hasFreelance = freelanceIncomeRef.current.scheme !== 'none'
+      && (freelanceIncomeRef.current.grossReceipts > 0 || freelanceIncomeRef.current.manualProfit > 0);
+    if (!raw && !hasFreelance) {
+      setError('');
       setResult(null);
       latestSalaryVal.current = 0;
       if (prefillTimer.current) clearTimeout(prefillTimer.current);
@@ -99,32 +114,33 @@ export default function App() {
     setError('');
     latestSalaryVal.current = val;
     setDeductions(prev => {
-      recalculate(val, prev, otherIncomeRef.current);
+      recalculate(val, prev, otherIncomeRef.current, freelanceIncomeRef.current);
       return prev;
     });
     if (prefillTimer.current) clearTimeout(prefillTimer.current);
-    prefillTimer.current = setTimeout(() => {
-      const finalVal = latestSalaryVal.current;
-      if (finalVal <= 0) return;
-      const annualBasic = inferAnnualBasic(finalVal);
-      setDeductions(prev => {
-        const prevInferred = lastInferredBasic.current;
-        const epfUnchanged = prev.epfInput.basicSalary === 0 || prev.epfInput.basicSalary === prevInferred;
-        const hraUnchanged = prev.hraInput.basicSalary === 0 || prev.hraInput.basicSalary === prevInferred;
-        const updatedEPF   = epfUnchanged ? { ...prev.epfInput, basicSalary: annualBasic } : prev.epfInput;
-        const updatedHRA   = hraUnchanged ? { ...prev.hraInput, basicSalary: annualBasic } : prev.hraInput;
-        const epfContrib   = calcEPFContribution(updatedEPF);
-        lastInferredBasic.current = annualBasic;
-        const updated: Deductions = {
-          ...prev,
-          epfInput:   updatedEPF,
-          section80C: { ...prev.section80C, epf: epfContrib },
-          hraInput:   updatedHRA,
-        };
-        recalculate(finalVal, updated, otherIncomeRef.current);
-        return updated;
-      });
-    }, 600);
+    if (val > 0) {
+      prefillTimer.current = setTimeout(() => {
+        const finalVal = latestSalaryVal.current;
+        const annualBasic = inferAnnualBasic(finalVal);
+        setDeductions(prev => {
+          const prevInferred = lastInferredBasic.current;
+          const epfUnchanged = prev.epfInput.basicSalary === 0 || prev.epfInput.basicSalary === prevInferred;
+          const hraUnchanged = prev.hraInput.basicSalary === 0 || prev.hraInput.basicSalary === prevInferred;
+          const updatedEPF   = epfUnchanged ? { ...prev.epfInput, basicSalary: annualBasic } : prev.epfInput;
+          const updatedHRA   = hraUnchanged ? { ...prev.hraInput, basicSalary: annualBasic } : prev.hraInput;
+          const epfContrib   = calcEPFContribution(updatedEPF);
+          lastInferredBasic.current = annualBasic;
+          const updated: Deductions = {
+            ...prev,
+            epfInput:   updatedEPF,
+            section80C: { ...prev.section80C, epf: epfContrib },
+            hraInput:   updatedHRA,
+          };
+          recalculate(finalVal, updated, otherIncomeRef.current, freelanceIncomeRef.current);
+          return updated;
+        });
+      }, 600);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [salary]);
 
@@ -140,7 +156,7 @@ export default function App() {
         : deductions.hraInput,
     };
     setDeductions(updated);
-    if (result) recalculate(result.gross, updated, otherIncomeRef.current);
+    if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
   }
 
   function handle80CChange(key: keyof Deductions80C, value: number) {
@@ -149,49 +165,56 @@ export default function App() {
       section80C: { ...deductions.section80C, [key]: value },
     };
     setDeductions(updated);
-    if (result) recalculate(result.gross, updated, otherIncomeRef.current);
+    if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
   }
 
   function handleHRAChange(hraInput: HRAInput) {
     const updated: Deductions = { ...deductions, hraInput };
     setDeductions(updated);
-    if (result) recalculate(result.gross, updated, otherIncomeRef.current);
+    if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
   }
 
   function handle80DChange(section80D: Section80DInput) {
     const updated: Deductions = { ...deductions, section80D };
     setDeductions(updated);
-    if (result) recalculate(result.gross, updated, otherIncomeRef.current);
+    if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
   }
 
   function handleNPSChange(nps80CCD1B: NPS80CCD1BInput) {
     const updated: Deductions = { ...deductions, nps80CCD1B };
     setDeductions(updated);
-    if (result) recalculate(result.gross, updated, otherIncomeRef.current);
+    if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
   }
 
   function handleHomeLoanChange(homeLoanInterest: HomeLoanInterestInput) {
     const updated: Deductions = { ...deductions, homeLoanInterest };
     setDeductions(updated);
-    if (result) recalculate(result.gross, updated, otherIncomeRef.current);
+    if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
   }
 
   function handleEducationLoanChange(educationLoan: EducationLoanInput) {
     const updated: Deductions = { ...deductions, educationLoan };
     setDeductions(updated);
-    if (result) recalculate(result.gross, updated, otherIncomeRef.current);
+    if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
   }
 
   function handlePerquisitesChange(perquisites: PerquisiteAllowances) {
     const updated: Deductions = { ...deductions, perquisites };
     setDeductions(updated);
-    if (result) recalculate(result.gross, updated, otherIncomeRef.current);
+    if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
   }
 
   function handleOtherIncomeChange(oi: OtherIncome) {
     otherIncomeRef.current = oi;
     setOtherIncome(oi);
-    if (result) recalculate(result.gross, deductions, oi);
+    if (result) recalculate(result.gross, deductions, oi, freelanceIncomeRef.current);
+  }
+
+  function handleFreelanceChange(fl: FreelanceIncome) {
+    freelanceIncomeRef.current = fl;
+    setFreelanceIncome(fl);
+    const gross = parseFloat(salary.replace(/,/g, '').trim()) || 0;
+    recalculate(gross, deductions, otherIncomeRef.current, fl);
   }
 
   // ── Derived values ────────────────────────────────────────────────
@@ -201,6 +224,7 @@ export default function App() {
   const newInHand   = result ? Math.round(Math.max(0, result.gross - result.new.total - epf) / 12) : 0;
   const oldInHand   = result ? Math.round(Math.max(0, result.gross - result.old.total - epf) / 12) : 0;
   const oiResult    = result ? result.otherIncomeResult : calcOtherIncome(EMPTY_OTHER_INCOME);
+  const flResult    = result ? result.freelanceResult   : calcFreelanceIncome(EMPTY_FREELANCE);
 
   return (
     <div className="min-h-screen bg-background text-[#004030] font-sans">
@@ -226,7 +250,7 @@ export default function App() {
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
               Income Tax Calculator — FY 2024–25 (AY 2025–26)
             </p>
-            <p className="text-xs font-semibold text-[#004030]/70 mb-1.5">Gross Annual Salary</p>
+            <p className="text-xs font-semibold text-[#004030]/70 mb-1.5">Gross Annual Salary <span className="font-normal opacity-60">(enter 0 if freelance only)</span></p>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#004030] font-semibold pointer-events-none">₹</span>
               <Input
@@ -370,6 +394,9 @@ export default function App() {
             )}
             {activeDetailTab === 'capital-gains' && (
               <CapitalGainsPanel value={otherIncome} result={oiResult} onChange={handleOtherIncomeChange} />
+            )}
+            {activeDetailTab === 'freelance' && (
+              <FreelancePanel value={freelanceIncome} result={flResult} onChange={handleFreelanceChange} />
             )}
             {activeDetailTab === '80c' && (
               <DeductionsPanel
