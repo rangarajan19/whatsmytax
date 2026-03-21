@@ -339,11 +339,15 @@ export default function App() {
                 </p>
               </div>
             ) : (
-              <div className="bg-white/40 rounded-xl px-4 py-3 border border-[#004030]/10 text-center">
-                <p className="text-sm font-medium text-[#004030]/60">
-                  Add your income details to see your tax
-                </p>
-              </div>
+              <button
+                onClick={() => {
+                  setActiveDetailTab('freelance');
+                  setViewMode('detail');
+                }}
+                className="w-full bg-[#004030] text-[#B6FF00] rounded-xl px-4 py-3 text-sm font-semibold hover:bg-[#004030]/90 transition-colors"
+              >
+                Add your freelance income →
+              </button>
             )}
           </div>
         ) : (
@@ -422,6 +426,7 @@ export default function App() {
                   isHigher={oldHigher}
                   gross={result.gross}
                   epf={epf}
+                  isFreelance={userType === 'freelance'}
                 />
               )}
               {activeTaxTab === 'new' && (
@@ -432,6 +437,7 @@ export default function App() {
                   isHigher={newHigher}
                   gross={result.gross}
                   epf={epf}
+                  isFreelance={userType === 'freelance'}
                 />
               )}
             </div>

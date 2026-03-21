@@ -10,6 +10,7 @@ export interface RegimeBreakdownProps {
   isHigher: boolean;
   gross: number;
   epf: number;
+  isFreelance?: boolean;
 }
 
 const ACCENT = {
@@ -25,10 +26,10 @@ function surchargeRate(income: number, regime: 'old' | 'new'): number {
   return 0;
 }
 
-export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf }: RegimeBreakdownProps) {
+export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf, isFreelance = false }: RegimeBreakdownProps) {
   const colors        = ACCENT[regime];
   const sRate         = surchargeRate(result.taxableIncome, regime);
-  const monthlyInHand = Math.round(Math.max(0, gross - result.total - epf) / 12);
+  const monthlyInHand = Math.round(Math.max(0, gross - result.total - (isFreelance ? 0 : epf)) / 12);
 
   return (
     <>
@@ -47,9 +48,11 @@ export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf }:
 
       {/* Monthly in-hand */}
       <div className="bg-muted/50 rounded-xl px-4 py-3 mb-5">
-        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Monthly In-Hand</p>
+        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">
+          {isFreelance ? 'Monthly Est.' : 'Monthly In-Hand'}
+        </p>
         <p className={`text-2xl font-bold ${isHigher ? 'text-[#C44A3A]' : colors.total}`}>{fmt(monthlyInHand)}</p>
-        {epf > 0 ? (
+        {!isFreelance && epf > 0 ? (
           <p className="text-xs text-muted-foreground mt-0.5">after tax + EPF ({fmt(Math.round(epf / 12))}/mo)</p>
         ) : (
           <p className="text-xs text-muted-foreground mt-0.5">after tax</p>
