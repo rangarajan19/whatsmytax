@@ -8,6 +8,7 @@ interface Props {
   value: FreelanceIncome;
   result: FreelanceResult;
   onChange: (updated: FreelanceIncome) => void;
+  isFreelanceOnly?: boolean;
 }
 
 const SCHEMES: { id: FreelanceScheme; label: string; sub: string }[] = [
@@ -17,10 +18,19 @@ const SCHEMES: { id: FreelanceScheme; label: string; sub: string }[] = [
   { id: 'manual', label: 'I know my profit', sub: 'Maintaining books — enter actual net profit' },
 ];
 
-export default function FreelancePanel({ value, result, onChange }: Props) {
+export default function FreelancePanel({ value, result, onChange, isFreelanceOnly = false }: Props) {
   function update(patch: Partial<FreelanceIncome>) {
     onChange({ ...value, ...patch });
   }
+
+  // For pure freelancers, auto-select 44ADA if still on 'none'
+  if (isFreelanceOnly && value.scheme === 'none') {
+    onChange({ ...value, scheme: '44ADA' });
+  }
+
+  const visibleSchemes = isFreelanceOnly
+    ? SCHEMES.filter(s => s.id !== 'none')
+    : SCHEMES;
 
   return (
     <Card className="mb-7">
@@ -42,7 +52,7 @@ export default function FreelancePanel({ value, result, onChange }: Props) {
         {/* Scheme selector */}
         <div className="space-y-2 mb-5">
           <p className="text-xs font-semibold text-[#004030]/60 uppercase tracking-wider">Select your situation</p>
-          {SCHEMES.map(s => (
+          {visibleSchemes.map(s => (
             <button
               key={s.id}
               type="button"

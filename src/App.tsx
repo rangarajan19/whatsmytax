@@ -511,7 +511,7 @@ export default function App() {
               <CapitalGainsPanel value={otherIncome} result={oiResult} onChange={handleOtherIncomeChange} />
             )}
             {activeDetailTab === 'freelance' && (
-              <FreelancePanel value={freelanceIncome} result={flResult} onChange={handleFreelanceChange} />
+              <FreelancePanel value={freelanceIncome} result={flResult} onChange={handleFreelanceChange} isFreelanceOnly={userType === 'freelance'} />
             )}
             {activeDetailTab === '80c' && (
               <DeductionsPanel
