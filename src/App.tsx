@@ -318,6 +318,12 @@ export default function App() {
           </div>
         ) : userType === 'freelance' ? (
           <div>
+            <button
+              onClick={() => setViewMode('landing')}
+              className="text-xs font-semibold text-[#004030]/60 hover:text-[#004030] mb-3 flex items-center gap-1"
+            >
+              ← Home
+            </button>
             <h1 className="text-2xl font-bold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
               Freelancer · FY 2024–25 (AY 2025–26)
@@ -342,6 +348,12 @@ export default function App() {
           </div>
         ) : (
           <div>
+            <button
+              onClick={() => setViewMode('landing')}
+              className="text-xs font-semibold text-[#004030]/60 hover:text-[#004030] mb-3 flex items-center gap-1"
+            >
+              ← Home
+            </button>
             <h1 className="text-2xl font-bold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
               Income Tax Calculator — FY 2024–25 (AY 2025–26)
