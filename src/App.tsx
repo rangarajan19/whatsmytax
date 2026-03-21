@@ -22,6 +22,7 @@ import CapitalGainsPanel from './components/CapitalGainsPanel';
 import FreelancePanel from './components/FreelancePanel';
 import CTCHelper from './components/CTCHelper';
 import LandingPage from './components/LandingPage';
+import { trackEvent } from './analytics';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
@@ -78,6 +79,17 @@ export default function App() {
   const otherIncomeRef     = useRef<OtherIncome>(saved?.otherIncome ?? EMPTY_OTHER_INCOME);
   const freelanceIncomeRef = useRef<FreelanceIncome>(saved?.freelanceIncome ?? EMPTY_FREELANCE);
 
+  // ── Analytics refs (one-shot per session) ────────────────────────
+  const hasSalaryTracked = useRef(false);
+  const trackedTabData   = useRef<Set<string>>(new Set());
+
+  function trackFirstData(tab: string, hasData: boolean) {
+    if (hasData && !trackedTabData.current.has(tab)) {
+      trackEvent('tab_has_data', { tab });
+      trackedTabData.current.add(tab);
+    }
+  }
+
   // ── Persist state to localStorage ────────────────────────────────
   useEffect(() => {
     try {
@@ -121,6 +133,10 @@ export default function App() {
     }
     setError('');
     latestSalaryVal.current = val;
+    if (val > 0 && !hasSalaryTracked.current) {
+      trackEvent('salary_entered');
+      hasSalaryTracked.current = true;
+    }
     setDeductions(prev => {
       recalculate(val, prev, otherIncomeRef.current, freelanceIncomeRef.current);
       return prev;
@@ -174,48 +190,60 @@ export default function App() {
     };
     setDeductions(updated);
     if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
+    trackFirstData('80c', value > 0);
   }
 
   function handleHRAChange(hraInput: HRAInput) {
     const updated: Deductions = { ...deductions, hraInput };
     setDeductions(updated);
     if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
+    trackFirstData('hra', hraInput.rentPaid > 0);
   }
 
   function handle80DChange(section80D: Section80DInput) {
     const updated: Deductions = { ...deductions, section80D };
     setDeductions(updated);
     if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
+    trackFirstData('80d', section80D.selfPremium > 0 || section80D.parentPremium > 0);
   }
 
   function handleNPSChange(nps80CCD1B: NPS80CCD1BInput) {
     const updated: Deductions = { ...deductions, nps80CCD1B };
     setDeductions(updated);
     if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
+    trackFirstData('nps', nps80CCD1B.amount > 0);
   }
 
   function handleHomeLoanChange(homeLoanInterest: HomeLoanInterestInput) {
     const updated: Deductions = { ...deductions, homeLoanInterest };
     setDeductions(updated);
     if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
+    trackFirstData('home-loan', homeLoanInterest.interestPaid > 0);
   }
 
   function handleEducationLoanChange(educationLoan: EducationLoanInput) {
     const updated: Deductions = { ...deductions, educationLoan };
     setDeductions(updated);
     if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
+    trackFirstData('edu-loan', educationLoan.interestPaid > 0);
   }
 
   function handlePerquisitesChange(perquisites: PerquisiteAllowances) {
     const updated: Deductions = { ...deductions, perquisites };
     setDeductions(updated);
     if (result) recalculate(result.gross, updated, otherIncomeRef.current, freelanceIncomeRef.current);
+    const hasPerq = Object.values(perquisites).some(v => typeof v === 'number' && v > 0);
+    trackFirstData('perquisites', hasPerq);
   }
 
   function handleOtherIncomeChange(oi: OtherIncome) {
     otherIncomeRef.current = oi;
     setOtherIncome(oi);
     if (result) recalculate(result.gross, deductions, oi, freelanceIncomeRef.current);
+    const hasOI = oi.savingsInterest > 0 || oi.fdInterest > 0 || oi.dividends > 0 || oi.rentalIncome > 0;
+    trackFirstData('other-income', hasOI);
+    const hasCG = oi.ltcgEquity > 0 || oi.stcgEquity > 0 || oi.ltcgOther > 0 || oi.stcgOther > 0;
+    trackFirstData('capital-gains', hasCG);
   }
 
   function handleFreelanceChange(fl: FreelanceIncome) {
@@ -223,6 +251,7 @@ export default function App() {
     setFreelanceIncome(fl);
     const gross = parseFloat(salary.replace(/,/g, '').trim()) || 0;
     recalculate(gross, deductions, otherIncomeRef.current, fl);
+    trackFirstData('freelance', fl.grossReceipts > 0 || fl.manualProfit > 0);
   }
 
   // ── Derived values ────────────────────────────────────────────────
@@ -241,6 +270,7 @@ export default function App() {
         onSelect={(type) => {
           setUserType(type);
           setViewMode('main');
+          trackEvent('flow_selected', { type });
         }}
       />
     );
@@ -380,6 +410,7 @@ export default function App() {
                   setActiveDetailTab('perquisites');
                 }
                 setViewMode('detail');
+                trackEvent('detail_opened', { userType });
               }}
             >
               {result ? 'Next →' : 'Add income details →'}
@@ -419,7 +450,10 @@ export default function App() {
                     ? 'font-semibold text-[#004030]'
                     : 'font-medium text-[#004030]/50'
                 }`}
-                onClick={() => setActiveDetailTab(tab.id)}
+                onClick={() => {
+                  setActiveDetailTab(tab.id);
+                  trackEvent('tab_viewed', { tab: tab.id });
+                }}
               >
                 {tab.label}
                 {activeDetailTab === tab.id && (
@@ -477,7 +511,9 @@ export default function App() {
                 onClick={() => {
                   const i = DETAIL_TABS.findIndex(t => t.id === activeDetailTab);
                   if (i > 0) {
-                    setActiveDetailTab(DETAIL_TABS[i - 1].id);
+                    const prevTab = DETAIL_TABS[i - 1].id;
+                    setActiveDetailTab(prevTab);
+                    trackEvent('tab_viewed', { tab: prevTab });
                   } else {
                     setViewMode('main');
                   }
@@ -490,7 +526,9 @@ export default function App() {
                 onClick={() => {
                   const i = DETAIL_TABS.findIndex(t => t.id === activeDetailTab);
                   if (i < DETAIL_TABS.length - 1) {
-                    setActiveDetailTab(DETAIL_TABS[i + 1].id);
+                    const nextTab = DETAIL_TABS[i + 1].id;
+                    setActiveDetailTab(nextTab);
+                    trackEvent('tab_viewed', { tab: nextTab });
                   } else {
                     setActiveTaxTab('old');
                     setViewMode('main');
