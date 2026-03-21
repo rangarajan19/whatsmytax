@@ -45,13 +45,13 @@ export default function LandingPage({ onSelect }: Props) {
         <div className="flex flex-col md:flex-row gap-4 w-full max-w-md">
           <button
             onClick={() => onSelect('salaried')}
-            className="flex-1 h-[52px] bg-[#004030] text-[#B6FF00] text-[15px] font-semibold rounded-[15px] hover:bg-[#004030]/90 transition-colors"
+            className="flex-1 h-[52px] px-4 bg-[#004030] text-[#B6FF00] text-[15px] font-semibold rounded-[15px] hover:bg-[#004030]/90 transition-colors"
           >
             I am a salaried Professional
           </button>
           <button
             onClick={() => onSelect('freelance')}
-            className="flex-1 h-[52px] bg-transparent border border-[#004030] text-[#004030] text-[15px] font-semibold rounded-[15px] hover:bg-[#004030]/5 transition-colors"
+            className="flex-1 h-[52px] px-4 bg-transparent border border-[#004030] text-[#004030] text-[15px] font-semibold rounded-[15px] hover:bg-[#004030]/5 transition-colors"
           >
             I am a freelancer
           </button>
