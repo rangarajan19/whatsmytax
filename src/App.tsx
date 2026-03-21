@@ -21,6 +21,7 @@ import OtherIncomePanel from './components/OtherIncomePanel';
 import CapitalGainsPanel from './components/CapitalGainsPanel';
 import FreelancePanel from './components/FreelancePanel';
 import CTCHelper from './components/CTCHelper';
+import LandingPage from './components/LandingPage';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
@@ -48,7 +49,13 @@ function loadStorage() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as { salary: string; deductions: Deductions; otherIncome: OtherIncome };
+    return JSON.parse(raw) as {
+      salary: string;
+      deductions: Deductions;
+      otherIncome: OtherIncome;
+      freelanceIncome?: FreelanceIncome;
+      userType?: 'salaried' | 'freelance';
+    };
   } catch { return null; }
 }
 
@@ -60,7 +67,8 @@ export default function App() {
   const [deductions, setDeductions]       = useState<Deductions>(saved?.deductions ?? { ...EMPTY_DEDUCTIONS });
   const [otherIncome, setOtherIncome]     = useState<OtherIncome>(saved?.otherIncome ?? { ...EMPTY_OTHER_INCOME });
   const [freelanceIncome, setFreelanceIncome] = useState<FreelanceIncome>(saved?.freelanceIncome ?? { ...EMPTY_FREELANCE });
-  const [viewMode, setViewMode]           = useState<'main' | 'detail'>('main');
+  const [userType, setUserType]           = useState<'salaried' | 'freelance'>(saved?.userType ?? 'salaried');
+  const [viewMode, setViewMode]           = useState<'landing' | 'main' | 'detail'>(saved?.userType ? 'main' : 'landing');
   const [activeDetailTab, setActiveDetailTab] = useState<string>('other-income');
   const [activeTaxTab, setActiveTaxTab]       = useState<'old' | 'new'>('new');
 
@@ -73,9 +81,9 @@ export default function App() {
   // ── Persist state to localStorage ────────────────────────────────
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ salary, deductions, otherIncome, freelanceIncome }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ salary, deductions, otherIncome, freelanceIncome, userType }));
     } catch { /* storage full — ignore */ }
-  }, [salary, deductions, otherIncome, freelanceIncome]);
+  }, [salary, deductions, otherIncome, freelanceIncome, userType]);
 
   // ── Live recalculation ───────────────────────────────────────────
   const recalculate = useCallback((gross: number, ded: Deductions, oi: OtherIncome, fl: FreelanceIncome) => {
@@ -225,6 +233,18 @@ export default function App() {
   const oldInHand   = result ? Math.round(Math.max(0, result.gross - result.old.total - epf) / 12) : 0;
   const oiResult    = result ? result.otherIncomeResult : calcOtherIncome(EMPTY_OTHER_INCOME);
   const flResult    = result ? result.freelanceResult   : calcFreelanceIncome(EMPTY_FREELANCE);
+
+  // ── Landing page ──────────────────────────────────────────────────
+  if (viewMode === 'landing') {
+    return (
+      <LandingPage
+        onSelect={(type) => {
+          setUserType(type);
+          setViewMode('main');
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-[#004030] font-sans">
