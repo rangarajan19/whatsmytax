@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import type { FreelanceIncome, FreelanceResult, FreelanceScheme } from '../tax';
 import { fmt } from '../tax';
 import { Card, CardContent } from './ui/card';
@@ -23,10 +24,13 @@ export default function FreelancePanel({ value, result, onChange, isFreelanceOnl
     onChange({ ...value, ...patch });
   }
 
-  // For pure freelancers, auto-select 44ADA if still on 'none'
-  if (isFreelanceOnly && value.scheme === 'none') {
-    onChange({ ...value, scheme: '44ADA' });
-  }
+  // For pure freelancers, auto-select 44ADA if still on 'none' — must be in useEffect, not render body
+  useEffect(() => {
+    if (isFreelanceOnly && value.scheme === 'none') {
+      onChange({ ...value, scheme: '44ADA' });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFreelanceOnly]);
 
   const visibleSchemes = isFreelanceOnly
     ? SCHEMES.filter(s => s.id !== 'none')
