@@ -27,13 +27,23 @@ import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
 
-const DETAIL_TABS = [
+const SALARIED_TABS = [
   { id: 'perquisites',    label: 'Perquisites' },
   { id: 'other-income',  label: 'Other Income' },
   { id: 'capital-gains', label: 'Capital Gains' },
-  { id: 'freelance',     label: 'Freelance' },
   { id: '80c',           label: '80C' },
   { id: 'hra',           label: 'HRA' },
+  { id: '80d',           label: '80D' },
+  { id: 'nps',           label: 'NPS' },
+  { id: 'home-loan',     label: 'Home Loan 24b' },
+  { id: 'edu-loan',      label: 'Education Loan' },
+];
+
+const FREELANCE_TABS = [
+  { id: 'freelance',     label: 'Freelance Income' },
+  { id: 'other-income',  label: 'Other Income' },
+  { id: 'capital-gains', label: 'Capital Gains' },
+  { id: '80c',           label: '80C' },
   { id: '80d',           label: '80D' },
   { id: 'nps',           label: 'NPS' },
   { id: 'home-loan',     label: 'Home Loan 24b' },
@@ -255,13 +265,24 @@ export default function App() {
   }
 
   // ── Derived values ────────────────────────────────────────────────
+  const activeTabs  = userType === 'freelance' ? FREELANCE_TABS : SALARIED_TABS;
   const epf         = deductions.section80C.epf;
   const oldHigher   = result !== null && result.old.total > result.new.total;
   const newHigher   = result !== null && result.new.total > result.old.total;
-  const newInHand   = result ? Math.round(Math.max(0, result.gross - result.new.total - epf) / 12) : 0;
-  const oldInHand   = result ? Math.round(Math.max(0, result.gross - result.old.total - epf) / 12) : 0;
   const oiResult    = result ? result.otherIncomeResult : calcOtherIncome(EMPTY_OTHER_INCOME);
   const flResult    = result ? result.freelanceResult   : calcFreelanceIncome(EMPTY_FREELANCE);
+
+  // In-hand: salaried = (gross - tax - EPF) / 12
+  //          freelancer = (gross receipts - tax) / 12 — EPF not applicable
+  const freelanceGross = userType === 'freelance'
+    ? (freelanceIncome.scheme === 'manual' ? freelanceIncome.manualProfit : freelanceIncome.grossReceipts)
+    : 0;
+  const newInHand = userType === 'freelance'
+    ? Math.round(Math.max(0, freelanceGross - (result?.new.total ?? 0)) / 12)
+    : result ? Math.round(Math.max(0, result.gross - result.new.total - epf) / 12) : 0;
+  const oldInHand = userType === 'freelance'
+    ? Math.round(Math.max(0, freelanceGross - (result?.old.total ?? 0)) / 12)
+    : result ? Math.round(Math.max(0, result.gross - result.old.total - epf) / 12) : 0;
 
   // ── Landing page ──────────────────────────────────────────────────
   if (viewMode === 'landing') {
@@ -269,6 +290,7 @@ export default function App() {
       <LandingPage
         onSelect={(type) => {
           setUserType(type);
+          if (type === 'freelance') setSalary('0');
           setViewMode('main');
           trackEvent('flow_selected', { type });
         }}
@@ -294,26 +316,37 @@ export default function App() {
               Old Regime {result ? fmt(result.old.total) : ''}
             </span>
           </div>
+        ) : userType === 'freelance' ? (
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
+            <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
+              Freelancer · FY 2024–25 (AY 2025–26)
+            </p>
+            {flResult.taxableIncome > 0 ? (
+              <div className="bg-white/70 rounded-xl px-4 py-3 border border-[#004030]/15">
+                <p className="text-xs font-semibold text-[#004030]/50 mb-0.5">Freelance Income (taxable)</p>
+                <p className="text-xl font-bold text-[#004030]">{fmt(flResult.taxableIncome)}</p>
+                <p className="text-xs text-[#004030]/50 mt-0.5">
+                  {freelanceIncome.scheme === '44ADA' && `50% of ${fmt(freelanceIncome.grossReceipts)} receipts (44ADA)`}
+                  {freelanceIncome.scheme === '44AD'  && `Presumptive income from ${fmt(freelanceIncome.grossReceipts)} turnover (44AD)`}
+                  {freelanceIncome.scheme === 'manual' && `Net profit (books of accounts)`}
+                </p>
+              </div>
+            ) : (
+              <div className="bg-white/40 rounded-xl px-4 py-3 border border-[#004030]/10 text-center">
+                <p className="text-sm font-medium text-[#004030]/60">
+                  Add your income details to see your tax
+                </p>
+              </div>
+            )}
+          </div>
         ) : (
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
               Income Tax Calculator — FY 2024–25 (AY 2025–26)
             </p>
-            <div className="flex items-center justify-between mb-1.5">
-              <p className="text-xs font-semibold text-[#004030]/70">Gross Annual Salary</p>
-              <button
-                type="button"
-                className="text-xs font-semibold text-[#004030] underline underline-offset-2 hover:opacity-70"
-                onClick={() => {
-                  setSalary('0');
-                  setActiveDetailTab('freelance');
-                  setViewMode('detail');
-                }}
-              >
-                Freelance only? →
-              </button>
-            </div>
+            <p className="text-xs font-semibold text-[#004030]/70 mb-1.5">Gross Annual Salary</p>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#004030] font-semibold pointer-events-none">₹</span>
               <Input
@@ -344,8 +377,8 @@ export default function App() {
             <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-3">
               Tax & In-hand Salary
             </p>
-            <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" />
-            <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" />
+            <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" isFreelance={userType === 'freelance'} />
+            <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} />
           </div>
 
           {/* Tax Calculations */}
@@ -402,13 +435,7 @@ export default function App() {
             <Button
               className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
               onClick={() => {
-                if (!result) {
-                  // Pure freelancer — set salary to 0, go straight to Freelance tab
-                  setSalary('0');
-                  setActiveDetailTab('freelance');
-                } else {
-                  setActiveDetailTab('perquisites');
-                }
+                setActiveDetailTab(activeTabs[0].id);
                 setViewMode('detail');
                 trackEvent('detail_opened', { userType });
               }}
@@ -424,17 +451,17 @@ export default function App() {
         <>
           {/* Progress indicator */}
           {(() => {
-            const i = DETAIL_TABS.findIndex(t => t.id === activeDetailTab);
+            const i = activeTabs.findIndex(t => t.id === activeDetailTab);
             return (
               <div className="flex items-center gap-2 px-4 pt-3 pb-1">
                 <div className="flex-1 h-1 bg-[#004030]/10 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-[#004030] rounded-full transition-all duration-300"
-                    style={{ width: `${((i + 1) / DETAIL_TABS.length) * 100}%` }}
+                    style={{ width: `${((i + 1) / activeTabs.length) * 100}%` }}
                   />
                 </div>
                 <span className="text-[10px] font-semibold text-[#004030]/50 shrink-0">
-                  {i + 1} / {DETAIL_TABS.length}
+                  {i + 1} / {activeTabs.length}
                 </span>
               </div>
             );
@@ -442,7 +469,7 @@ export default function App() {
 
           {/* Horizontal tab bar — underline style matching Figma */}
           <div className="flex overflow-x-auto border-b border-border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {DETAIL_TABS.map(tab => (
+            {activeTabs.map(tab => (
               <button
                 key={tab.id}
                 className={`relative shrink-0 px-3 py-3 text-sm transition-colors whitespace-nowrap ${
@@ -509,9 +536,9 @@ export default function App() {
                 variant="outline"
                 className="h-12 px-5 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 active:scale-[0.98]"
                 onClick={() => {
-                  const i = DETAIL_TABS.findIndex(t => t.id === activeDetailTab);
+                  const i = activeTabs.findIndex(t => t.id === activeDetailTab);
                   if (i > 0) {
-                    const prevTab = DETAIL_TABS[i - 1].id;
+                    const prevTab = activeTabs[i - 1].id;
                     setActiveDetailTab(prevTab);
                     trackEvent('tab_viewed', { tab: prevTab });
                   } else {
@@ -524,9 +551,9 @@ export default function App() {
               <Button
                 className="flex-1 h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
                 onClick={() => {
-                  const i = DETAIL_TABS.findIndex(t => t.id === activeDetailTab);
-                  if (i < DETAIL_TABS.length - 1) {
-                    const nextTab = DETAIL_TABS[i + 1].id;
+                  const i = activeTabs.findIndex(t => t.id === activeDetailTab);
+                  if (i < activeTabs.length - 1) {
+                    const nextTab = activeTabs[i + 1].id;
                     setActiveDetailTab(nextTab);
                     trackEvent('tab_viewed', { tab: nextTab });
                   } else {
@@ -535,7 +562,7 @@ export default function App() {
                   }
                 }}
               >
-                {activeDetailTab === DETAIL_TABS.at(-1)?.id ? 'Done' : 'Next →'}
+                {activeDetailTab === activeTabs.at(-1)?.id ? 'Done' : 'Next →'}
               </Button>
             </div>
           </div>
@@ -548,8 +575,8 @@ export default function App() {
 
 // ─── Helper components ─────────────────────────────────────────────────────
 
-function TaxRow({ label, tax, inHand, isHigher, regime }: {
-  label: string; tax: number; inHand: number; isHigher: boolean; regime: 'old' | 'new';
+function TaxRow({ label, tax, inHand, isHigher, regime, isFreelance }: {
+  label: string; tax: number; inHand: number; isHigher: boolean; regime: 'old' | 'new'; isFreelance?: boolean;
 }) {
   const bg = regime === 'new' ? 'bg-[rgba(0,128,0,0.05)]' : 'bg-card ring-1 ring-foreground/10';
   return (
@@ -561,7 +588,9 @@ function TaxRow({ label, tax, inHand, isHigher, regime }: {
         </p>
       </div>
       <div className="text-right">
-        <p className="text-xs text-[#004030]/50 font-medium mb-1">In-Hand Salary</p>
+        <p className="text-xs text-[#004030]/50 font-medium mb-1">
+          {isFreelance ? 'Monthly Est.' : 'In-Hand Salary'}
+        </p>
         <p className="text-xl font-bold text-[#004030]">{fmt(inHand)}</p>
       </div>
     </div>

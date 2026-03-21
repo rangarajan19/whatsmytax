@@ -36,7 +36,7 @@ export default function FreelancePanel({ value, result, onChange }: Props) {
           Income from professional services or business. Taxed at slab rate — added on top of your salary.
         </p>
         <p className="text-xs text-[#004030]/60 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mb-5">
-          If you have <strong>no salary</strong>, set gross salary to ₹0 above. Standard deduction (₹75K / ₹50K) only applies to salary income — this section handles it correctly.
+          Standard deduction (₹75K / ₹50K) only applies to salary income — not applicable here. Chapter VI-A deductions (80C, 80D, NPS) still apply against your total income.
         </p>
 
         {/* Scheme selector */}
