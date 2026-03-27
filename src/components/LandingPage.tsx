@@ -14,9 +14,10 @@ const TRIVIA = [
 
 interface Props {
   onSelect: (type: 'salaried' | 'freelance') => void;
+  onChangelog: () => void;
 }
 
-export default function LandingPage({ onSelect }: Props) {
+export default function LandingPage({ onSelect, onChangelog }: Props) {
   const [triviaIndex, setTriviaIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
@@ -51,6 +52,12 @@ export default function LandingPage({ onSelect }: Props) {
         <span className="text-2xl font-bold text-black tracking-tight">
           Whats My Tax?
         </span>
+        <button
+          onClick={onChangelog}
+          className="text-xs font-semibold text-[#004030]/60 hover:text-[#004030] border border-[#004030]/20 rounded-full px-3 py-1.5 transition-colors"
+        >
+          What's new · v2.0
+        </button>
       </nav>
 
       {/* Centre content — grows to fill space */}

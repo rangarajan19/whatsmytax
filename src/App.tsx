@@ -23,6 +23,7 @@ import FreelancePanel from './components/FreelancePanel';
 import CTCHelper from './components/CTCHelper';
 import LandingPage from './components/LandingPage';
 import TaxOptimiserPanel from './components/TaxOptimiserPanel';
+import ChangelogPage from './components/ChangelogPage';
 import { trackEvent } from './analytics';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -80,7 +81,7 @@ export default function App() {
   const [otherIncome, setOtherIncome]     = useState<OtherIncome>(saved?.otherIncome ?? { ...EMPTY_OTHER_INCOME });
   const [freelanceIncome, setFreelanceIncome] = useState<FreelanceIncome>(saved?.freelanceIncome ?? { ...EMPTY_FREELANCE });
   const [userType, setUserType]           = useState<'salaried' | 'freelance'>(saved?.userType ?? 'salaried');
-  const [viewMode, setViewMode]           = useState<'landing' | 'main' | 'detail' | 'summary'>(saved?.userType ? 'main' : 'landing');
+  const [viewMode, setViewMode]           = useState<'landing' | 'main' | 'detail' | 'summary' | 'changelog'>(saved?.userType ? 'main' : 'landing');
   const [activeDetailTab, setActiveDetailTab] = useState<string>('other-income');
   const [activeTaxTab, setActiveTaxTab]       = useState<'old' | 'new'>('new');
 
@@ -317,6 +318,11 @@ export default function App() {
     ? Math.round(Math.max(0, freelanceGross - (result?.old.total ?? 0)) / 12)
     : result ? Math.round(Math.max(0, result.gross - result.old.total - epf) / 12) : 0;
 
+  // ── Changelog ─────────────────────────────────────────────────────
+  if (viewMode === 'changelog') {
+    return <ChangelogPage onBack={() => setViewMode('landing')} />;
+  }
+
   // ── Landing page ──────────────────────────────────────────────────
   if (viewMode === 'landing') {
     return (
@@ -327,6 +333,7 @@ export default function App() {
           setViewMode('main');
           trackEvent('flow_selected', { type });
         }}
+        onChangelog={() => setViewMode('changelog')}
       />
     );
   }
@@ -335,7 +342,7 @@ export default function App() {
     <div className="min-h-screen bg-background text-[#004030] font-sans">
 
       {/* ── Header — full width ── */}
-      <header className="bg-[#B6FF00] px-4 pt-4 pb-8 rounded-b-[40px]">
+      <header className="no-print bg-[#B6FF00] px-4 pt-4 pb-8 rounded-b-[40px]">
         <div className={`${viewMode === 'detail' || viewMode === 'summary' ? 'md:max-w-[48vw]' : 'md:max-w-[35vw]'} mx-auto`}>
         {viewMode === 'detail' ? (
           <div className="flex items-center justify-between">
@@ -499,7 +506,7 @@ export default function App() {
 
       {/* Fixed CTA — always visible on main view */}
       {viewMode === 'main' && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+        <div className="no-print fixed bottom-0 left-0 right-0 bg-white border-t">
           <div className="md:max-w-[35vw] mx-auto px-4 pt-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
             <Button
               className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
@@ -518,7 +525,16 @@ export default function App() {
       {/* ── Summary view ── */}
       {viewMode === 'summary' && result && (
         <div className="md:max-w-[48vw] mx-auto">
-          <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-1">
+          {/* Save as PDF */}
+          <div className="no-print flex justify-end px-4 pt-3">
+            <button
+              onClick={() => window.print()}
+              className="text-xs font-semibold text-[#004030]/50 hover:text-[#004030] flex items-center gap-1.5 transition-colors"
+            >
+              ↓ Save as PDF
+            </button>
+          </div>
+          <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-2 pb-1">
             FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
           </p>
           <div className="px-4 py-4 border-b">
@@ -555,7 +571,7 @@ export default function App() {
           )}
 
           {/* Fixed Edit details CTA */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+          <div className="no-print fixed bottom-0 left-0 right-0 bg-white border-t">
             <div className="md:max-w-[48vw] mx-auto px-4 pt-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
               <Button
                 className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"

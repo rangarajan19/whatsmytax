@@ -152,6 +152,20 @@
   background: rgba(0, 64, 48, 0.25);
 }
 
+/* ── Print / Save as PDF ── */
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+
+  body { background: white; }
+
+  /* Remove fixed positioning so content flows naturally */
+  header { position: static !important; border-radius: 0 !important; }
+
+  /* Force background colors to print */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
