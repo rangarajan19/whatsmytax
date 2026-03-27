@@ -525,16 +525,7 @@ export default function App() {
       {/* ── Summary view ── */}
       {viewMode === 'summary' && result && (
         <div className="md:max-w-[48vw] mx-auto">
-          {/* Save as PDF */}
-          <div className="no-print flex justify-end px-4 pt-3">
-            <button
-              onClick={() => window.print()}
-              className="text-xs font-semibold text-[#004030]/50 hover:text-[#004030] flex items-center gap-1.5 transition-colors"
-            >
-              ↓ Save as PDF
-            </button>
-          </div>
-          <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-2 pb-1">
+          <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-1">
             FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
           </p>
           <div className="px-4 py-4 border-b">
@@ -569,14 +560,21 @@ export default function App() {
             </div>
           </div>
 
-          {/* Fixed Edit details CTA */}
+          {/* Fixed footer: Save as PDF (primary) + Edit details (secondary) */}
           <div className="no-print fixed bottom-0 left-0 right-0 bg-white border-t">
-            <div className="md:max-w-[48vw] mx-auto px-4 pt-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+            <div className="md:max-w-[48vw] mx-auto px-4 pt-3 flex gap-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
               <Button
-                className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
+                variant="outline"
+                className="h-12 px-5 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 active:scale-[0.98]"
                 onClick={() => setViewMode('detail')}
               >
-                ← Edit details
+                ← Edit
+              </Button>
+              <Button
+                className="flex-1 h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
+                onClick={() => window.print()}
+              >
+                ↓ Save as PDF
               </Button>
             </div>
           </div>
