@@ -128,6 +128,30 @@
   100% { transform: scale(2); opacity: 0; }
 }
 
+/* ── Scroll panel: scrollbar hidden at rest, fades in on scroll ── */
+.scroll-panel {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.4s ease;
+}
+.scroll-panel.is-scrolling {
+  scrollbar-color: rgba(0, 64, 48, 0.25) transparent;
+}
+.scroll-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.scroll-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-panel::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.4s ease;
+}
+.scroll-panel.is-scrolling::-webkit-scrollbar-thumb {
+  background: rgba(0, 64, 48, 0.25);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

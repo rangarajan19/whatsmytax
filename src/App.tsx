@@ -79,7 +79,7 @@ export default function App() {
   const [otherIncome, setOtherIncome]     = useState<OtherIncome>(saved?.otherIncome ?? { ...EMPTY_OTHER_INCOME });
   const [freelanceIncome, setFreelanceIncome] = useState<FreelanceIncome>(saved?.freelanceIncome ?? { ...EMPTY_FREELANCE });
   const [userType, setUserType]           = useState<'salaried' | 'freelance'>(saved?.userType ?? 'salaried');
-  const [viewMode, setViewMode]           = useState<'landing' | 'main' | 'detail'>(saved?.userType ? 'main' : 'landing');
+  const [viewMode, setViewMode]           = useState<'landing' | 'main' | 'detail' | 'summary'>(saved?.userType ? 'main' : 'landing');
   const [activeDetailTab, setActiveDetailTab] = useState<string>('other-income');
   const [activeTaxTab, setActiveTaxTab]       = useState<'old' | 'new'>('new');
 
@@ -88,6 +88,8 @@ export default function App() {
   const latestSalaryVal    = useRef<number>(0);
   const otherIncomeRef     = useRef<OtherIncome>(saved?.otherIncome ?? EMPTY_OTHER_INCOME);
   const freelanceIncomeRef = useRef<FreelanceIncome>(saved?.freelanceIncome ?? EMPTY_FREELANCE);
+  const scrollPanelRef     = useRef<HTMLDivElement>(null);
+  const scrollHideTimer    = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Analytics refs (one-shot per session) ────────────────────────
   const hasSalaryTracked = useRef(false);
@@ -266,6 +268,36 @@ export default function App() {
 
   // ── Derived values ────────────────────────────────────────────────
   const activeTabs  = userType === 'freelance' ? FREELANCE_TABS : SALARIED_TABS;
+
+  // ── Tab filled detection (for sidebar ticks) ──────────────────────
+  function hasTabData(tabId: string): boolean {
+    switch (tabId) {
+      case 'freelance':
+        return freelanceIncome.grossReceipts > 0 || freelanceIncome.manualProfit > 0;
+      case 'other-income':
+        return otherIncome.savingsInterest > 0 || otherIncome.fdInterest > 0
+          || otherIncome.dividends > 0 || otherIncome.rentalIncome > 0;
+      case 'capital-gains':
+        return otherIncome.ltcgEquity > 0 || otherIncome.stcgEquity > 0
+          || otherIncome.ltcgOther > 0 || otherIncome.stcgOther > 0;
+      case '80c':
+        return Object.values(deductions.section80C).some(v => typeof v === 'number' && v > 0);
+      case 'hra':
+        return deductions.hraInput.rentPaid > 0;
+      case '80d':
+        return deductions.section80D.selfPremium > 0 || deductions.section80D.parentPremium > 0;
+      case 'nps':
+        return deductions.nps80CCD1B.amount > 0;
+      case 'home-loan':
+        return deductions.homeLoanInterest.interestPaid > 0;
+      case 'edu-loan':
+        return deductions.educationLoan.interestPaid > 0;
+      case 'perquisites':
+        return Object.values(deductions.perquisites).some(v => typeof v === 'number' && v > 0);
+      default:
+        return false;
+    }
+  }
   const epf         = deductions.section80C.epf;
   const oldHigher   = result !== null && result.old.total > result.new.total;
   const newHigher   = result !== null && result.new.total > result.old.total;
@@ -300,10 +332,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background text-[#004030] font-sans">
-      <div className="md:max-w-[35vw] mx-auto">
 
-      {/* ── Header ── */}
+      {/* ── Header — full width ── */}
       <header className="bg-[#B6FF00] px-4 pt-4 pb-8 rounded-b-[40px]">
+        <div className={`${viewMode === 'detail' || viewMode === 'summary' ? 'md:max-w-[48vw]' : 'md:max-w-[35vw]'} mx-auto`}>
         {viewMode === 'detail' ? (
           <div className="flex items-center justify-between">
             <button
@@ -316,14 +348,26 @@ export default function App() {
               Old Regime {result ? fmt(result.old.total) : ''}
             </span>
           </div>
+        ) : viewMode === 'summary' ? (
+          <div className="flex items-center justify-between">
+            <button
+              className="flex items-center gap-1.5 text-sm font-semibold text-[#004030]"
+              onClick={() => setViewMode('detail')}
+            >
+              ← Edit
+            </button>
+            <span className="text-sm font-semibold text-[#004030]">Tax Summary</span>
+          </div>
         ) : userType === 'freelance' ? (
           <div>
-            <button
-              onClick={() => setViewMode('landing')}
-              className="text-xs font-semibold text-[#004030]/60 hover:text-[#004030] mb-3 flex items-center gap-1"
-            >
-              ← Home
-            </button>
+            <div className="flex justify-start mb-3">
+              <button
+                onClick={() => setViewMode('landing')}
+                className="text-xs font-semibold text-[#004030]/60 hover:text-[#004030] flex items-center gap-1"
+              >
+                ← Home
+              </button>
+            </div>
             <h1 className="text-2xl font-bold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
               Freelancer · FY 2024–25 (AY 2025–26)
@@ -352,12 +396,14 @@ export default function App() {
           </div>
         ) : (
           <div>
-            <button
-              onClick={() => setViewMode('landing')}
-              className="text-xs font-semibold text-[#004030]/60 hover:text-[#004030] mb-3 flex items-center gap-1"
-            >
-              ← Home
-            </button>
+            <div className="flex justify-start mb-3">
+              <button
+                onClick={() => setViewMode('landing')}
+                className="text-xs font-semibold text-[#004030]/60 hover:text-[#004030] flex items-center gap-1"
+              >
+                ← Home
+              </button>
+            </div>
             <h1 className="text-2xl font-bold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
               Income Tax Calculator — FY 2024–25 (AY 2025–26)
@@ -378,7 +424,11 @@ export default function App() {
             <CTCHelper onUseGross={gross => setSalary(String(gross))} />
           </div>
         )}
+        </div>
       </header>
+
+      {/* ── Body content ── */}
+      <div className={`${viewMode === 'detail' ? 'md:max-w-[48vw]' : 'md:max-w-[35vw]'} mx-auto`}>
 
       {/* ── Main view ── */}
       {result && viewMode === 'main' && (
@@ -449,7 +499,7 @@ export default function App() {
       {/* Fixed CTA — always visible on main view */}
       {viewMode === 'main' && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
-          <div className="md:max-w-[35vw] mx-auto px-4 py-3">
+          <div className="md:max-w-[35vw] mx-auto px-4 pt-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
             <Button
               className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
               onClick={() => {
@@ -464,92 +514,165 @@ export default function App() {
         </div>
       )}
 
+      {/* ── Summary view ── */}
+      {viewMode === 'summary' && result && (
+        <div className="md:max-w-[48vw] mx-auto">
+          <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-1">
+            FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
+          </p>
+          <div className="px-4 py-4 border-b">
+            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-3">Tax & In-hand</p>
+            <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" isFreelance={userType === 'freelance'} />
+            <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} />
+          </div>
+          <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider px-4 pt-4 pb-2">Tax Calculations</p>
+          <div className="mx-4 bg-card rounded-xl ring-1 ring-foreground/10 overflow-hidden mb-6">
+            <div className="border-b px-4 py-3">
+              <ToggleGroup value={activeTaxTab} onValueChange={(v) => { if (v) setActiveTaxTab(v as 'old' | 'new'); }} className="w-full">
+                <ToggleGroupItem value="old">Old Regime</ToggleGroupItem>
+                <ToggleGroupItem value="new">New Regime</ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+            <div className="px-4 py-4 pb-28">
+              {activeTaxTab === 'old' && <RegimeBreakdown regime="old" label="Pre-2020 slabs with deductions" result={result.old} isHigher={oldHigher} gross={result.gross} epf={epf} isFreelance={userType === 'freelance'} />}
+              {activeTaxTab === 'new' && <RegimeBreakdown regime="new" label="Simplified slabs, higher std. deduction (₹75K)" result={result.new} isHigher={newHigher} gross={result.gross} epf={epf} isFreelance={userType === 'freelance'} />}
+            </div>
+          </div>
+          {/* Fixed Edit details CTA */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+            <div className="md:max-w-[48vw] mx-auto px-4 pt-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+              <Button
+                className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
+                onClick={() => setViewMode('detail')}
+              >
+                ← Edit details
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Detail view ── */}
       {viewMode === 'detail' && (
         <>
-          {/* Progress indicator */}
-          {(() => {
-            const i = activeTabs.findIndex(t => t.id === activeDetailTab);
-            return (
-              <div className="flex items-center gap-2 px-4 pt-3 pb-1">
-                <div className="flex-1 h-1 bg-[#004030]/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[#004030] rounded-full transition-all duration-300"
-                    style={{ width: `${((i + 1) / activeTabs.length) * 100}%` }}
-                  />
-                </div>
-                <span className="text-[10px] font-semibold text-[#004030]/50 shrink-0">
-                  {i + 1} / {activeTabs.length}
-                </span>
-              </div>
-            );
-          })()}
+          {/* Layout: sidebar on desktop, tab bar on mobile */}
+          <div className="md:flex md:flex-row md:h-[calc(100vh-88px)] md:overflow-hidden">
 
-          {/* Horizontal tab bar — underline style matching Figma */}
-          <div className="flex overflow-x-auto border-b border-border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {activeTabs.map(tab => (
-              <button
-                key={tab.id}
-                className={`relative shrink-0 px-3 py-3 text-sm transition-colors whitespace-nowrap ${
-                  activeDetailTab === tab.id
-                    ? 'font-semibold text-[#004030]'
-                    : 'font-medium text-[#004030]/50'
-                }`}
-                onClick={() => {
-                  setActiveDetailTab(tab.id);
-                  trackEvent('tab_viewed', { tab: tab.id });
+            {/* ── Sidebar — desktop only ── */}
+            <aside className="hidden md:flex md:flex-col w-[172px] shrink-0 border-r border-[#004030]/10 pt-3 px-2 gap-0.5">
+              {activeTabs.map(tab => {
+                const filled = hasTabData(tab.id);
+                const isActive = activeDetailTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveDetailTab(tab.id);
+                      trackEvent('tab_viewed', { tab: tab.id });
+                    }}
+                    className={`flex items-center justify-between gap-1 w-full px-3 py-2.5 rounded-lg text-sm text-left transition-colors ${
+                      isActive
+                        ? 'bg-[#B6FF00] font-bold text-[#004030]'
+                        : 'font-medium text-[#004030]/60 hover:bg-[#004030]/5'
+                    }`}
+                  >
+                    <span className="truncate">{tab.label}</span>
+                    {filled && (
+                      <span className={`text-xs shrink-0 ${isActive ? 'text-[#004030]' : 'text-[#004030]/50'}`}>✓</span>
+                    )}
+                  </button>
+                );
+              })}
+            </aside>
+
+            {/* ── Right side: tab bar (mobile) + panel ── */}
+            <div className="flex-1 flex flex-col min-w-0 md:overflow-hidden">
+
+              {/* Tab bar — mobile only, with dot indicator for filled tabs */}
+              <div className="md:hidden flex overflow-x-auto border-b border-border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {activeTabs.map(tab => {
+                  const filled = hasTabData(tab.id);
+                  return (
+                    <button
+                      key={tab.id}
+                      className={`relative shrink-0 px-3 py-3 text-sm transition-colors whitespace-nowrap ${
+                        activeDetailTab === tab.id
+                          ? 'font-semibold text-[#004030]'
+                          : 'font-medium text-[#004030]/50'
+                      }`}
+                      onClick={() => {
+                        setActiveDetailTab(tab.id);
+                        trackEvent('tab_viewed', { tab: tab.id });
+                      }}
+                    >
+                      {tab.label}
+                      {filled && (
+                        <span className="absolute top-2 right-1 w-1.5 h-1.5 rounded-full bg-[#004030]/60" />
+                      )}
+                      {activeDetailTab === tab.id && (
+                        <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#004030]" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Panel content */}
+              <div
+                ref={scrollPanelRef}
+                className="scroll-panel overflow-y-auto pb-24 px-4 pt-4 md:flex-1"
+                onScroll={() => {
+                  const el = scrollPanelRef.current;
+                  if (!el) return;
+                  el.classList.add('is-scrolling');
+                  if (scrollHideTimer.current) clearTimeout(scrollHideTimer.current);
+                  scrollHideTimer.current = setTimeout(() => {
+                    el.classList.remove('is-scrolling');
+                  }, 1000);
                 }}
               >
-                {tab.label}
-                {activeDetailTab === tab.id && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#004030]" />
+                {activeDetailTab === 'other-income' && (
+                  <OtherIncomePanel value={otherIncome} result={oiResult} onChange={handleOtherIncomeChange} />
                 )}
-              </button>
-            ))}
-          </div>
-
-          {/* Panel content — strip card bg/ring so panels sit on page bg */}
-          <div className="overflow-y-auto pb-24 px-4 pt-4">
-            {activeDetailTab === 'other-income' && (
-              <OtherIncomePanel value={otherIncome} result={oiResult} onChange={handleOtherIncomeChange} />
-            )}
-            {activeDetailTab === 'capital-gains' && (
-              <CapitalGainsPanel value={otherIncome} result={oiResult} onChange={handleOtherIncomeChange} />
-            )}
-            {activeDetailTab === 'freelance' && (
-              <FreelancePanel value={freelanceIncome} result={flResult} onChange={handleFreelanceChange} isFreelanceOnly={userType === 'freelance'} />
-            )}
-            {activeDetailTab === '80c' && (
-              <DeductionsPanel
-                epfInput={deductions.epfInput}
-                onEPFChange={handleEPFChange}
-                values={deductions.section80C}
-                onChange={handle80CChange}
-              />
-            )}
-            {activeDetailTab === 'hra' && (
-              <HRAPanel hraInput={deductions.hraInput} onChange={handleHRAChange} />
-            )}
-            {activeDetailTab === '80d' && (
-              <Section80DPanel value={deductions.section80D} onChange={handle80DChange} />
-            )}
-            {activeDetailTab === 'nps' && (
-              <NPSPanel value={deductions.nps80CCD1B} onChange={handleNPSChange} />
-            )}
-            {activeDetailTab === 'home-loan' && (
-              <HomeLoanInterestPanel value={deductions.homeLoanInterest} onChange={handleHomeLoanChange} />
-            )}
-            {activeDetailTab === 'edu-loan' && (
-              <EducationLoanPanel values={deductions.educationLoan} onChange={handleEducationLoanChange} />
-            )}
-            {activeDetailTab === 'perquisites' && (
-              <PerquisiteAllowancesPanel values={deductions.perquisites} onChange={handlePerquisitesChange} />
-            )}
+                {activeDetailTab === 'capital-gains' && (
+                  <CapitalGainsPanel value={otherIncome} result={oiResult} onChange={handleOtherIncomeChange} />
+                )}
+                {activeDetailTab === 'freelance' && (
+                  <FreelancePanel value={freelanceIncome} result={flResult} onChange={handleFreelanceChange} isFreelanceOnly={userType === 'freelance'} />
+                )}
+                {activeDetailTab === '80c' && (
+                  <DeductionsPanel
+                    epfInput={deductions.epfInput}
+                    onEPFChange={handleEPFChange}
+                    values={deductions.section80C}
+                    onChange={handle80CChange}
+                  />
+                )}
+                {activeDetailTab === 'hra' && (
+                  <HRAPanel hraInput={deductions.hraInput} onChange={handleHRAChange} />
+                )}
+                {activeDetailTab === '80d' && (
+                  <Section80DPanel value={deductions.section80D} onChange={handle80DChange} />
+                )}
+                {activeDetailTab === 'nps' && (
+                  <NPSPanel value={deductions.nps80CCD1B} onChange={handleNPSChange} />
+                )}
+                {activeDetailTab === 'home-loan' && (
+                  <HomeLoanInterestPanel value={deductions.homeLoanInterest} onChange={handleHomeLoanChange} />
+                )}
+                {activeDetailTab === 'edu-loan' && (
+                  <EducationLoanPanel values={deductions.educationLoan} onChange={handleEducationLoanChange} />
+                )}
+                {activeDetailTab === 'perquisites' && (
+                  <PerquisiteAllowancesPanel values={deductions.perquisites} onChange={handlePerquisitesChange} />
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Fixed Next/Done */}
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
-            <div className="md:max-w-[35vw] mx-auto px-4 py-3 flex gap-3">
+            <div className="md:max-w-[48vw] mx-auto px-4 pt-3 flex gap-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
               <Button
                 variant="outline"
                 className="h-12 px-5 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 active:scale-[0.98]"
@@ -575,8 +698,8 @@ export default function App() {
                     setActiveDetailTab(nextTab);
                     trackEvent('tab_viewed', { tab: nextTab });
                   } else {
-                    setActiveTaxTab('old');
-                    setViewMode('main');
+                    setActiveTaxTab('new');
+                    setViewMode('summary');
                   }
                 }}
               >
