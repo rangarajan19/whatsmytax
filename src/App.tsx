@@ -542,7 +542,20 @@ export default function App() {
             <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" isFreelance={userType === 'freelance'} />
             <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} />
           </div>
-          <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider px-4 pt-4 pb-2">Tax Calculations</p>
+
+          {/* Deduction Analysis — always visible, shown before calculations */}
+          <div className="px-4">
+            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider pt-4 pb-2">
+              Deduction Analysis
+            </p>
+            <TaxOptimiserPanel
+              deductions={deductions}
+              oldResult={result.old}
+              userType={userType}
+            />
+          </div>
+
+          <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider px-4 pt-6 pb-2">Tax Calculations</p>
           <div className="mx-4 bg-card rounded-xl ring-1 ring-foreground/10 overflow-hidden mb-6">
             <div className="border-b px-4 py-3">
               <ToggleGroup value={activeTaxTab} onValueChange={(v) => { if (v) setActiveTaxTab(v as 'old' | 'new'); }} className="w-full">
@@ -550,25 +563,11 @@ export default function App() {
                 <ToggleGroupItem value="new">New Regime</ToggleGroupItem>
               </ToggleGroup>
             </div>
-            <div className="px-4 py-4 pb-4">
+            <div className="px-4 py-4 pb-28">
               {activeTaxTab === 'old' && <RegimeBreakdown regime="old" label="Pre-2020 slabs with deductions" result={result.old} isHigher={oldHigher} gross={result.gross} epf={epf} isFreelance={userType === 'freelance'} />}
               {activeTaxTab === 'new' && <RegimeBreakdown regime="new" label="Simplified slabs, higher std. deduction (₹75K)" result={result.new} isHigher={newHigher} gross={result.gross} epf={epf} isFreelance={userType === 'freelance'} />}
             </div>
           </div>
-
-          {/* Deduction optimiser — Old Regime only */}
-          {activeTaxTab === 'old' && (
-            <div className="px-4 pb-28">
-              <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider pt-4 pb-2">
-                Deduction Analysis
-              </p>
-              <TaxOptimiserPanel
-                deductions={deductions}
-                oldResult={result.old}
-                userType={userType}
-              />
-            </div>
-          )}
 
           {/* Fixed Edit details CTA */}
           <div className="no-print fixed bottom-0 left-0 right-0 bg-white border-t">
@@ -732,6 +731,7 @@ export default function App() {
                   } else {
                     setActiveTaxTab('new');
                     setViewMode('summary');
+                    window.scrollTo({ top: 0, behavior: 'instant' });
                   }
                 }}
               >
