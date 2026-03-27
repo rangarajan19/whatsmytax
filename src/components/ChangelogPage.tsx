@@ -51,12 +51,12 @@ export default function ChangelogPage({ onBack }: Props) {
 
         {/* Header */}
         <header className="bg-[#B6FF00] px-4 pt-4 pb-8 rounded-b-[40px]">
-          <div className="flex items-center justify-between">
+          <div className="relative flex items-center justify-center">
             <button
               onClick={onBack}
-              className="flex items-center gap-1.5 text-sm font-semibold text-[#004030]"
+              className="absolute left-0 text-sm font-semibold text-[#004030]"
             >
-              ← Back
+              ←
             </button>
             <span className="text-sm font-semibold text-[#004030]">What's new</span>
           </div>
