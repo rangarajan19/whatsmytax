@@ -22,6 +22,7 @@ import CapitalGainsPanel from './components/CapitalGainsPanel';
 import FreelancePanel from './components/FreelancePanel';
 import CTCHelper from './components/CTCHelper';
 import LandingPage from './components/LandingPage';
+import TaxOptimiserPanel from './components/TaxOptimiserPanel';
 import { trackEvent } from './analytics';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -533,11 +534,26 @@ export default function App() {
                 <ToggleGroupItem value="new">New Regime</ToggleGroupItem>
               </ToggleGroup>
             </div>
-            <div className="px-4 py-4 pb-28">
+            <div className="px-4 py-4 pb-4">
               {activeTaxTab === 'old' && <RegimeBreakdown regime="old" label="Pre-2020 slabs with deductions" result={result.old} isHigher={oldHigher} gross={result.gross} epf={epf} isFreelance={userType === 'freelance'} />}
               {activeTaxTab === 'new' && <RegimeBreakdown regime="new" label="Simplified slabs, higher std. deduction (₹75K)" result={result.new} isHigher={newHigher} gross={result.gross} epf={epf} isFreelance={userType === 'freelance'} />}
             </div>
           </div>
+
+          {/* Deduction optimiser — Old Regime only */}
+          {activeTaxTab === 'old' && (
+            <div className="px-4 pb-28">
+              <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider pt-4 pb-2">
+                Deduction Analysis
+              </p>
+              <TaxOptimiserPanel
+                deductions={deductions}
+                oldResult={result.old}
+                userType={userType}
+              />
+            </div>
+          )}
+
           {/* Fixed Edit details CTA */}
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
             <div className="md:max-w-[48vw] mx-auto px-4 pt-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
