@@ -9,7 +9,6 @@ import type {
   Section80DInput, NPS80CCD1BInput, HomeLoanInterestInput,
   EducationLoanInput, PerquisiteAllowances, OtherIncome, FreelanceIncome,
 } from './tax';
-import { RegimeBreakdown } from './components/RegimeCard';
 import DeductionsPanel from './components/DeductionsPanel';
 import HRAPanel from './components/HRAPanel';
 import Section80DPanel from './components/Section80DPanel';
@@ -27,7 +26,6 @@ import ChangelogPage from './components/ChangelogPage';
 import { trackEvent } from './analytics';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
-import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
 
 const SALARIED_TABS = [
   { id: 'perquisites',    label: 'Perquisites' },
@@ -83,7 +81,6 @@ export default function App() {
   const [userType, setUserType]           = useState<'salaried' | 'freelance'>(saved?.userType ?? 'salaried');
   const [viewMode, setViewMode]           = useState<'landing' | 'main' | 'detail' | 'summary' | 'changelog'>(saved?.userType ? 'main' : 'landing');
   const [activeDetailTab, setActiveDetailTab] = useState<string>('other-income');
-  const [activeTaxTab, setActiveTaxTab]       = useState<'old' | 'new'>('new');
 
   const lastInferredBasic  = useRef<number>(0);
   const prefillTimer       = useRef<ReturnType<typeof setTimeout> | null>(null);
