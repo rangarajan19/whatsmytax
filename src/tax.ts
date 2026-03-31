@@ -738,6 +738,69 @@ export function calcNewRegime(
   };
 }
 
+// ─── Regime recommendation ───────────────────────────────────────
+
+export interface RegimeRecommendation {
+  winner: 'old' | 'new' | 'equal';
+  savingsAmount: number;       // absolute tax difference
+  canOldBeatNew: boolean;      // can old regime beat new with remaining headroom?
+  neededDeductions: number;    // extra deductions needed for old to beat new (0 if old already wins)
+  availableHeadroom: number;   // total remaining deduction capacity
+  marginalRate: number;        // user's effective marginal rate in old regime
+}
+
+export function getRegimeRecommendation(
+  oldResult: RegimeResult,
+  newResult: RegimeResult,
+  deductions: Deductions,
+): RegimeRecommendation {
+  const oldTax = oldResult.total;
+  const newTax = newResult.total;
+
+  // Marginal rate from old regime taxable income (including 4% cess)
+  const taxable = oldResult.taxableIncome;
+  let marginalRate = 0;
+  if      (taxable > 1_000_000) marginalRate = 0.312;  // 30% + 4% cess
+  else if (taxable >   500_000) marginalRate = 0.208;  // 20% + 4% cess
+  else if (taxable >   250_000) marginalRate = 0.052;  // 5%  + 4% cess
+
+  // Remaining headroom across deductible sections
+  const used80C        = Math.min(total80C(deductions.section80C), MAX_80C);
+  const headroom80C    = Math.max(0, MAX_80C - used80C);
+
+  const selfLimit      = deductions.section80D.selfSenior   ? MAX_80D_SELF_SENIOR   : MAX_80D_SELF;
+  const parentLimit    = deductions.section80D.parentSenior ? MAX_80D_PARENT_SENIOR : MAX_80D_PARENT;
+  const used80D        = deductions.section80D.selfPremium + deductions.section80D.parentPremium;
+  const headroom80D    = Math.max(0, selfLimit + parentLimit - used80D);
+
+  const headroomNPS    = Math.max(0, 50_000 - deductions.nps80CCD1B.amount);
+
+  const usedHomeLoan   = deductions.homeLoanInterest.isSelfOccupied
+    ? Math.min(deductions.homeLoanInterest.interestPaid, MAX_HOME_LOAN_INTEREST) : 0;
+  const headroomHomeLoan = deductions.homeLoanInterest.isSelfOccupied
+    ? Math.max(0, MAX_HOME_LOAN_INTEREST - usedHomeLoan) : 0;
+
+  const availableHeadroom  = headroom80C + headroom80D + headroomNPS + headroomHomeLoan;
+  const potentialTaxSavings = Math.round(availableHeadroom * marginalRate);
+
+  const canOldBeatNew   = oldTax > newTax
+    ? (oldTax - potentialTaxSavings) < newTax
+    : true;  // old already winning
+
+  const neededDeductions = oldTax > newTax && marginalRate > 0
+    ? Math.ceil((oldTax - newTax) / marginalRate)
+    : 0;
+
+  return {
+    winner:           oldTax < newTax ? 'old' : newTax < oldTax ? 'new' : 'equal',
+    savingsAmount:    Math.abs(oldTax - newTax),
+    canOldBeatNew,
+    neededDeductions,
+    availableHeadroom,
+    marginalRate,
+  };
+}
+
 // ─── Formatters ───────────────────────────────────────────────────
 
 export function fmt(n: number): string {

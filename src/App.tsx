@@ -22,8 +22,11 @@ import FreelancePanel from './components/FreelancePanel';
 import CTCHelper from './components/CTCHelper';
 import LandingPage from './components/LandingPage';
 import TaxOptimiserPanel from './components/TaxOptimiserPanel';
+import RegimeRecommendationCard from './components/RegimeRecommendationCard';
 import ChangelogPage from './components/ChangelogPage';
 import { trackEvent } from './analytics';
+import { getRegimeRecommendation } from './tax';
+import type { RegimeRecommendation } from './tax';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 
@@ -297,9 +300,12 @@ export default function App() {
         return false;
     }
   }
-  const epf         = deductions.section80C.epf;
-  const oldHigher   = result !== null && result.old.total > result.new.total;
-  const newHigher   = result !== null && result.new.total > result.old.total;
+  const epf           = deductions.section80C.epf;
+  const oldHigher     = result !== null && result.old.total > result.new.total;
+  const newHigher     = result !== null && result.new.total > result.old.total;
+  const recommendation: RegimeRecommendation | null = result
+    ? getRegimeRecommendation(result.old, result.new, deductions)
+    : null;
   const oiResult    = result ? result.otherIncomeResult : calcOtherIncome(EMPTY_OTHER_INCOME);
   const flResult    = result ? result.freelanceResult   : calcFreelanceIncome(EMPTY_FREELANCE);
 
@@ -437,10 +443,23 @@ export default function App() {
             FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
           </p>
 
+          {/* Regime recommendation banner */}
+          {recommendation && (
+            <RegimeRecommendationCard
+              recommendation={recommendation}
+              oldResult={result.old}
+              newResult={result.new}
+              oldInHand={oldInHand}
+              newInHand={newInHand}
+              isFreelance={userType === 'freelance'}
+              compact
+            />
+          )}
+
           {/* Tax & In-hand Salary */}
-          <div className="px-4 py-4 border-b">
+          <div className="px-4 py-4 border-b mt-3">
             <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-3">
-              Tax & In-hand Salary
+              Both Regimes
             </p>
             <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" isFreelance={userType === 'freelance'} />
             <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} />
@@ -474,8 +493,32 @@ export default function App() {
           <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-1">
             FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
           </p>
+          {/* Regime recommendation — winner card + switch analysis */}
+          {recommendation && (
+            <RegimeRecommendationCard
+              recommendation={recommendation}
+              oldResult={result.old}
+              newResult={result.new}
+              oldInHand={oldInHand}
+              newInHand={newInHand}
+              isFreelance={userType === 'freelance'}
+            />
+          )}
+
+          {/* Deduction Analysis */}
+          <div className="px-4 mt-4 pb-6">
+            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider pb-2">
+              Deduction Analysis
+            </p>
+            <TaxOptimiserPanel
+              deductions={deductions}
+              oldResult={result.old}
+              userType={userType}
+            />
+          </div>
+
           {/* CA CTA */}
-          <div className="mx-4 mt-4 bg-[#004030] rounded-2xl px-5 py-5">
+          <div className="mx-4 mb-10 bg-[#004030] rounded-2xl px-5 py-5">
             <p className="text-xs font-semibold text-[#B6FF00]/70 uppercase tracking-wider mb-1">Not sure if this is right?</p>
             <p className="text-base font-bold text-white mb-1">Get a CA to review &amp; file for you</p>
             <p className="text-xs text-white/50 mb-4">A qualified CA will review your numbers, confirm the right regime, and file on your behalf.</p>
@@ -487,24 +530,6 @@ export default function App() {
             >
               I'm interested →
             </a>
-          </div>
-
-          <div className="px-4 py-4 border-b mt-4">
-            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-3">Tax & In-hand</p>
-            <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" isFreelance={userType === 'freelance'} />
-            <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} />
-          </div>
-
-          {/* Deduction Analysis */}
-          <div className="px-4 pb-10">
-            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider pt-4 pb-2">
-              Deduction Analysis
-            </p>
-            <TaxOptimiserPanel
-              deductions={deductions}
-              oldResult={result.old}
-              userType={userType}
-            />
           </div>
 
         </div>
