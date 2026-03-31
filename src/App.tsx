@@ -560,6 +560,21 @@ export default function App() {
             </div>
           </div>
 
+          {/* CA CTA */}
+          <div className="mx-4 mb-6 bg-[#004030] rounded-2xl px-5 py-5">
+            <p className="text-xs font-semibold text-[#B6FF00]/70 uppercase tracking-wider mb-1">Not sure if this is right?</p>
+            <p className="text-base font-bold text-white mb-1">Get a CA to review &amp; file for you</p>
+            <p className="text-xs text-white/50 mb-4">A qualified CA will review your numbers, confirm the right regime, and file on your behalf.</p>
+            <a
+              href="https://forms.gle/vdF6KuRz1DqBZbKv6"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 bg-[#B6FF00] text-[#004030] text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#B6FF00]/90 transition-colors"
+            >
+              I'm interested →
+            </a>
+          </div>
+
           {/* Fixed footer: Save as PDF (primary) + Edit details (secondary) */}
           <div className="no-print fixed bottom-0 left-0 right-0 bg-white border-t">
             <div className="md:max-w-[48vw] mx-auto px-4 pt-3 flex gap-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
