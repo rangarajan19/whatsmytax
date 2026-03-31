@@ -546,22 +546,8 @@ export default function App() {
             />
           </div>
 
-          <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider px-4 pt-6 pb-2">Tax Calculations</p>
-          <div className="mx-4 bg-card rounded-xl ring-1 ring-foreground/10 overflow-hidden mb-6">
-            <div className="border-b px-4 py-3">
-              <ToggleGroup value={activeTaxTab} onValueChange={(v) => { if (v) setActiveTaxTab(v as 'old' | 'new'); }} className="w-full">
-                <ToggleGroupItem value="old">Old Regime</ToggleGroupItem>
-                <ToggleGroupItem value="new">New Regime</ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-            <div className="px-4 py-4">
-              {activeTaxTab === 'old' && <RegimeBreakdown regime="old" label="Pre-2020 slabs with deductions" result={result.old} isHigher={oldHigher} gross={result.gross} epf={epf} isFreelance={userType === 'freelance'} />}
-              {activeTaxTab === 'new' && <RegimeBreakdown regime="new" label="Simplified slabs, higher std. deduction (₹75K)" result={result.new} isHigher={newHigher} gross={result.gross} epf={epf} isFreelance={userType === 'freelance'} />}
-            </div>
-          </div>
-
           {/* CA CTA */}
-          <div className="mx-4 mb-28 bg-[#004030] rounded-2xl px-5 py-5">
+          <div className="mx-4 mt-6 mb-10 bg-[#004030] rounded-2xl px-5 py-5">
             <p className="text-xs font-semibold text-[#B6FF00]/70 uppercase tracking-wider mb-1">Not sure if this is right?</p>
             <p className="text-base font-bold text-white mb-1">Get a CA to review &amp; file for you</p>
             <p className="text-xs text-white/50 mb-4">A qualified CA will review your numbers, confirm the right regime, and file on your behalf.</p>
@@ -575,24 +561,6 @@ export default function App() {
             </a>
           </div>
 
-          {/* Fixed footer: Save as PDF (primary) + Edit details (secondary) */}
-          <div className="no-print fixed bottom-0 left-0 right-0 bg-white border-t">
-            <div className="md:max-w-[48vw] mx-auto px-4 pt-3 flex gap-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
-              <Button
-                variant="outline"
-                className="h-12 px-5 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 active:scale-[0.98]"
-                onClick={() => setViewMode('detail')}
-              >
-                ← Edit
-              </Button>
-              <Button
-                className="flex-1 h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
-                onClick={() => window.print()}
-              >
-                ↓ Save as PDF
-              </Button>
-            </div>
-          </div>
         </div>
       )}
 
