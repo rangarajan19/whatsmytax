@@ -22,11 +22,8 @@ import FreelancePanel from './components/FreelancePanel';
 import CTCHelper from './components/CTCHelper';
 import LandingPage from './components/LandingPage';
 import TaxOptimiserPanel from './components/TaxOptimiserPanel';
-import RegimeRecommendationCard from './components/RegimeRecommendationCard';
 import ChangelogPage from './components/ChangelogPage';
 import { trackEvent } from './analytics';
-import { getRegimeRecommendation } from './tax';
-import type { RegimeRecommendation } from './tax';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 
@@ -303,9 +300,6 @@ export default function App() {
   const epf           = deductions.section80C.epf;
   const oldHigher     = result !== null && result.old.total > result.new.total;
   const newHigher     = result !== null && result.new.total > result.old.total;
-  const recommendation: RegimeRecommendation | null = result
-    ? getRegimeRecommendation(result.old, result.new, deductions)
-    : null;
   const oiResult    = result ? result.otherIncomeResult : calcOtherIncome(EMPTY_OTHER_INCOME);
   const flResult    = result ? result.freelanceResult   : calcFreelanceIncome(EMPTY_FREELANCE);
 
@@ -443,23 +437,10 @@ export default function App() {
             FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
           </p>
 
-          {/* Regime recommendation banner */}
-          {recommendation && (
-            <RegimeRecommendationCard
-              recommendation={recommendation}
-              oldResult={result.old}
-              newResult={result.new}
-              oldInHand={oldInHand}
-              newInHand={newInHand}
-              isFreelance={userType === 'freelance'}
-              compact
-            />
-          )}
-
           {/* Tax & In-hand Salary */}
-          <div className="px-4 py-4 border-b mt-3">
+          <div className="px-4 py-4 border-b">
             <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-3">
-              Both Regimes
+              Tax & In-hand Salary
             </p>
             <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" isFreelance={userType === 'freelance'} />
             <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} />
@@ -474,7 +455,7 @@ export default function App() {
         <div className="no-print fixed bottom-0 left-0 right-0 bg-white border-t">
           <div className="md:max-w-[35vw] mx-auto px-4 pt-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
             <Button
-              className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
+              className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.99]"
               onClick={() => {
                 setActiveDetailTab(activeTabs[0].id);
                 setViewMode('detail');
@@ -493,18 +474,6 @@ export default function App() {
           <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-1">
             FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
           </p>
-          {/* Regime recommendation — winner card + switch analysis */}
-          {recommendation && (
-            <RegimeRecommendationCard
-              recommendation={recommendation}
-              oldResult={result.old}
-              newResult={result.new}
-              oldInHand={oldInHand}
-              newInHand={newInHand}
-              isFreelance={userType === 'freelance'}
-            />
-          )}
-
           {/* Deduction Analysis */}
           <div className="px-4 mt-4 pb-6">
             <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider pb-2">
@@ -658,7 +627,7 @@ export default function App() {
             <div className="md:max-w-[48vw] mx-auto px-4 pt-3 flex gap-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
               <Button
                 variant="outline"
-                className="h-12 px-5 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 active:scale-[0.98]"
+                className="h-12 px-5 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 active:scale-[0.99]"
                 onClick={() => {
                   const i = activeTabs.findIndex(t => t.id === activeDetailTab);
                   if (i > 0) {
@@ -673,7 +642,7 @@ export default function App() {
                 ← Back
               </Button>
               <Button
-                className="flex-1 h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.98]"
+                className="flex-1 h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.99]"
                 onClick={() => {
                   const i = activeTabs.findIndex(t => t.id === activeDetailTab);
                   if (i < activeTabs.length - 1) {
