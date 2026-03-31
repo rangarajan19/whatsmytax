@@ -357,13 +357,7 @@ export default function App() {
             </span>
           </div>
         ) : viewMode === 'summary' ? (
-          <div className="flex items-center justify-between">
-            <button
-              className="flex items-center gap-1.5 text-sm font-semibold text-[#004030]"
-              onClick={() => setViewMode('detail')}
-            >
-              ← Edit
-            </button>
+          <div className="flex items-center justify-center">
             <span className="text-sm font-semibold text-[#004030]">Tax Summary</span>
           </div>
         ) : userType === 'freelance' ? (
@@ -455,51 +449,6 @@ export default function App() {
             <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} />
           </div>
 
-          {/* Tax Calculations */}
-          <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider px-4 pt-4 pb-2">
-            Tax Calculations
-          </p>
-          <div className="mx-4 bg-card rounded-xl ring-1 ring-foreground/10 overflow-hidden">
-            <div className="border-b px-4 py-3">
-              <ToggleGroup
-                value={activeTaxTab}
-                onValueChange={(v) => {
-                  if (v) {
-                    setActiveTaxTab(v as 'old' | 'new');
-                    window.scrollTo({ top: 0, behavior: 'instant' });
-                  }
-                }}
-                className="w-full"
-              >
-                <ToggleGroupItem value="old">Old Regime</ToggleGroupItem>
-                <ToggleGroupItem value="new">New Regime</ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-            <div className="px-4 py-4 pb-28">
-              {activeTaxTab === 'old' && (
-                <RegimeBreakdown
-                  regime="old"
-                  label="Pre-2020 slabs with deductions"
-                  result={result.old}
-                  isHigher={oldHigher}
-                  gross={result.gross}
-                  epf={epf}
-                  isFreelance={userType === 'freelance'}
-                />
-              )}
-              {activeTaxTab === 'new' && (
-                <RegimeBreakdown
-                  regime="new"
-                  label="Simplified slabs, higher std. deduction (₹75K)"
-                  result={result.new}
-                  isHigher={newHigher}
-                  gross={result.gross}
-                  epf={epf}
-                  isFreelance={userType === 'freelance'}
-                />
-              )}
-            </div>
-          </div>
 
         </>
       )}
