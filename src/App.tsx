@@ -554,14 +554,14 @@ export default function App() {
                 <ToggleGroupItem value="new">New Regime</ToggleGroupItem>
               </ToggleGroup>
             </div>
-            <div className="px-4 py-4 pb-28">
+            <div className="px-4 py-4">
               {activeTaxTab === 'old' && <RegimeBreakdown regime="old" label="Pre-2020 slabs with deductions" result={result.old} isHigher={oldHigher} gross={result.gross} epf={epf} isFreelance={userType === 'freelance'} />}
               {activeTaxTab === 'new' && <RegimeBreakdown regime="new" label="Simplified slabs, higher std. deduction (₹75K)" result={result.new} isHigher={newHigher} gross={result.gross} epf={epf} isFreelance={userType === 'freelance'} />}
             </div>
           </div>
 
           {/* CA CTA */}
-          <div className="mx-4 mb-6 bg-[#004030] rounded-2xl px-5 py-5">
+          <div className="mx-4 mb-28 bg-[#004030] rounded-2xl px-5 py-5">
             <p className="text-xs font-semibold text-[#B6FF00]/70 uppercase tracking-wider mb-1">Not sure if this is right?</p>
             <p className="text-base font-bold text-white mb-1">Get a CA to review &amp; file for you</p>
             <p className="text-xs text-white/50 mb-4">A qualified CA will review your numbers, confirm the right regime, and file on your behalf.</p>
