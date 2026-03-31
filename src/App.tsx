@@ -474,26 +474,8 @@ export default function App() {
           <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-1">
             FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
           </p>
-          <div className="px-4 py-4 border-b">
-            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-3">Tax & In-hand</p>
-            <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" isFreelance={userType === 'freelance'} />
-            <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} />
-          </div>
-
-          {/* Deduction Analysis — always visible, shown before calculations */}
-          <div className="px-4">
-            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider pt-4 pb-2">
-              Deduction Analysis
-            </p>
-            <TaxOptimiserPanel
-              deductions={deductions}
-              oldResult={result.old}
-              userType={userType}
-            />
-          </div>
-
           {/* CA CTA */}
-          <div className="mx-4 mt-6 mb-10 bg-[#004030] rounded-2xl px-5 py-5">
+          <div className="mx-4 mt-4 bg-[#004030] rounded-2xl px-5 py-5">
             <p className="text-xs font-semibold text-[#B6FF00]/70 uppercase tracking-wider mb-1">Not sure if this is right?</p>
             <p className="text-base font-bold text-white mb-1">Get a CA to review &amp; file for you</p>
             <p className="text-xs text-white/50 mb-4">A qualified CA will review your numbers, confirm the right regime, and file on your behalf.</p>
@@ -505,6 +487,24 @@ export default function App() {
             >
               I'm interested →
             </a>
+          </div>
+
+          <div className="px-4 py-4 border-b mt-4">
+            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-3">Tax & In-hand</p>
+            <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" isFreelance={userType === 'freelance'} />
+            <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} />
+          </div>
+
+          {/* Deduction Analysis */}
+          <div className="px-4 pb-10">
+            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider pt-4 pb-2">
+              Deduction Analysis
+            </p>
+            <TaxOptimiserPanel
+              deductions={deductions}
+              oldResult={result.old}
+              userType={userType}
+            />
           </div>
 
         </div>
