@@ -656,7 +656,6 @@ export default function App() {
                     setActiveDetailTab(nextTab);
                     trackEvent('tab_viewed', { tab: nextTab });
                   } else {
-                    setActiveTaxTab('new');
                     setViewMode('summary');
                     window.scrollTo({ top: 0, behavior: 'instant' });
                   }
