@@ -455,7 +455,7 @@ export default function App() {
         <div className="no-print fixed bottom-0 left-0 right-0 bg-white border-t">
           <div className="md:max-w-[35vw] mx-auto px-4 pt-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
             <Button
-              className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.99]"
+              className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 transition-transform duration-100 ease-out active:scale-[0.995]"
               onClick={() => {
                 setActiveDetailTab(activeTabs[0].id);
                 setViewMode('detail');
@@ -627,7 +627,7 @@ export default function App() {
             <div className="md:max-w-[48vw] mx-auto px-4 pt-3 flex gap-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
               <Button
                 variant="outline"
-                className="h-12 px-5 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 active:scale-[0.99]"
+                className="h-12 px-5 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 transition-transform duration-100 ease-out active:scale-[0.995]"
                 onClick={() => {
                   const i = activeTabs.findIndex(t => t.id === activeDetailTab);
                   if (i > 0) {
@@ -642,7 +642,7 @@ export default function App() {
                 ← Back
               </Button>
               <Button
-                className="flex-1 h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 active:scale-[0.99]"
+                className="flex-1 h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 transition-transform duration-100 ease-out active:scale-[0.995]"
                 onClick={() => {
                   const i = activeTabs.findIndex(t => t.id === activeDetailTab);
                   if (i < activeTabs.length - 1) {
