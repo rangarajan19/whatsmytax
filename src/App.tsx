@@ -3,6 +3,9 @@ import {
   calcOldRegime, calcNewRegime, fmt,
   calcEPFContribution, calcOtherIncome, calcFreelanceIncome,
   EMPTY_DEDUCTIONS, EMPTY_OTHER_INCOME, EMPTY_FREELANCE,
+  getRegimeRecommendation, total80C,
+  MAX_80C, MAX_80D_SELF, MAX_80D_SELF_SENIOR, MAX_80D_PARENT, MAX_80D_PARENT_SENIOR,
+  MAX_HOME_LOAN_INTEREST,
 } from './tax';
 import type {
   TaxResult, Deductions, Deductions80C, EPFInput, HRAInput,
@@ -21,7 +24,6 @@ import CapitalGainsPanel from './components/CapitalGainsPanel';
 import FreelancePanel from './components/FreelancePanel';
 import CTCHelper from './components/CTCHelper';
 import LandingPage from './components/LandingPage';
-import TaxOptimiserPanel from './components/TaxOptimiserPanel';
 import ChangelogPage from './components/ChangelogPage';
 import { trackEvent } from './analytics';
 import { Button } from './components/ui/button';
@@ -300,6 +302,50 @@ export default function App() {
   const epf           = deductions.section80C.epf;
   const oldHigher     = result !== null && result.old.total > result.new.total;
   const newHigher     = result !== null && result.new.total > result.old.total;
+
+  // ── Summary page headroom items ───────────────────────────────────
+  const summaryRec  = result ? getRegimeRecommendation(result.old, result.new, deductions) : null;
+  const marginalRate = summaryRec?.marginalRate ?? 0;
+  const headroomItems = result ? [
+    {
+      label: 'Section 80C',
+      used: Math.min(total80C(deductions.section80C), MAX_80C),
+      max: MAX_80C,
+      headroom: Math.max(0, MAX_80C - Math.min(total80C(deductions.section80C), MAX_80C)),
+      taxSaving: Math.round(Math.max(0, MAX_80C - Math.min(total80C(deductions.section80C), MAX_80C)) * marginalRate),
+    },
+    {
+      label: 'Section 80D',
+      used: deductions.section80D.selfPremium + deductions.section80D.parentPremium,
+      max: (deductions.section80D.selfSenior ? MAX_80D_SELF_SENIOR : MAX_80D_SELF) +
+           (deductions.section80D.parentSenior ? MAX_80D_PARENT_SENIOR : MAX_80D_PARENT),
+      headroom: Math.max(0,
+        (deductions.section80D.selfSenior ? MAX_80D_SELF_SENIOR : MAX_80D_SELF) +
+        (deductions.section80D.parentSenior ? MAX_80D_PARENT_SENIOR : MAX_80D_PARENT) -
+        deductions.section80D.selfPremium - deductions.section80D.parentPremium),
+      taxSaving: Math.round(Math.max(0,
+        (deductions.section80D.selfSenior ? MAX_80D_SELF_SENIOR : MAX_80D_SELF) +
+        (deductions.section80D.parentSenior ? MAX_80D_PARENT_SENIOR : MAX_80D_PARENT) -
+        deductions.section80D.selfPremium - deductions.section80D.parentPremium) * marginalRate),
+    },
+    {
+      label: 'NPS 80CCD(1B)',
+      used: deductions.nps80CCD1B.amount,
+      max: 50_000,
+      headroom: Math.max(0, 50_000 - deductions.nps80CCD1B.amount),
+      taxSaving: Math.round(Math.max(0, 50_000 - deductions.nps80CCD1B.amount) * marginalRate),
+    },
+    {
+      label: 'Home Loan Interest (24b)',
+      used: deductions.homeLoanInterest.isSelfOccupied
+        ? Math.min(deductions.homeLoanInterest.interestPaid, MAX_HOME_LOAN_INTEREST) : 0,
+      max: MAX_HOME_LOAN_INTEREST,
+      headroom: deductions.homeLoanInterest.isSelfOccupied
+        ? Math.max(0, MAX_HOME_LOAN_INTEREST - Math.min(deductions.homeLoanInterest.interestPaid, MAX_HOME_LOAN_INTEREST)) : 0,
+      taxSaving: deductions.homeLoanInterest.isSelfOccupied
+        ? Math.round(Math.max(0, MAX_HOME_LOAN_INTEREST - Math.min(deductions.homeLoanInterest.interestPaid, MAX_HOME_LOAN_INTEREST)) * marginalRate) : 0,
+    },
+  ].filter(i => i.headroom > 0 && i.taxSaving > 0) : [];
   const oiResult    = result ? result.otherIncomeResult : calcOtherIncome(EMPTY_OTHER_INCOME);
   const flResult    = result ? result.freelanceResult   : calcFreelanceIncome(EMPTY_FREELANCE);
 
@@ -470,27 +516,145 @@ export default function App() {
 
       {/* ── Summary view ── */}
       {viewMode === 'summary' && result && (
-        <div className="md:max-w-[48vw] mx-auto">
-          <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-1">
+        <div className="md:max-w-[48vw] mx-auto pb-10">
+          <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-4">
             FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
           </p>
-          {/* Deduction Analysis */}
-          <div className="px-4 mt-4 pb-6">
-            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider pb-2">
-              Deduction Analysis
-            </p>
-            <TaxOptimiserPanel
-              deductions={deductions}
-              oldResult={result.old}
-              userType={userType}
-            />
+
+          {/* 1 ── Old Regime breakdown */}
+          <div className="mx-4 mb-4">
+            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-2">Old Regime</p>
+            <div className="bg-card rounded-2xl ring-1 ring-foreground/10 overflow-hidden">
+              <div className="px-4 pt-4 pb-3 space-y-2">
+                {/* Gross */}
+                <div className="flex justify-between">
+                  <span className="text-sm text-[#004030]/70">Gross Income</span>
+                  <span className="text-sm font-semibold text-[#004030]">{fmt(result.gross)}</span>
+                </div>
+                {/* Deductions */}
+                {result.old.stdDeduction > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#004030]/50">Standard Deduction</span>
+                    <span className="text-sm text-[#004030]/50">− {fmt(result.old.stdDeduction)}</span>
+                  </div>
+                )}
+                {result.old.deduction80C > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#004030]/50">
+                      80C <span className="text-[11px]">({fmt(result.old.deduction80C)} of {fmt(MAX_80C)})</span>
+                    </span>
+                    <span className="text-sm text-[#004030]/50">− {fmt(result.old.deduction80C)}</span>
+                  </div>
+                )}
+                {result.old.deductionHRA > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#004030]/50">HRA Exemption</span>
+                    <span className="text-sm text-[#004030]/50">− {fmt(result.old.deductionHRA)}</span>
+                  </div>
+                )}
+                {result.old.deduction80D > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#004030]/50">Section 80D</span>
+                    <span className="text-sm text-[#004030]/50">− {fmt(result.old.deduction80D)}</span>
+                  </div>
+                )}
+                {result.old.deductionNPS > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#004030]/50">NPS 80CCD(1B)</span>
+                    <span className="text-sm text-[#004030]/50">− {fmt(result.old.deductionNPS)}</span>
+                  </div>
+                )}
+                {result.old.deductionHomeLoan > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#004030]/50">Home Loan Interest (24b)</span>
+                    <span className="text-sm text-[#004030]/50">− {fmt(result.old.deductionHomeLoan)}</span>
+                  </div>
+                )}
+                {result.old.deductionEducationLoan > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#004030]/50">Education Loan (80E)</span>
+                    <span className="text-sm text-[#004030]/50">− {fmt(result.old.deductionEducationLoan)}</span>
+                  </div>
+                )}
+                {result.old.deductionPerquisites > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-[#004030]/50">Perquisites</span>
+                    <span className="text-sm text-[#004030]/50">− {fmt(result.old.deductionPerquisites)}</span>
+                  </div>
+                )}
+              </div>
+              <div className="border-t px-4 py-3 space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-semibold text-[#004030]/50">Taxable Income</span>
+                  <span className="text-sm font-semibold text-[#004030]">{fmt(result.old.taxableIncome)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-bold text-[#004030]">Tax + Cess</span>
+                  <span className="text-lg font-bold text-[#004030]">{fmt(result.old.total)}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* CA CTA */}
-          <div className="mx-4 mb-10 bg-[#004030] rounded-2xl px-5 py-5">
-            <p className="text-xs font-semibold text-[#B6FF00]/70 uppercase tracking-wider mb-1">Not sure if this is right?</p>
+          {/* 2 ── Invest more to save (only when headroom exists) */}
+          {headroomItems.length > 0 && (
+            <div className="mx-4 mb-4">
+              <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-2">Invest more to save tax</p>
+              <div className="bg-card rounded-2xl ring-1 ring-foreground/10 divide-y divide-border">
+                {headroomItems.map(item => (
+                  <div key={item.label} className="flex items-center justify-between px-4 py-3">
+                    <div>
+                      <p className="text-sm font-semibold text-[#004030]">{item.label}</p>
+                      <p className="text-xs text-[#004030]/50">{fmt(item.headroom)} more available</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] text-[#004030]/40 uppercase tracking-wide">Saves up to</p>
+                      <p className="text-sm font-bold text-[#004030]">{fmt(item.taxSaving)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 3 ── Which regime is better */}
+          <div className="mx-4 mb-4">
+            <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-2">Which regime is better?</p>
+            <div className="bg-card rounded-2xl ring-1 ring-foreground/10 overflow-hidden">
+              {[
+                { label: 'New Regime', tax: result.new.total, inHand: newInHand, better: newHigher },
+                { label: 'Old Regime', tax: result.old.total, inHand: oldInHand, better: oldHigher },
+              ].map(r => (
+                <div key={r.label} className={`flex items-center justify-between px-4 py-3 border-b last:border-0 ${r.better ? 'bg-[#B6FF00]/20' : ''}`}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-[#004030]">{r.label}</span>
+                    {r.better && (
+                      <span className="text-[10px] font-bold bg-[#004030] text-[#B6FF00] px-2 py-0.5 rounded-full">Better</span>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-[#004030]">{fmt(r.tax)}</p>
+                    <p className="text-xs text-[#004030]/50">{fmt(r.inHand)}/mo</p>
+                  </div>
+                </div>
+              ))}
+              {result.old.total !== result.new.total && (
+                <div className="px-4 py-2.5 bg-[#004030]/5 border-t">
+                  <p className="text-xs font-semibold text-[#004030]">
+                    {oldHigher
+                      ? `Switch to New Regime — save ${fmt(result.old.total - result.new.total)} in tax`
+                      : `Your deductions make Old Regime better — saving ${fmt(result.new.total - result.old.total)}`}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 4 ── CA CTA */}
+          <div className="mx-4 bg-[#004030] rounded-2xl px-5 py-5">
+            <p className="text-xs font-semibold text-[#B6FF00]/70 uppercase tracking-wider mb-1">Want expert help?</p>
             <p className="text-base font-bold text-white mb-1">Get a CA to review &amp; file for you</p>
-            <p className="text-xs text-white/50 mb-4">A qualified CA will review your numbers, confirm the right regime, and file on your behalf.</p>
+            <p className="text-xs text-white/50 mb-4">Share your details and a qualified CA will reach out to verify your numbers and file your return.</p>
             <a
               href="https://forms.gle/vdF6KuRz1DqBZbKv6"
               target="_blank"
