@@ -622,8 +622,8 @@ export default function App() {
             <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-2">Which regime is better?</p>
             <div className="bg-card rounded-2xl ring-1 ring-foreground/10 overflow-hidden">
               {[
-                { label: 'New Regime', tax: result.new.total, inHand: newInHand, better: newHigher },
-                { label: 'Old Regime', tax: result.old.total, inHand: oldInHand, better: oldHigher },
+                { label: 'New Regime', tax: result.new.total, inHand: newInHand, better: oldHigher },
+                { label: 'Old Regime', tax: result.old.total, inHand: oldInHand, better: newHigher },
               ].map(r => (
                 <div key={r.label} className={`flex items-center justify-between px-4 py-3 border-b last:border-0 ${r.better ? 'bg-[#B6FF00]/20' : ''}`}>
                   <div className="flex items-center gap-2">
