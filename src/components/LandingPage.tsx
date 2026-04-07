@@ -17,9 +17,9 @@ const TRIVIA = [
 const EASE: BezierDefinition = [0.22, 1, 0.36, 1];
 
 const fadeUp = (delay: number) => ({
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 16 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.45, ease: EASE, delay },
+  transition: { duration: 0.4, ease: EASE, delay },
 });
 
 interface Props {
@@ -77,19 +77,19 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
         <div className="flex flex-col items-center gap-3 w-full max-w-md">
           <motion.p
             className="text-sm font-semibold text-[#004030]/70 text-center"
-            {...fadeUp(0.1)}
+            {...fadeUp(0.15)}
           >
             Income Tax Calculator — FY 2024–25 (AY 2025–26)
           </motion.p>
           <motion.h1
             className="text-[32px] md:text-[48px] font-bold text-[#004030]/80 text-center leading-tight"
-            {...fadeUp(0.2)}
+            {...fadeUp(0.3)}
           >
             Calculate your tax<br />Precisely.
           </motion.h1>
           <motion.p
             className="text-base font-semibold text-[#004030]/70 text-center"
-            {...fadeUp(0.3)}
+            {...fadeUp(0.45)}
           >
             No more confusion on what's left and what's available
           </motion.p>
@@ -98,7 +98,7 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
         {/* CTA buttons */}
         <motion.div
           className="flex flex-col md:flex-row gap-4 w-full max-w-lg"
-          {...fadeUp(0.4)}
+          {...fadeUp(0.6)}
         >
           <button
             onClick={() => onSelect('salaried')}
@@ -125,7 +125,7 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
           >
             {TRIVIA[triviaIndex]}
           </motion.p>
