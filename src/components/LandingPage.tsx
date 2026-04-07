@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 
 const TRIVIA = [
   'Only 3% of Indians pay income tax',
@@ -12,6 +13,12 @@ const TRIVIA = [
   'NPS contributions under 80CCD(1B) give an additional ₹50,000 deduction',
 ];
 
+const fadeUp = (delay: number) => ({
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1], delay },
+});
+
 interface Props {
   onSelect: (type: 'salaried' | 'freelance') => void;
   onChangelog: () => void;
@@ -19,15 +26,10 @@ interface Props {
 
 export default function LandingPage({ onSelect, onChangelog }: Props) {
   const [triviaIndex, setTriviaIndex] = useState(0);
-  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setVisible(false);
-      setTimeout(() => {
-        setTriviaIndex(i => (i + 1) % TRIVIA.length);
-        setVisible(true);
-      }, 400);
+      setTriviaIndex(i => (i + 1) % TRIVIA.length);
     }, 20000);
     return () => clearInterval(interval);
   }, []);
@@ -48,7 +50,12 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
       />
 
       {/* Navbar */}
-      <nav className="relative z-10 flex items-center justify-between px-8 pt-10 pb-0">
+      <motion.nav
+        className="relative z-10 flex items-center justify-between px-8 pt-10 pb-0"
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      >
         <span className="text-2xl font-bold text-black tracking-tight">
           Whats My Tax?
         </span>
@@ -58,26 +65,38 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
         >
           What's new · v2.0
         </button>
-      </nav>
+      </motion.nav>
 
-      {/* Centre content — grows to fill space */}
+      {/* Centre content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 py-12 gap-12">
 
         {/* Text block */}
         <div className="flex flex-col items-center gap-3 w-full max-w-md">
-          <p className="text-sm font-semibold text-[#004030]/70 text-center">
+          <motion.p
+            className="text-sm font-semibold text-[#004030]/70 text-center"
+            {...fadeUp(0.1)}
+          >
             Income Tax Calculator — FY 2024–25 (AY 2025–26)
-          </p>
-          <h1 className="text-[32px] md:text-[48px] font-bold text-[#004030]/80 text-center leading-tight">
+          </motion.p>
+          <motion.h1
+            className="text-[32px] md:text-[48px] font-bold text-[#004030]/80 text-center leading-tight"
+            {...fadeUp(0.2)}
+          >
             Calculate your tax<br />Precisely.
-          </h1>
-          <p className="text-base font-semibold text-[#004030]/70 text-center">
+          </motion.h1>
+          <motion.p
+            className="text-base font-semibold text-[#004030]/70 text-center"
+            {...fadeUp(0.3)}
+          >
             No more confusion on what's left and what's available
-          </p>
+          </motion.p>
         </div>
 
         {/* CTA buttons */}
-        <div className="flex flex-col md:flex-row gap-4 w-full max-w-lg">
+        <motion.div
+          className="flex flex-col md:flex-row gap-4 w-full max-w-lg"
+          {...fadeUp(0.4)}
+        >
           <button
             onClick={() => onSelect('salaried')}
             className="w-full md:flex-1 h-[52px] px-4 bg-[#004030] text-[#B6FF00] text-[15px] font-semibold rounded-[15px] hover:bg-[#004030]/90 transition-colors"
@@ -90,18 +109,24 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
           >
             I am a freelancer
           </button>
-        </div>
+        </motion.div>
 
       </div>
 
-      {/* Trivia — bottom, rotates every 20s */}
+      {/* Trivia — AnimatePresence crossfade */}
       <div className="relative z-10 flex items-center justify-center py-5 min-h-[40px]">
-        <p
-          className="text-sm font-semibold text-[#004030]/70 text-center px-6 transition-opacity duration-400"
-          style={{ opacity: visible ? 1 : 0 }}
-        >
-          {TRIVIA[triviaIndex]}
-        </p>
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={triviaIndex}
+            className="text-sm font-semibold text-[#004030]/70 text-center px-6 absolute"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
+          >
+            {TRIVIA[triviaIndex]}
+          </motion.p>
+        </AnimatePresence>
       </div>
 
     </div>
