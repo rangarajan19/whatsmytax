@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import type { BezierDefinition } from 'motion';
 
 const TRIVIA = [
   'Only 3% of Indians pay income tax',
@@ -13,10 +14,12 @@ const TRIVIA = [
   'NPS contributions under 80CCD(1B) give an additional ₹50,000 deduction',
 ];
 
+const EASE: BezierDefinition = [0.22, 1, 0.36, 1];
+
 const fadeUp = (delay: number) => ({
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1], delay },
+  transition: { duration: 0.45, ease: EASE, delay },
 });
 
 interface Props {
@@ -54,7 +57,7 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
         className="relative z-10 flex items-center justify-between px-8 pt-10 pb-0"
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.4, ease: EASE }}
       >
         <span className="text-2xl font-bold text-black tracking-tight">
           Whats My Tax?
