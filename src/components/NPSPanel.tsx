@@ -19,7 +19,7 @@ export default function NPSPanel({ value, onChange }: Props) {
   return (
     <Card className="mb-7">
       <CardContent className="p-4 sm:p-7">
-        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 font-medium mb-2">
+        <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium mb-2">
           Old Regime Only
         </Badge>
         <div className="flex items-center gap-2 mb-1">
@@ -56,18 +56,18 @@ export default function NPSPanel({ value, onChange }: Props) {
               <div className="mt-3">
                 <div className="flex justify-between text-xs text-muted-foreground mb-1">
                   <span>{overflow
-                    ? <span className="text-amber-600 font-semibold">Capped at ₹50,000</span>
+                    ? <span className="text-[#004030] font-semibold">Capped at ₹50,000</span>
                     : remaining > 0
                       ? <span>{fmt(remaining)} more to max</span>
-                      : <span className="text-emerald-600 font-semibold">Fully utilised ✓</span>
+                      : <span className="text-[#004030] font-semibold">Fully utilised ✓</span>
                   }</span>
-                  <span className={`font-semibold ${overflow ? 'text-amber-600' : fillPct === 100 ? 'text-emerald-600' : 'text-indigo-600'}`}>
+                  <span className="font-semibold text-[#004030]">
                     {fmt(deduction)} / {fmt(MAX_NPS_80CCD1B)}
                   </span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                   <div
-                    className={`h-2 rounded-full transition-all duration-300 ${overflow ? 'bg-amber-500' : fillPct === 100 ? 'bg-emerald-500' : 'bg-indigo-500'}`}
+                    className="h-2 rounded-full transition-all duration-300 bg-[#004030]"
                     style={{ width: `${fillPct}%` }}
                   />
                 </div>
@@ -75,18 +75,18 @@ export default function NPSPanel({ value, onChange }: Props) {
             )}
 
             {overflow && (
-              <p className="text-xs text-amber-700 mt-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              <p className="text-xs text-[#004030] mt-2 bg-[#004030]/5 border border-[#004030]/15 rounded-lg px-3 py-2">
                 ⚠️ Contribution exceeds ₹50,000 limit. Only ₹50,000 will be deducted under 80CCD(1B).
               </p>
             )}
           </div>
 
           {/* Info card */}
-          <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 space-y-2.5">
+          <div className="bg-[#004030]/8 border border-[#004030]/15 rounded-xl p-4 space-y-2.5">
             <InfoRow label="Deduction limit" value={fmt(MAX_NPS_80CCD1B)} />
             <InfoRow label="Applied deduction" value={deduction > 0 ? fmt(deduction) : '—'} highlight={deduction > 0} />
-            <div className="border-t border-indigo-100 pt-2 mt-1">
-              <p className="text-xs text-indigo-600">
+            <div className="border-t border-[#004030]/15 pt-2 mt-1">
+              <p className="text-xs text-[#004030]/60">
                 💡 This is <strong>separate</strong> from the NPS you may have entered inside Section 80C.
                 That one counts within ₹1.5L; this gives an <strong>extra ₹50K</strong> benefit.
               </p>
@@ -101,8 +101,8 @@ export default function NPSPanel({ value, onChange }: Props) {
 function InfoRow({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex justify-between items-center text-sm">
-      <span className="text-indigo-600 text-xs">{label}</span>
-      <span className={`font-bold text-sm ${highlight ? 'text-indigo-700' : 'text-indigo-400'}`}>{value}</span>
+      <span className="text-[#004030]/60 text-xs">{label}</span>
+      <span className={`font-bold text-sm ${highlight ? 'text-[#004030]' : 'text-[#004030]/40'}`}>{value}</span>
     </div>
   );
 }

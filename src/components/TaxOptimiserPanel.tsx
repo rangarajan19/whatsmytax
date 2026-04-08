@@ -44,7 +44,7 @@ function Headroom({ headroom, saving }: { headroom: number; saving: number }) {
 }
 
 function FullyUsed() {
-  return <p className="text-xs font-semibold text-green-600 mt-1">✓ Fully utilized</p>;
+  return <p className="text-xs font-semibold text-[#004030] mt-1">✓ Fully utilized</p>;
 }
 
 function SectionHeader({ label, sub, claimed, limit }: { label: string; sub: string; claimed: number; limit?: number }) {
@@ -163,7 +163,7 @@ export default function TaxOptimiserPanel({ deductions, oldResult, userType }: P
               Not claimed — if you pay rent, fill HRA details to reduce taxable income.
             </p>
           ) : (
-            <p className="text-xs text-green-600 font-semibold mt-1">✓ Exemption applied</p>
+            <p className="text-xs text-[#004030] font-semibold mt-1">✓ Exemption applied</p>
           )}
         </div>
       )}
@@ -228,7 +228,7 @@ export default function TaxOptimiserPanel({ deductions, oldResult, userType }: P
       {eduLoan > 0 && (
         <div className="bg-card rounded-xl ring-1 ring-foreground/10 px-4 py-3">
           <SectionHeader label="Education Loan (80E)" sub="Interest deduction · No upper limit" claimed={eduLoan} />
-          <p className="text-xs text-green-600 font-semibold mt-1">✓ Full interest deducted</p>
+          <p className="text-xs text-[#004030] font-semibold mt-1">✓ Full interest deducted</p>
         </div>
       )}
 

@@ -29,7 +29,7 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
     <Card className="mb-7">
       <CardContent className="p-4 sm:p-7">
         {/* Header */}
-        <Badge className="bg-purple-100 text-purple-700 border-purple-200 font-medium mb-2">
+        <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium mb-2">
           Both Regimes
         </Badge>
         <div className="flex items-center gap-2 mb-1">
@@ -44,17 +44,17 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
         </p>
 
         {/* Senior citizen toggle */}
-        <div className="flex items-center gap-3 mb-6 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+        <div className="flex items-center gap-3 mb-6 bg-[#004030]/5 border border-[#004030]/15 rounded-xl px-4 py-3">
           <Switch
             checked={value.isSenior}
             onCheckedChange={(checked) => update({ isSenior: checked })}
-            className="data-checked:bg-amber-500"
+            className="data-checked:bg-[#004030]"
           />
           <div>
-            <p className="text-xs font-semibold text-amber-800">
+            <p className="text-xs font-semibold text-[#004030]">
               I am a senior citizen (60+)
             </p>
-            <p className="text-xs text-amber-600 mt-0.5">
+            <p className="text-xs text-[#004030]/60 mt-0.5">
               {value.isSenior
                 ? `80TTB applies — combined savings + FD interest deduction up to ${fmt(MAX_80TTB)}`
                 : `80TTA applies — savings account interest deduction up to ${fmt(MAX_80TTA)}`}
@@ -129,12 +129,12 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
         {/* Summary */}
         {hasAny && (
           <div className="mt-6">
-            <div className="bg-purple-50 border border-purple-200 rounded-xl px-4 py-3">
-              <p className="text-xs font-semibold text-purple-600 uppercase tracking-wider mb-1">
+            <div className="bg-[#004030]/6 border border-[#004030]/15 rounded-xl px-4 py-3">
+              <p className="text-xs font-semibold text-[#004030]/60 uppercase tracking-wider mb-1">
                 Added to slab income
               </p>
-              <p className="text-xl font-bold text-purple-800">{fmt(result.totalAddedToIncome)}</p>
-              <p className="text-xs text-purple-500 mt-0.5">Taxed at your applicable slab rate</p>
+              <p className="text-xl font-bold text-[#004030]">{fmt(result.totalAddedToIncome)}</p>
+              <p className="text-xs text-[#004030]/50 mt-0.5">Taxed at your applicable slab rate</p>
             </div>
           </div>
         )}
@@ -174,10 +174,10 @@ function IncomeRow({
 
   return (
     <div className={`rounded-xl border p-4 transition-all ${
-      hasValue ? 'border-purple-200 bg-purple-50/40' : 'border-border bg-muted/20'
+      hasValue ? 'border-[#004030]/15 bg-[#004030]/4' : 'border-[#004030]/8 bg-[#004030]/3'
     }`}>
       {isSpecial && (
-        <Badge className="bg-orange-100 text-orange-600 border-orange-200 mb-2">
+        <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 mb-2">
           Flat rate
         </Badge>
       )}
@@ -196,12 +196,12 @@ function IncomeRow({
               placeholder="0"
               value={value === 0 ? '' : value}
               onChange={e => onChange(parseFloat(e.target.value) || 0)}
-              className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-purple-400"
+              className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
             />
           </div>
           <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{info}</p>
           {tdsNote && (
-            <p className="text-xs text-amber-700 mt-1 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+            <p className="text-xs text-amber-700 mt-1 bg-[#004030]/5 border border-[#004030]/15 rounded px-2 py-1">
               ⚠️ {tdsNote}
             </p>
           )}
@@ -244,7 +244,7 @@ function IncomeRow({
 function Chip({ label, value, color }: { label: string; value: string; color: 'green' | 'purple' | 'amber' | 'orange' | 'gray' }) {
   const colors = {
     green:  'bg-emerald-100 text-emerald-700 border-emerald-200',
-    purple: 'bg-purple-100 text-purple-700 border-purple-200',
+    purple: 'bg-[#004030]/8 text-[#004030] border-[#004030]/15',
     amber:  'bg-amber-100 text-amber-700 border-amber-200',
     orange: 'bg-orange-100 text-orange-700 border-orange-200',
     gray:   'bg-gray-100 text-gray-500 border-gray-200',

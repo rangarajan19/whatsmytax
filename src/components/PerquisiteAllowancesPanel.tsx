@@ -27,7 +27,7 @@ function TaxBreakdownPill({ taxable, exempt }: { taxable: number; exempt: number
         </Badge>
       )}
       {exempt > 0 && (
-        <Badge className="bg-teal-50 text-teal-700 border-teal-100 font-medium text-xs">
+        <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium text-xs">
           ₹{(exempt / 1000).toFixed(1)}K/yr exempt
         </Badge>
       )}
@@ -54,7 +54,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
           <div>
-            <Badge className="bg-teal-100 text-teal-700 border-teal-200 font-medium mb-2">
+            <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium mb-2">
               Both Regimes
             </Badge>
             <h2 className="text-base font-semibold text-[#003F31]">
@@ -67,7 +67,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
           {bd.totalExempt > 0 && (
             <div className="text-right shrink-0">
               <p className="text-xs text-muted-foreground">Net exempt deduction</p>
-              <p className="text-sm font-bold text-teal-700">{fmt(bd.totalExempt)}</p>
+              <p className="text-sm font-bold text-[#004030]">{fmt(bd.totalExempt)}</p>
               {bd.totalTaxable > 0 && (
                 <p className="text-xs text-red-500">{fmt(bd.totalTaxable)} stays taxable</p>
               )}
@@ -76,7 +76,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
         </div>
 
         {/* How it works callout */}
-        <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-800 mb-6 leading-relaxed">
+        <div className="bg-[#004030]/5 border border-[#004030]/15 rounded-xl px-4 py-3 text-xs text-[#004030] mb-6 leading-relaxed">
           <strong>How this works:</strong> Your employer bears the actual cost of these perquisites.
           Only a small <em>fixed perquisite value</em> (set by IT Rules) is added to your taxable income —
           the rest is your employer's business expense, saving you significant tax in both regimes.
@@ -86,7 +86,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
 
           {/* ── Telephone / Internet ── */}
           <div className="border border-border rounded-xl p-4">
-            <Badge className="bg-teal-100 text-teal-700 border-teal-200 font-semibold mb-2">
+            <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-semibold mb-2">
               NIL perquisite
             </Badge>
             <div className="flex items-center gap-2 mb-3">
@@ -108,7 +108,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
                     type="number" min={0} placeholder="0"
                     value={values.telephoneInternet === 0 ? '' : values.telephoneInternet}
                     onChange={e => handleAmount('telephoneInternet', e.target.value)}
-                    className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-teal-400"
+                    className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
                   />
                 </div>
                 {bd.telephoneExempt > 0 && (
@@ -116,7 +116,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
                 )}
               </div>
               <div className="text-xs text-muted-foreground bg-muted/40 rounded-lg p-3">
-                <p className="font-semibold text-teal-700 mb-1">Rule 3(7)(ix)</p>
+                <p className="font-semibold text-[#004030] mb-1">Rule 3(7)(ix)</p>
                 Telephone/mobile provided by employer = <strong>NIL perquisite value</strong>.
                 The full cost is exempt — 100% of what your employer pays is tax-free.
               </div>
@@ -163,7 +163,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
                     type="number" min={0} placeholder="0"
                     value={values.petrolAllowance === 0 ? '' : values.petrolAllowance}
                     onChange={e => handleAmount('petrolAllowance', e.target.value)}
-                    className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-teal-400"
+                    className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
                   />
                 </div>
                 {values.petrolAllowance > 0 && (
@@ -202,7 +202,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
                     type="number" min={0} placeholder="0"
                     value={values.driverSalary === 0 ? '' : values.driverSalary}
                     onChange={e => handleAmount('driverSalary', e.target.value)}
-                    className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-teal-400"
+                    className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
                   />
                 </div>
                 {values.driverSalary > 0 && (

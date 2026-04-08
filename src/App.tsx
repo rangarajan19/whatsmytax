@@ -791,7 +791,7 @@ export default function App() {
             <div className="md:max-w-[48vw] mx-auto px-4 pt-3 flex gap-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
               <Button
                 variant="outline"
-                className="h-12 px-5 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 transition-transform duration-100 ease-out active:scale-[0.995]"
+                className="h-12 px-4 rounded-xl text-sm font-semibold border-[#004030]/30 text-[#004030] hover:bg-[#004030]/5 transition-transform duration-100 ease-out active:scale-[0.995]"
                 onClick={() => {
                   const i = activeTabs.findIndex(t => t.id === activeDetailTab);
                   if (i > 0) {

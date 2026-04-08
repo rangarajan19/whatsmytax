@@ -16,7 +16,7 @@ export default function EducationLoanPanel({ values, onChange }: Props) {
       <CardContent className="p-4 sm:p-7">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
           <div>
-            <Badge className="bg-orange-100 text-orange-700 border-orange-200 font-medium mb-2">
+            <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium mb-2">
               Old Regime Only
             </Badge>
             <h2 className="text-base font-semibold text-[#003F31]">
@@ -29,7 +29,7 @@ export default function EducationLoanPanel({ values, onChange }: Props) {
           {values.interestPaid > 0 && (
             <div className="text-right">
               <p className="text-xs text-muted-foreground mb-0.5">Deduction</p>
-              <p className="text-sm font-bold text-orange-600">{fmt(values.interestPaid)}</p>
+              <p className="text-sm font-bold text-[#004030]">{fmt(values.interestPaid)}</p>
             </div>
           )}
         </div>
@@ -50,7 +50,7 @@ export default function EducationLoanPanel({ values, onChange }: Props) {
               onChange={e =>
                 onChange({ interestPaid: Math.max(0, parseFloat(e.target.value) || 0) })
               }
-              className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-orange-400"
+              className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
             />
           </div>
           <p className="text-xs text-muted-foreground mt-1">

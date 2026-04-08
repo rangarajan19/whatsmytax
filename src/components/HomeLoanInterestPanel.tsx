@@ -22,7 +22,7 @@ export default function HomeLoanInterestPanel({ value, onChange }: Props) {
   return (
     <Card className="mb-7">
       <CardContent className="p-4 sm:p-7">
-        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 font-medium mb-2">
+        <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium mb-2">
           Old Regime Only
         </Badge>
         <div className="flex items-center gap-2 mb-1">
@@ -85,7 +85,7 @@ export default function HomeLoanInterestPanel({ value, onChange }: Props) {
             </div>
 
             {isCapped && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-800">
+              <div className="bg-[#004030]/5 border border-[#004030]/15 rounded-xl px-4 py-3 text-xs text-[#004030]">
                 ⚠️ Interest paid ({fmt(value.interestPaid)}) exceeds the ₹2,00,000 self-occupied cap.
                 Only {fmt(MAX_HOME_LOAN_INTEREST)} will be deducted.
               </div>
@@ -101,9 +101,9 @@ export default function HomeLoanInterestPanel({ value, onChange }: Props) {
             <SummaryRow label="Property type"       value={value.isSelfOccupied ? 'Self-Occupied' : 'Let-Out'} />
             <SummaryRow label="Applicable limit"    value={value.isSelfOccupied ? fmt(MAX_HOME_LOAN_INTEREST) : 'No limit'} />
             <div className="border-t border-border pt-3">
-              <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
-                <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Deduction Applied</p>
-                <p className="text-xl font-bold text-emerald-700">{deduction > 0 ? fmt(deduction) : '—'}</p>
+              <div className="flex items-center justify-between bg-[#004030]/6 border border-[#004030]/15 rounded-lg px-4 py-3">
+                <p className="text-xs font-semibold text-[#004030]/60 uppercase tracking-wider">Deduction Applied</p>
+                <p className="text-xl font-bold text-[#004030]">{deduction > 0 ? fmt(deduction) : '—'}</p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground pt-1">

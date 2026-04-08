@@ -39,7 +39,7 @@ export default function FreelancePanel({ value, result, onChange, isFreelanceOnl
   return (
     <Card className="mb-7">
       <CardContent className="p-4 sm:p-7">
-        <Badge className="bg-blue-100 text-blue-700 border-blue-200 font-medium mb-2">
+        <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium mb-2">
           Both Regimes
         </Badge>
         <div className="flex items-center gap-2 mb-1">
@@ -49,7 +49,7 @@ export default function FreelancePanel({ value, result, onChange, isFreelanceOnl
         <p className="text-xs text-muted-foreground mb-1">
           Income from professional services or business. Taxed at slab rate — added on top of your salary.
         </p>
-        <p className="text-xs text-[#004030]/60 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mb-5">
+        <p className="text-xs text-[#004030]/60 bg-[#004030]/5 border border-[#004030]/15 rounded-lg px-3 py-2 mb-5">
           Standard deduction (₹75K / ₹50K) only applies to salary income — not applicable here. Chapter VI-A deductions (80C, 80D, NPS) still apply against your total income.
         </p>
 
@@ -99,7 +99,7 @@ function Section44ADA({ value, result, onChange }: {
   const LIMIT_44ADA = 7_500_000;
   return (
     <div className="space-y-4">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-800 space-y-1.5">
+      <div className="bg-[#004030]/5 border border-[#004030]/15 rounded-xl p-4 text-xs text-[#004030] space-y-1.5">
         <p className="font-semibold">How 44ADA works</p>
         <p>If your gross professional receipts are ≤ ₹75L, you can declare <strong>50% as your income</strong> — no books to maintain, no expense proofs needed.</p>
         <p>You can still claim <strong>80C, 80D, NPS</strong> etc. deductions on top of this. Chapter VI-A deductions apply normally.</p>
@@ -117,7 +117,7 @@ function Section44ADA({ value, result, onChange }: {
             placeholder="0"
             value={value.grossReceipts === 0 ? '' : value.grossReceipts}
             onChange={e => onChange({ grossReceipts: parseFloat(e.target.value) || 0 })}
-            className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-blue-400"
+            className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
           />
         </div>
       </div>
@@ -153,7 +153,7 @@ function Section44AD({ value, result, onChange }: {
 
   return (
     <div className="space-y-4">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-800 space-y-1.5">
+      <div className="bg-[#004030]/5 border border-[#004030]/15 rounded-xl p-4 text-xs text-[#004030] space-y-1.5">
         <p className="font-semibold">How 44AD works</p>
         <p>For small businesses with turnover ≤ ₹3Cr (if ≥95% is digital). Declare <strong>6%</strong> of digital receipts or <strong>8%</strong> of cash receipts as income.</p>
         <p>If turnover exceeds ₹3Cr, you must maintain books of accounts.</p>
@@ -169,7 +169,7 @@ function Section44AD({ value, result, onChange }: {
             placeholder="0"
             value={value.grossReceipts === 0 ? '' : value.grossReceipts}
             onChange={e => onChange({ grossReceipts: parseFloat(e.target.value) || 0 })}
-            className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-blue-400"
+            className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
           />
         </div>
       </div>
@@ -227,7 +227,7 @@ function SectionManual({ value, result, onChange }: {
 }) {
   return (
     <div className="space-y-4">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-800">
+      <div className="bg-[#004030]/5 border border-[#004030]/15 rounded-xl p-4 text-xs text-[#004030]">
         <p>Enter your <strong>net profit</strong> after deducting business expenses. This is the amount from your P&L / books of accounts.</p>
       </div>
       <div>
@@ -242,7 +242,7 @@ function SectionManual({ value, result, onChange }: {
             placeholder="0"
             value={value.manualProfit === 0 ? '' : value.manualProfit}
             onChange={e => onChange({ manualProfit: parseFloat(e.target.value) || 0 })}
-            className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-blue-400"
+            className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
           />
         </div>
       </div>

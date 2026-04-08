@@ -14,8 +14,8 @@ export interface RegimeBreakdownProps {
 }
 
 const ACCENT = {
-  old: { title: 'text-cyan-600', total: 'text-cyan-600', border: 'border-cyan-200' },
-  new: { title: 'text-emerald-600', total: 'text-emerald-600', border: 'border-emerald-200' },
+  old: { title: 'text-[#004030]', total: 'text-[#004030]', border: 'border-[#004030]/15' },
+  new: { title: 'text-[#004030]', total: 'text-[#004030]', border: 'border-[#004030]/15' },
 };
 
 function surchargeRate(income: number, regime: 'old' | 'new'): number {
@@ -36,7 +36,7 @@ export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf, i
       <p className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${isHigher ? 'text-[#C44A3A]' : colors.title}`}>
         {regime === 'old' ? 'Old Regime' : 'New Regime'}
         {sRate > 0 && (
-          <Badge className="bg-amber-100 text-amber-700 border-amber-200 font-semibold normal-case tracking-normal">
+          <Badge className="bg-[#004030]/5 text-[#004030] border-[#004030]/15 font-semibold normal-case tracking-normal">
             +{sRate}% Surcharge
           </Badge>
         )}
@@ -75,18 +75,18 @@ export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf, i
           label="Std. Deductions"
           value={result.stdDeduction}
           tagLabel="Applied"
-          tagClass={regime === 'old' ? 'bg-cyan-100 text-cyan-700' : 'bg-muted text-muted-foreground'}
+          tagClass={regime === 'old' ? 'bg-[#004030]/8 text-[#004030]' : 'bg-muted text-muted-foreground'}
           show
         />
 
         {regime === 'old' && (
           <>
-            <DeductionRow label="Sec. 80C" value={result.deduction80C} tagLabel={result.deduction80C > 0 ? 'Applied' : 'None entered'} tagClass={result.deduction80C > 0 ? 'bg-cyan-100 text-cyan-700' : 'bg-muted text-muted-foreground'} show dimIfZero />
-            <DeductionRow label="HRA Exemption" value={result.deductionHRA} tagLabel={result.deductionHRA > 0 ? 'Applied' : 'None entered'} tagClass={result.deductionHRA > 0 ? 'bg-cyan-100 text-cyan-700' : 'bg-muted text-muted-foreground'} show dimIfZero />
-            <DeductionRow label="Sec. 80D" value={result.deduction80D} tagLabel={result.deduction80D > 0 ? 'Applied' : 'None entered'} tagClass={result.deduction80D > 0 ? 'bg-cyan-100 text-cyan-700' : 'bg-muted text-muted-foreground'} show dimIfZero />
-            <DeductionRow label="NPS 80CCD(1B)" value={result.deductionNPS} tagLabel={result.deductionNPS > 0 ? 'Applied' : 'None entered'} tagClass={result.deductionNPS > 0 ? 'bg-cyan-100 text-cyan-700' : 'bg-muted text-muted-foreground'} show dimIfZero />
-            <DeductionRow label="Home Loan Interest 24b" value={result.deductionHomeLoan} tagLabel={result.deductionHomeLoan > 0 ? 'Applied' : 'None entered'} tagClass={result.deductionHomeLoan > 0 ? 'bg-cyan-100 text-cyan-700' : 'bg-muted text-muted-foreground'} show dimIfZero />
-            <DeductionRow label="Education Loan Interest 80E" value={result.deductionEducationLoan} tagLabel={result.deductionEducationLoan > 0 ? 'Applied' : 'None entered'} tagClass={result.deductionEducationLoan > 0 ? 'bg-cyan-100 text-cyan-700' : 'bg-muted text-muted-foreground'} show dimIfZero />
+            <DeductionRow label="Sec. 80C" value={result.deduction80C} tagLabel={result.deduction80C > 0 ? 'Applied' : 'None entered'} tagClass={result.deduction80C > 0 ? 'bg-[#004030]/8 text-[#004030]' : 'bg-muted text-muted-foreground'} show dimIfZero />
+            <DeductionRow label="HRA Exemption" value={result.deductionHRA} tagLabel={result.deductionHRA > 0 ? 'Applied' : 'None entered'} tagClass={result.deductionHRA > 0 ? 'bg-[#004030]/8 text-[#004030]' : 'bg-muted text-muted-foreground'} show dimIfZero />
+            <DeductionRow label="Sec. 80D" value={result.deduction80D} tagLabel={result.deduction80D > 0 ? 'Applied' : 'None entered'} tagClass={result.deduction80D > 0 ? 'bg-[#004030]/8 text-[#004030]' : 'bg-muted text-muted-foreground'} show dimIfZero />
+            <DeductionRow label="NPS 80CCD(1B)" value={result.deductionNPS} tagLabel={result.deductionNPS > 0 ? 'Applied' : 'None entered'} tagClass={result.deductionNPS > 0 ? 'bg-[#004030]/8 text-[#004030]' : 'bg-muted text-muted-foreground'} show dimIfZero />
+            <DeductionRow label="Home Loan Interest 24b" value={result.deductionHomeLoan} tagLabel={result.deductionHomeLoan > 0 ? 'Applied' : 'None entered'} tagClass={result.deductionHomeLoan > 0 ? 'bg-[#004030]/8 text-[#004030]' : 'bg-muted text-muted-foreground'} show dimIfZero />
+            <DeductionRow label="Education Loan Interest 80E" value={result.deductionEducationLoan} tagLabel={result.deductionEducationLoan > 0 ? 'Applied' : 'None entered'} tagClass={result.deductionEducationLoan > 0 ? 'bg-[#004030]/8 text-[#004030]' : 'bg-muted text-muted-foreground'} show dimIfZero />
           </>
         )}
 
@@ -96,24 +96,24 @@ export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf, i
           </p>
         )}
 
-        <DeductionRow label="Perquisite Allowances" value={result.deductionPerquisites} tagLabel={result.deductionPerquisites > 0 ? 'Applied · Both Regimes' : 'None entered'} tagClass={result.deductionPerquisites > 0 ? 'bg-teal-100 text-teal-700' : 'bg-muted text-muted-foreground'} show dimIfZero />
+        <DeductionRow label="Perquisite Allowances" value={result.deductionPerquisites} tagLabel={result.deductionPerquisites > 0 ? 'Applied · Both Regimes' : 'None entered'} tagClass={result.deductionPerquisites > 0 ? 'bg-[#004030]/8 text-[#004030]' : 'bg-muted text-muted-foreground'} show dimIfZero />
 
         {result.otherIncomeAdded > 0 && (
           <div className="flex justify-between text-sm items-center">
             <span className="text-muted-foreground flex items-center gap-1 flex-wrap">
               Other Income
-              <span className="text-xs px-1.5 py-0.5 rounded font-semibold bg-purple-100 text-purple-700">Added</span>
+              <span className="text-xs px-1.5 py-0.5 rounded font-semibold bg-[#004030]/6 text-[#004030]">Added</span>
             </span>
-            <span className="shrink-0 ml-2 font-semibold text-purple-700">+ {fmt(result.otherIncomeAdded)}</span>
+            <span className="shrink-0 ml-2 font-semibold text-[#004030]">+ {fmt(result.otherIncomeAdded)}</span>
           </div>
         )}
         {result.specialTax > 0 && (
           <div className="flex justify-between text-sm items-center">
             <span className="text-muted-foreground flex items-center gap-1 flex-wrap">
               Capital Gains Tax
-              <span className="text-xs px-1.5 py-0.5 rounded font-semibold bg-orange-100 text-orange-700">Flat rate</span>
+              <span className="text-xs px-1.5 py-0.5 rounded font-semibold bg-[#004030]/6 text-[#004030]">Flat rate</span>
             </span>
-            <span className="shrink-0 ml-2 font-semibold text-orange-700">+ {fmt(result.specialTax)}</span>
+            <span className="shrink-0 ml-2 font-semibold text-[#004030]">+ {fmt(result.specialTax)}</span>
           </div>
         )}
 
@@ -185,7 +185,7 @@ function DeductionRow({
         {label}
         <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${tagClass}`}>{tagLabel}</span>
       </span>
-      <span className={`shrink-0 ml-2 ${isZero ? 'text-muted-foreground' : 'font-semibold text-cyan-700'}`}>
+      <span className={`shrink-0 ml-2 ${isZero ? 'text-muted-foreground' : 'font-semibold text-[#004030]'}`}>
         {isZero ? '---' : `- ${fmt(value)}`}
       </span>
     </div>

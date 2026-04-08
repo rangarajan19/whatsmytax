@@ -27,7 +27,7 @@ export default function HRAPanel({ hraInput, onChange }: Props) {
   return (
     <Card className="mb-7">
       <CardContent className="p-4 sm:p-7">
-        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 font-medium mb-2">
+        <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium mb-2">
           Old Regime Only
         </Badge>
         <div className="flex items-center gap-2 mb-1">
@@ -157,16 +157,16 @@ export default function HRAPanel({ hraInput, onChange }: Props) {
               />
             </div>
 
-            <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
+            <div className="flex items-center justify-between bg-[#004030]/8 border border-[#004030]/15 rounded-lg px-4 py-3">
               <div>
-                <p className="text-xs text-emerald-600 font-semibold uppercase tracking-wider">HRA Exempt</p>
-                <p className="text-xs text-emerald-500 mt-0.5">Minimum of (a), (b), (c)</p>
+                <p className="text-xs text-[#004030] font-semibold uppercase tracking-wider">HRA Exempt</p>
+                <p className="text-xs text-[#004030]/60 mt-0.5">Minimum of (a), (b), (c)</p>
               </div>
-              <p className="text-2xl font-bold text-emerald-700">{fmt(exemption)}</p>
+              <p className="text-2xl font-bold text-[#004030]">{fmt(exemption)}</p>
             </div>
 
             {exemption === 0 && (
-              <p className="text-xs text-amber-700 mt-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              <p className="text-xs text-[#004030] mt-3 bg-[#004030]/5 border border-[#004030]/15 rounded-lg px-3 py-2">
                 ⚠️ Rent paid is less than 10% of basic salary — no HRA exemption applies.
               </p>
             )}
@@ -189,19 +189,19 @@ function RuleRow({
   return (
     <div className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-all ${
       isLimiting
-        ? 'bg-indigo-100 border border-indigo-300'
+        ? 'bg-[#004030]/8 border border-[#004030]/15'
         : 'bg-card border border-border'
     }`}>
       <div>
-        <span className={`font-medium ${isLimiting ? 'text-indigo-800' : 'text-muted-foreground'}`}>{label}</span>
+        <span className={`font-medium ${isLimiting ? 'text-[#004030]' : 'text-muted-foreground'}`}>{label}</span>
         {note && <span className="text-xs text-muted-foreground ml-2">({note})</span>}
         {isLimiting && (
-          <span className="ml-2 text-xs bg-indigo-600 text-white px-1.5 py-0.5 rounded font-semibold">
+          <span className="ml-2 text-xs bg-[#004030] text-white px-1.5 py-0.5 rounded font-semibold">
             Limiting factor
           </span>
         )}
       </div>
-      <span className={`font-bold ml-4 shrink-0 ${isLimiting ? 'text-indigo-700' : 'text-[#003F31]'}`}>
+      <span className={`font-bold ml-4 shrink-0 ${isLimiting ? 'text-[#004030]' : 'text-[#003F31]'}`}>
         {fmt(value)}
       </span>
     </div>
