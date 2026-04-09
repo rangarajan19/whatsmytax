@@ -32,7 +32,7 @@ export default function HRAPanel({ hraInput, onChange }: Props) {
         </Badge>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-lg">🏠</span>
-          <h2 className="text-base font-semibold text-[#003F31]">
+          <h2 className="text-[15px] md:text-base font-semibold text-[#003F31]">
             HRA — House Rent Allowance
           </h2>
         </div>
@@ -80,7 +80,7 @@ export default function HRAPanel({ hraInput, onChange }: Props) {
                 placeholder="e.g. 240000"
                 value={hraInput.rentPaid === 0 ? '' : hraInput.rentPaid}
                 onChange={e => update({ rentPaid: parseFloat(e.target.value) || 0 })}
-                className="pl-8 h-auto py-3 text-sm font-medium"
+                className="pl-8 h-auto py-2 text-sm font-medium"
               />
             </div>
             {hraInput.rentPaid > 0 && (
@@ -103,7 +103,7 @@ export default function HRAPanel({ hraInput, onChange }: Props) {
                 placeholder="e.g. 600000"
                 value={hraInput.basicSalary === 0 ? '' : hraInput.basicSalary}
                 onChange={e => update({ basicSalary: parseFloat(e.target.value) || 0 })}
-                className="pl-8 h-auto py-3 text-sm font-medium"
+                className="pl-8 h-auto py-2 text-sm font-medium"
               />
             </div>
             <p className="text-xs text-muted-foreground mt-1">Usually 40–50% of gross CTC</p>
@@ -162,7 +162,7 @@ export default function HRAPanel({ hraInput, onChange }: Props) {
                 <p className="text-xs text-[#004030] font-semibold uppercase tracking-wider">HRA Exempt</p>
                 <p className="text-xs text-[#004030]/60 mt-0.5">Minimum of (a), (b), (c)</p>
               </div>
-              <p className="text-2xl font-bold text-[#004030]">{fmt(exemption)}</p>
+              <p className="text-[22px] md:text-2xl font-bold text-[#004030]">{fmt(exemption)}</p>
             </div>
 
             {exemption === 0 && (

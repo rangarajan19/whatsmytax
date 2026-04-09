@@ -413,7 +413,7 @@ export default function App() {
                 ← Home
               </button>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
               Freelancer · FY 2024–25 (AY 2025–26)
             </p>
@@ -449,7 +449,7 @@ export default function App() {
                 ← Home
               </button>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
               Income Tax Calculator — FY 2024–25 (AY 2025–26)
             </p>
@@ -462,7 +462,7 @@ export default function App() {
                 placeholder="0"
                 value={salary}
                 onChange={e => setSalary(e.target.value)}
-                className="pl-7 h-auto py-3 text-base font-semibold bg-white border-[#004030]/20 focus-visible:ring-[#004030]/40"
+                className="pl-7 h-auto py-2 text-base font-medium bg-white border-[#004030]/20 focus-visible:ring-[#004030]/40"
               />
             </div>
             {error && <p className="text-destructive text-xs mt-1.5">{error}</p>}
@@ -653,7 +653,7 @@ export default function App() {
           {/* 4 ── CA CTA */}
           <div className="mx-4 bg-[#004030] rounded-2xl px-5 py-5">
             <p className="text-xs font-semibold text-[#B6FF00]/70 uppercase tracking-wider mb-1">Want expert help?</p>
-            <p className="text-base font-bold text-white mb-1">Get a CA to review &amp; file for you</p>
+            <p className="text-[15px] md:text-base font-bold text-white mb-1">Get a CA to review &amp; file for you</p>
             <p className="text-xs text-white/50 mb-4">Share your details and a qualified CA will reach out to verify your numbers and file your return.</p>
             <a
               href="https://forms.gle/vdF6KuRz1DqBZbKv6"
@@ -840,7 +840,7 @@ function TaxRow({ label, tax, inHand, isHigher, regime, isFreelance }: {
     <div className={`grid grid-cols-2 gap-2 mb-2 last:mb-0 rounded-xl px-4 py-4 ${bg}`}>
       <div>
         <p className="text-xs text-[#004030]/50 font-medium mb-1">{label}</p>
-        <p className={`text-xl font-bold ${isHigher ? 'text-[#C44A3A]' : 'text-[#004030]'}`}>
+        <p className={`text-[22px] md:text-2xl font-bold ${isHigher ? 'text-[#C44A3A]' : 'text-[#004030]'}`}>
           {fmt(tax)}
         </p>
       </div>
@@ -848,7 +848,7 @@ function TaxRow({ label, tax, inHand, isHigher, regime, isFreelance }: {
         <p className="text-xs text-[#004030]/50 font-medium mb-1">
           {isFreelance ? 'Monthly Est.' : 'In-Hand Salary'}
         </p>
-        <p className="text-xl font-bold text-[#004030]">{fmt(inHand)}</p>
+        <p className="text-[22px] md:text-2xl font-bold text-[#004030]">{fmt(inHand)}</p>
       </div>
     </div>
   );

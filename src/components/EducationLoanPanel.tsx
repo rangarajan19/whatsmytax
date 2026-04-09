@@ -19,7 +19,7 @@ export default function EducationLoanPanel({ values, onChange }: Props) {
             <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium mb-2">
               Old Regime Only
             </Badge>
-            <h2 className="text-base font-semibold text-[#003F31]">
+            <h2 className="text-[15px] md:text-base font-semibold text-[#003F31]">
               Section 80E — Education Loan Interest
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -50,7 +50,7 @@ export default function EducationLoanPanel({ values, onChange }: Props) {
               onChange={e =>
                 onChange({ interestPaid: Math.max(0, parseFloat(e.target.value) || 0) })
               }
-              className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
+              className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
             />
           </div>
           <p className="text-xs text-muted-foreground mt-1">

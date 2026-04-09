@@ -57,7 +57,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
             <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium mb-2">
               Both Regimes
             </Badge>
-            <h2 className="text-base font-semibold text-[#003F31]">
+            <h2 className="text-[15px] md:text-base font-semibold text-[#003F31]">
               Perquisite Allowances
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -108,7 +108,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
                     type="number" min={0} placeholder="0"
                     value={values.telephoneInternet === 0 ? '' : values.telephoneInternet}
                     onChange={e => handleAmount('telephoneInternet', e.target.value)}
-                    className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
+                    className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
                   />
                 </div>
                 {bd.telephoneExempt > 0 && (
@@ -163,7 +163,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
                     type="number" min={0} placeholder="0"
                     value={values.petrolAllowance === 0 ? '' : values.petrolAllowance}
                     onChange={e => handleAmount('petrolAllowance', e.target.value)}
-                    className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
+                    className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
                   />
                 </div>
                 {values.petrolAllowance > 0 && (
@@ -202,7 +202,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
                     type="number" min={0} placeholder="0"
                     value={values.driverSalary === 0 ? '' : values.driverSalary}
                     onChange={e => handleAmount('driverSalary', e.target.value)}
-                    className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
+                    className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
                   />
                 </div>
                 {values.driverSalary > 0 && (

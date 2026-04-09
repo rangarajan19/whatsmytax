@@ -34,7 +34,7 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
         </Badge>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">💹</span>
-          <h2 className="text-base font-semibold text-[#003F31]">
+          <h2 className="text-[15px] md:text-base font-semibold text-[#003F31]">
             Other Income Sources
           </h2>
         </div>
@@ -133,7 +133,7 @@ export default function OtherIncomePanel({ value, result, onChange }: Props) {
               <p className="text-xs font-semibold text-[#004030]/60 uppercase tracking-wider mb-1">
                 Added to slab income
               </p>
-              <p className="text-xl font-bold text-[#004030]">{fmt(result.totalAddedToIncome)}</p>
+              <p className="text-[22px] md:text-2xl font-bold text-[#004030]">{fmt(result.totalAddedToIncome)}</p>
               <p className="text-xs text-[#004030]/50 mt-0.5">Taxed at your applicable slab rate</p>
             </div>
           </div>
@@ -196,7 +196,7 @@ function IncomeRow({
               placeholder="0"
               value={value === 0 ? '' : value}
               onChange={e => onChange(parseFloat(e.target.value) || 0)}
-              className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
+              className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
             />
           </div>
           <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{info}</p>

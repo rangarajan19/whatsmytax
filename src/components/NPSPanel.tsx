@@ -24,7 +24,7 @@ export default function NPSPanel({ value, onChange }: Props) {
         </Badge>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">🏛️</span>
-          <h2 className="text-base font-semibold text-[#003F31]">
+          <h2 className="text-[15px] md:text-base font-semibold text-[#003F31]">
             Section 80CCD(1B) — NPS Additional Contribution
           </h2>
         </div>
@@ -47,7 +47,7 @@ export default function NPSPanel({ value, onChange }: Props) {
                 placeholder="e.g. 50000"
                 value={value.amount === 0 ? '' : value.amount}
                 onChange={e => onChange({ amount: parseFloat(e.target.value) || 0 })}
-                className="pl-8 h-auto py-3 text-sm font-medium rounded-xl"
+                className="pl-8 h-auto py-2 text-sm font-medium rounded-xl"
               />
             </div>
 

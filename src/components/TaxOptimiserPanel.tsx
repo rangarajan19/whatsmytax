@@ -55,7 +55,7 @@ function SectionHeader({ label, sub, claimed, limit }: { label: string; sub: str
         <p className="text-xs text-[#004030]/60 mt-0.5">{sub}</p>
       </div>
       <div className="text-right">
-        <p className="text-base font-bold text-[#004030]">{rs(claimed)}</p>
+        <p className="text-[15px] md:text-base font-bold text-[#004030]">{rs(claimed)}</p>
         {limit !== undefined && <p className="text-[10px] text-[#004030]/40">of {rs(limit)}</p>}
       </div>
     </div>
@@ -125,7 +125,7 @@ export default function TaxOptimiserPanel({ deductions, oldResult, userType }: P
           <p className="text-[11px] font-semibold text-[#B6FF00]/70 uppercase tracking-wider mb-0.5">
             Potential tax savings
           </p>
-          <p className="text-2xl font-bold text-[#B6FF00]">{rs(totalPotential)}</p>
+          <p className="text-[22px] md:text-2xl font-bold text-[#B6FF00]">{rs(totalPotential)}</p>
           <p className="text-xs text-white/50 mt-0.5">by fully utilizing available deductions</p>
         </div>
       )}

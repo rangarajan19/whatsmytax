@@ -59,7 +59,7 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: EASE }}
       >
-        <span className="text-2xl font-bold text-black tracking-tight">
+        <span className="text-2xl font-semibold text-black tracking-tight">
           Whats My Tax?
         </span>
         <button
@@ -82,13 +82,13 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
             Income Tax Calculator — FY 2024–25 (AY 2025–26)
           </motion.p>
           <motion.h1
-            className="text-[32px] md:text-[48px] font-bold text-[#004030]/80 text-center leading-tight"
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#004030]/80 text-center leading-tight"
             {...fadeUp(0.3)}
           >
             Calculate your tax<br />Precisely.
           </motion.h1>
           <motion.p
-            className="text-base font-semibold text-[#004030]/70 text-center"
+            className="text-[15px] md:text-base font-semibold text-[#004030]/70 text-center"
             {...fadeUp(0.45)}
           >
             No more confusion on what's left and what's available
@@ -102,13 +102,13 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
         >
           <button
             onClick={() => onSelect('salaried')}
-            className="w-full md:flex-1 h-12 px-4 bg-[#004030] text-[#B6FF00] text-[15px] font-semibold rounded-[15px] hover:bg-[#004030]/90 transition-colors"
+            className="w-full md:flex-1 h-12 px-4 bg-[#004030] text-[#B6FF00] text-sm font-semibold rounded-[15px] hover:bg-[#004030]/90 transition-colors"
           >
             I am a salaried Professional
           </button>
           <button
             onClick={() => onSelect('freelance')}
-            className="w-full md:flex-1 h-12 px-4 bg-transparent border border-[#004030] text-[#004030] text-[15px] font-semibold rounded-[15px] hover:bg-[#004030]/5 transition-colors"
+            className="w-full md:flex-1 h-12 px-4 bg-transparent border border-[#004030] text-[#004030] text-sm font-semibold rounded-[15px] hover:bg-[#004030]/5 transition-colors"
           >
             I am a freelancer
           </button>

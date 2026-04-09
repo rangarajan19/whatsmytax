@@ -27,7 +27,7 @@ export default function HomeLoanInterestPanel({ value, onChange }: Props) {
         </Badge>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">🏡</span>
-          <h2 className="text-base font-semibold text-[#003F31]">
+          <h2 className="text-[15px] md:text-base font-semibold text-[#003F31]">
             Section 24b — Home Loan Interest
           </h2>
         </div>
@@ -74,7 +74,7 @@ export default function HomeLoanInterestPanel({ value, onChange }: Props) {
                   placeholder="e.g. 180000"
                   value={value.interestPaid === 0 ? '' : value.interestPaid}
                   onChange={e => update({ interestPaid: parseFloat(e.target.value) || 0 })}
-                  className="pl-8 h-auto py-3 text-sm font-medium rounded-xl"
+                  className="pl-8 h-auto py-2 text-sm font-medium rounded-xl"
                 />
               </div>
               {value.interestPaid > 0 && (
@@ -103,7 +103,7 @@ export default function HomeLoanInterestPanel({ value, onChange }: Props) {
             <div className="border-t border-border pt-3">
               <div className="flex items-center justify-between bg-[#004030]/6 border border-[#004030]/15 rounded-lg px-4 py-3">
                 <p className="text-xs font-semibold text-[#004030]/60 uppercase tracking-wider">Deduction Applied</p>
-                <p className="text-xl font-bold text-[#004030]">{deduction > 0 ? fmt(deduction) : '—'}</p>
+                <p className="text-[22px] md:text-2xl font-bold text-[#004030]">{deduction > 0 ? fmt(deduction) : '—'}</p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground pt-1">

@@ -27,7 +27,7 @@ export default function CapitalGainsPanel({ value, result, onChange }: Props) {
         </Badge>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">📊</span>
-          <h2 className="text-base font-semibold text-[#003F31]">Capital Gains</h2>
+          <h2 className="text-[15px] md:text-base font-semibold text-[#003F31]">Capital Gains</h2>
         </div>
         <p className="text-xs text-muted-foreground mb-1">
           Capital gains are taxed separately from your salary income — either at flat rates or at slab rates depending on the asset type.
@@ -107,7 +107,7 @@ export default function CapitalGainsPanel({ value, result, onChange }: Props) {
                 <p className="text-xs font-semibold text-[#004030]/60 uppercase tracking-wider mb-1">
                   Capital gains flat tax
                 </p>
-                <p className="text-xl font-bold text-[#004030]">{fmt(result.totalSpecialTax)}</p>
+                <p className="text-[22px] md:text-2xl font-bold text-[#004030]">{fmt(result.totalSpecialTax)}</p>
                 <p className="text-xs text-[#004030]/50 mt-0.5">Outside slabs (+ 4% cess added later)</p>
               </div>
             )}
@@ -116,7 +116,7 @@ export default function CapitalGainsPanel({ value, result, onChange }: Props) {
                 <p className="text-xs font-semibold text-[#004030]/60 uppercase tracking-wider mb-1">
                   Added to slab income
                 </p>
-                <p className="text-xl font-bold text-[#004030]">{fmt(result.taxableStcgOther)}</p>
+                <p className="text-[22px] md:text-2xl font-bold text-[#004030]">{fmt(result.taxableStcgOther)}</p>
                 <p className="text-xs text-[#004030]/50 mt-0.5">STCG Other — taxed at your slab rate</p>
               </div>
             )}
@@ -179,7 +179,7 @@ function GainsRow({
           placeholder="0"
           value={value === 0 ? '' : value}
           onChange={e => onChange(parseFloat(e.target.value) || 0)}
-          className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
+          className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
         />
       </div>
       <p className="text-xs text-muted-foreground leading-relaxed">{info}</p>

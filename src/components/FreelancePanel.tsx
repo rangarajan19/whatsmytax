@@ -44,7 +44,7 @@ export default function FreelancePanel({ value, result, onChange, isFreelanceOnl
         </Badge>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">💼</span>
-          <h2 className="text-base font-semibold text-[#003F31]">Freelance / Self-employed</h2>
+          <h2 className="text-[15px] md:text-base font-semibold text-[#003F31]">Freelance / Self-employed</h2>
         </div>
         <p className="text-xs text-muted-foreground mb-1">
           Income from professional services or business. Taxed at slab rate — added on top of your salary.
@@ -117,7 +117,7 @@ function Section44ADA({ value, result, onChange }: {
             placeholder="0"
             value={value.grossReceipts === 0 ? '' : value.grossReceipts}
             onChange={e => onChange({ grossReceipts: parseFloat(e.target.value) || 0 })}
-            className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
+            className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
           />
         </div>
       </div>
@@ -169,7 +169,7 @@ function Section44AD({ value, result, onChange }: {
             placeholder="0"
             value={value.grossReceipts === 0 ? '' : value.grossReceipts}
             onChange={e => onChange({ grossReceipts: parseFloat(e.target.value) || 0 })}
-            className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
+            className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
           />
         </div>
       </div>
@@ -242,7 +242,7 @@ function SectionManual({ value, result, onChange }: {
             placeholder="0"
             value={value.manualProfit === 0 ? '' : value.manualProfit}
             onChange={e => onChange({ manualProfit: parseFloat(e.target.value) || 0 })}
-            className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
+            className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
           />
         </div>
       </div>
@@ -266,7 +266,7 @@ function ResultCard({ label, value, note, breakdown, limitWarning }: {
   return (
     <div className="bg-[#004030]/5 border border-[#004030]/15 rounded-xl px-4 py-3">
       <p className="text-xs text-[#004030]/50 font-medium">{breakdown}</p>
-      <p className="text-xl font-bold text-[#004030] mt-1">{fmt(value)}</p>
+      <p className="text-[22px] md:text-2xl font-bold text-[#004030] mt-1">{fmt(value)}</p>
       <p className="text-xs font-semibold text-[#004030]/60 mt-0.5">{label}</p>
       <p className="text-xs text-muted-foreground mt-0.5">{note}</p>
       {limitWarning && <p className="text-xs text-red-600 font-semibold mt-1">⚠️ {limitWarning}</p>}

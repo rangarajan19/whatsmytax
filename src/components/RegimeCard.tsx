@@ -43,7 +43,7 @@ export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf, i
       </p>
       <h3 className="text-sm text-muted-foreground mb-4 mt-0.5">{label}</h3>
 
-      <p className={`text-3xl sm:text-4xl font-bold mb-1 ${isHigher ? 'text-[#C44A3A]' : colors.total}`}>{fmt(result.total)}</p>
+      <p className={`text-3xl font-bold mb-1 ${isHigher ? 'text-[#C44A3A]' : colors.total}`}>{fmt(result.total)}</p>
       <p className="text-sm text-muted-foreground mb-4">Effective rate: {pct(result.total, gross)}</p>
 
       {/* Monthly in-hand */}
@@ -51,7 +51,7 @@ export function RegimeBreakdown({ regime, label, result, isHigher, gross, epf, i
         <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">
           {isFreelance ? 'Monthly Est.' : 'Monthly In-Hand'}
         </p>
-        <p className={`text-2xl font-bold ${isHigher ? 'text-[#C44A3A]' : colors.total}`}>{fmt(monthlyInHand)}</p>
+        <p className={`text-[22px] md:text-2xl font-bold ${isHigher ? 'text-[#C44A3A]' : colors.total}`}>{fmt(monthlyInHand)}</p>
         {!isFreelance && epf > 0 ? (
           <p className="text-xs text-muted-foreground mt-0.5">after tax + EPF ({fmt(Math.round(epf / 12))}/mo)</p>
         ) : (

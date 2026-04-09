@@ -53,7 +53,7 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
               placeholder="e.g. 480000"
               value={epfInput.basicSalary === 0 ? '' : epfInput.basicSalary}
               onChange={e => handleBasicChange(parseFloat(e.target.value) || 0)}
-              className="pl-7 h-auto py-2.5 text-sm font-medium bg-white border-[#004030]/15 focus-visible:ring-[#004030]/40"
+              className="pl-7 h-auto py-2 text-sm font-medium bg-white border-[#004030]/15 focus-visible:ring-[#004030]/40"
             />
           </div>
           <p className="text-xs text-[#004030]/60 mt-1">
@@ -79,7 +79,7 @@ export function EPFPanel({ epfInput, onEPFChange }: EPFPanelProps) {
               placeholder={autoContrib > 0 ? String(autoContrib) : '0'}
               value={displayedEPF === 0 ? '' : displayedEPF}
               onChange={e => handleEPFAmountChange(parseFloat(e.target.value) || 0)}
-              className="pl-7 h-auto py-2.5 text-sm font-medium bg-white border-[#004030]/15 focus-visible:ring-[#004030]/40"
+              className="pl-7 h-auto py-2 text-sm font-medium bg-white border-[#004030]/15 focus-visible:ring-[#004030]/40"
             />
           </div>
           <p className="text-xs text-[#004030]/60 mt-1">
@@ -168,7 +168,7 @@ export default function DeductionsPanel({ epfInput, onEPFChange, values, onChang
             <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-medium mb-2">
               Old Regime Only
             </Badge>
-            <h2 className="text-base font-semibold text-[#003F31]">
+            <h2 className="text-[15px] md:text-base font-semibold text-[#003F31]">
               Section 80C Investments
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -220,7 +220,7 @@ export default function DeductionsPanel({ epfInput, onEPFChange, values, onChang
                   placeholder="0"
                   value={values[key] === 0 ? '' : values[key]}
                   onChange={e => handleChange(key, e.target.value)}
-                  className="pl-7 h-auto py-2.5 text-sm font-medium focus-visible:ring-[#004030]/40"
+                  className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-1">{description}</p>

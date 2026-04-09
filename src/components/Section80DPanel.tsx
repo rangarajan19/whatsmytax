@@ -35,7 +35,7 @@ export default function Section80DPanel({ value, onChange }: Props) {
         </Badge>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">🏥</span>
-          <h2 className="text-base font-semibold text-[#003F31]">
+          <h2 className="text-[15px] md:text-base font-semibold text-[#003F31]">
             Section 80D — Health Insurance
           </h2>
         </div>
@@ -66,7 +66,7 @@ export default function Section80DPanel({ value, onChange }: Props) {
                 placeholder="e.g. 15000"
                 value={value.selfPremium === 0 ? '' : value.selfPremium}
                 onChange={e => update({ selfPremium: parseFloat(e.target.value) || 0 })}
-                className="pl-7 h-auto py-2.5 text-sm font-medium bg-white border-[#004030]/15 focus-visible:ring-[#004030]/40"
+                className="pl-7 h-auto py-2 text-sm font-medium bg-white border-[#004030]/15 focus-visible:ring-[#004030]/40"
               />
             </div>
 
@@ -118,7 +118,7 @@ export default function Section80DPanel({ value, onChange }: Props) {
                 placeholder="e.g. 25000"
                 value={value.parentPremium === 0 ? '' : value.parentPremium}
                 onChange={e => update({ parentPremium: parseFloat(e.target.value) || 0 })}
-                className="pl-7 h-auto py-2.5 text-sm font-medium bg-white border-[#004030]/15 focus-visible:ring-[#004030]/40"
+                className="pl-7 h-auto py-2 text-sm font-medium bg-white border-[#004030]/15 focus-visible:ring-[#004030]/40"
               />
             </div>
 
@@ -157,7 +157,7 @@ export default function Section80DPanel({ value, onChange }: Props) {
               <p className="text-xs font-semibold text-[#004030] uppercase tracking-wider">Total 80D Deduction</p>
               <p className="text-xs text-[#004030]/60 mt-0.5">Self: {fmt(selfDeduction)} + Parents: {fmt(parentDeduction)}</p>
             </div>
-            <p className="text-2xl font-bold text-[#004030]">{fmt(total)}</p>
+            <p className="text-[22px] md:text-2xl font-bold text-[#004030]">{fmt(total)}</p>
           </div>
         )}
 
