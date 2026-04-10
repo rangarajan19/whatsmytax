@@ -8,7 +8,6 @@ import {
 } from '../tax';
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
-import { Label } from './ui/label';
 import { Badge } from './ui/badge';
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
 
@@ -86,10 +85,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
 
           {/* ── Telephone / Internet ── */}
           <div className="border border-border rounded-xl p-4">
-            <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 font-semibold mb-2">
-              NIL perquisite
-            </Badge>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-1">
               <span className="text-lg">📱</span>
               <div>
                 <p className="text-sm font-semibold text-[#003F31]">Telephone / Internet Reimbursement</p>
@@ -97,30 +93,21 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-              <div>
-                <Label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
-                  Annual amount in CTC
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-semibold pointer-events-none">₹</span>
-                  <Input
-                    type="number" min={0} placeholder="0"
-                    value={values.telephoneInternet === 0 ? '' : values.telephoneInternet}
-                    onChange={e => handleAmount('telephoneInternet', e.target.value)}
-                    className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
-                  />
-                </div>
-                {bd.telephoneExempt > 0 && (
-                  <TaxBreakdownPill taxable={0} exempt={bd.telephoneExempt} />
-                )}
-              </div>
-              <div className="text-xs text-muted-foreground bg-muted/40 rounded-lg p-3">
-                <p className="font-semibold text-[#004030] mb-1">Rule 3(7)(ix)</p>
-                Telephone/mobile provided by employer = <strong>NIL perquisite value</strong>.
-                The full cost is exempt — 100% of what your employer pays is tax-free.
-              </div>
+            <div className="relative mt-3">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-semibold pointer-events-none">₹</span>
+              <Input
+                type="number" min={0} placeholder="0"
+                value={values.telephoneInternet === 0 ? '' : values.telephoneInternet}
+                onChange={e => handleAmount('telephoneInternet', e.target.value)}
+                className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
+              />
             </div>
+            {bd.telephoneExempt > 0 && (
+              <TaxBreakdownPill taxable={0} exempt={bd.telephoneExempt} />
+            )}
+            <p className="text-xs text-muted-foreground mt-2">
+              Rule 3(7)(ix) — NIL perquisite value. The full cost is exempt from tax.
+            </p>
           </div>
 
           {/* ── Petrol / Fuel ── */}
@@ -133,9 +120,22 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
               </div>
             </div>
 
+            <div className="relative mb-2">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-semibold pointer-events-none">₹</span>
+              <Input
+                type="number" min={0} placeholder="0"
+                value={values.petrolAllowance === 0 ? '' : values.petrolAllowance}
+                onChange={e => handleAmount('petrolAllowance', e.target.value)}
+                className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
+              />
+            </div>
+            {values.petrolAllowance > 0 && (
+              <TaxBreakdownPill taxable={bd.petrolTaxable} exempt={bd.petrolExempt} />
+            )}
+
             {/* Car engine size toggle */}
-            <div className="mb-4">
-              <p className="text-xs font-semibold text-muted-foreground mb-2">Car Engine Capacity</p>
+            <div className="mt-3">
+              <p className="text-xs font-semibold text-muted-foreground mb-1.5">Car Engine Capacity</p>
               <ToggleGroup
                 value={values.carEngineSize}
                 onValueChange={v => v && setField('carEngineSize', v as CarEngineSize)}
@@ -152,33 +152,9 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
               </ToggleGroup>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-              <div>
-                <Label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
-                  Annual petrol/fuel cost in CTC
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-semibold pointer-events-none">₹</span>
-                  <Input
-                    type="number" min={0} placeholder="0"
-                    value={values.petrolAllowance === 0 ? '' : values.petrolAllowance}
-                    onChange={e => handleAmount('petrolAllowance', e.target.value)}
-                    className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
-                  />
-                </div>
-                {values.petrolAllowance > 0 && (
-                  <TaxBreakdownPill taxable={bd.petrolTaxable} exempt={bd.petrolExempt} />
-                )}
-              </div>
-              <div className="text-xs text-muted-foreground bg-muted/40 rounded-lg p-3">
-                <p className="font-semibold text-[#003F31] mb-1">Rule 3(2) — Fixed perquisite</p>
-                Only{' '}
-                <strong className="text-red-600">
-                  ₹{((values.carEngineSize === 'large' ? CAR_PERQUISITE_LARGE : CAR_PERQUISITE_SMALL) / 12).toLocaleString('en-IN')}/month
-                </strong>{' '}
-                is taxable regardless of actual spend. Everything above that is your employer's business expense — fully exempt for you.
-              </div>
-            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Rule 3(2) — Only ₹{((values.carEngineSize === 'large' ? CAR_PERQUISITE_LARGE : CAR_PERQUISITE_SMALL) / 12).toLocaleString('en-IN')}/month is taxable regardless of actual spend.
+            </p>
           </div>
 
           {/* ── Driver Salary ── */}
@@ -191,31 +167,21 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-              <div>
-                <Label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
-                  Annual driver salary in CTC
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-semibold pointer-events-none">₹</span>
-                  <Input
-                    type="number" min={0} placeholder="0"
-                    value={values.driverSalary === 0 ? '' : values.driverSalary}
-                    onChange={e => handleAmount('driverSalary', e.target.value)}
-                    className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
-                  />
-                </div>
-                {values.driverSalary > 0 && (
-                  <TaxBreakdownPill taxable={bd.driverTaxable} exempt={bd.driverExempt} />
-                )}
-              </div>
-              <div className="text-xs text-muted-foreground bg-muted/40 rounded-lg p-3">
-                <p className="font-semibold text-[#003F31] mb-1">Rule 3(2) — Fixed perquisite</p>
-                Only <strong className="text-red-600">₹900/month (₹{(DRIVER_PERQUISITE / 1000).toFixed(1)}K/year)</strong> is
-                taxable. If your employer pays ₹5,000/month for your driver,
-                only ₹900 gets added to your taxable income — saving you significant tax.
-              </div>
+            <div className="relative mb-2">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-semibold pointer-events-none">₹</span>
+              <Input
+                type="number" min={0} placeholder="0"
+                value={values.driverSalary === 0 ? '' : values.driverSalary}
+                onChange={e => handleAmount('driverSalary', e.target.value)}
+                className="pl-7 h-auto py-2 text-sm font-medium focus-visible:ring-[#004030]/40"
+              />
             </div>
+            {values.driverSalary > 0 && (
+              <TaxBreakdownPill taxable={bd.driverTaxable} exempt={bd.driverExempt} />
+            )}
+            <p className="text-xs text-muted-foreground mt-2">
+              Rule 3(2) — Only ₹900/month (₹{(DRIVER_PERQUISITE / 1000).toFixed(1)}K/year) is taxable regardless of actual salary paid.
+            </p>
           </div>
 
         </div>

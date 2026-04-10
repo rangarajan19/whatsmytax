@@ -156,9 +156,7 @@ function GainsRow({
   const hasValue = value > 0;
 
   return (
-    <div className={`rounded-xl border p-4 transition-all ${
-      hasValue ? 'border-[#004030]/15 bg-[#004030]/4' : 'border-[#004030]/8 bg-[#004030]/3'
-    }`}>
+    <div className="rounded-xl border border-border p-4">
       <div className="flex items-center justify-between mb-1.5">
         <Label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
           <span>{icon}</span>

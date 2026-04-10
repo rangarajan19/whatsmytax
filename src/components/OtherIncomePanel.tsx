@@ -173,9 +173,7 @@ function IncomeRow({
   const hasValue = value > 0;
 
   return (
-    <div className={`rounded-xl border p-4 transition-all ${
-      hasValue ? 'border-[#004030]/15 bg-[#004030]/4' : 'border-[#004030]/8 bg-[#004030]/3'
-    }`}>
+    <div className="rounded-xl border border-border p-4">
       {isSpecial && (
         <Badge className="bg-[#004030]/8 text-[#004030] border-[#004030]/15 mb-2">
           Flat rate
