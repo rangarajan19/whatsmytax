@@ -873,8 +873,8 @@ function TaxRow({ label, tax, inHand, isHigher, regime, isFreelance, selected, o
         </p>
         <p className={`text-[22px] md:text-2xl font-bold ${selected ? 'text-white' : 'text-[#004030]'}`}>{fmt(inHand)}</p>
       </div>
-      <div className={`col-span-2 border-t mt-1 pt-2 ${selected ? 'border-white/20' : 'border-[#004030]/10'}`}>
-        <p className={`text-xs font-semibold ${selected ? 'text-[#B6FF00]' : 'text-[#004030]/40'}`}>
+      <div className={`col-span-2 border-t mt-4 pt-4 text-center ${selected ? 'border-white/20' : 'border-[#004030]/10'}`}>
+        <p className={`text-[15px] md:text-base font-semibold ${selected ? 'text-[#B6FF00]' : 'text-[#004030]/40'}`}>
           Calculate tax →
         </p>
       </div>
