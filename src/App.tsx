@@ -411,7 +411,7 @@ export default function App() {
               ← Back
             </button>
             <span className="text-sm font-semibold text-[#004030]">
-              Old Regime {result ? fmt(result.old.total) : ''}
+              {selectedRegime === 'new' ? 'New' : 'Old'} Regime {result ? fmt(selectedRegime === 'new' ? result.new.total : result.old.total) : ''}
             </span>
           </div>
         ) : viewMode === 'summary' ? (
