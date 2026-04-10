@@ -842,7 +842,7 @@ function TaxRow({ label, tax, inHand, isHigher, regime, isFreelance, selected, o
     <button
       type="button"
       onClick={onClick}
-      className={`w-full grid grid-cols-2 gap-2 mb-3 last:mb-0 rounded-xl px-4 py-4 text-left transition-all active:scale-[0.995] ${bg} ${onClick ? 'cursor-pointer hover:ring-2 hover:ring-[#004030]/40' : ''}`}
+      className={`w-full grid grid-cols-2 gap-2 mb-6 last:mb-0 rounded-xl px-4 py-4 text-left transition-all active:scale-[0.995] ${bg} ${onClick ? 'cursor-pointer hover:ring-2 hover:ring-[#004030]/40' : ''}`}
     >
       <div>
         <p className={`text-xs font-medium mb-1 ${selected ? 'text-white/60' : 'text-[#004030]/50'}`}>{label}</p>
