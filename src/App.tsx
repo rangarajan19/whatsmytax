@@ -29,7 +29,7 @@ import { trackEvent } from './analytics';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 
-const SALARIED_TABS = [
+const SALARIED_TABS_OLD = [
   { id: 'perquisites',    label: 'Perquisites' },
   { id: 'other-income',  label: 'Other Income' },
   { id: 'capital-gains', label: 'Capital Gains' },
@@ -41,7 +41,13 @@ const SALARIED_TABS = [
   { id: 'edu-loan',      label: 'Education Loan' },
 ];
 
-const FREELANCE_TABS = [
+const SALARIED_TABS_NEW = [
+  { id: 'perquisites',    label: 'Perquisites' },
+  { id: 'other-income',  label: 'Other Income' },
+  { id: 'capital-gains', label: 'Capital Gains' },
+];
+
+const FREELANCE_TABS_OLD = [
   { id: 'freelance',     label: 'Freelance Income' },
   { id: 'other-income',  label: 'Other Income' },
   { id: 'capital-gains', label: 'Capital Gains' },
@@ -50,6 +56,12 @@ const FREELANCE_TABS = [
   { id: 'nps',           label: 'NPS' },
   { id: 'home-loan',     label: 'Home Loan 24b' },
   { id: 'edu-loan',      label: 'Education Loan' },
+];
+
+const FREELANCE_TABS_NEW = [
+  { id: 'freelance',     label: 'Freelance Income' },
+  { id: 'other-income',  label: 'Other Income' },
+  { id: 'capital-gains', label: 'Capital Gains' },
 ];
 
 function inferAnnualBasic(grossAnnual: number): number {
@@ -83,6 +95,7 @@ export default function App() {
   const [userType, setUserType]           = useState<'salaried' | 'freelance'>(saved?.userType ?? 'salaried');
   const [viewMode, setViewMode]           = useState<'landing' | 'main' | 'detail' | 'summary' | 'changelog'>(saved?.userType ? 'main' : 'landing');
   const [activeDetailTab, setActiveDetailTab] = useState<string>('other-income');
+  const [selectedRegime, setSelectedRegime]   = useState<'old' | 'new'>('old');
 
   const lastInferredBasic  = useRef<number>(0);
   const prefillTimer       = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -268,7 +281,9 @@ export default function App() {
   }
 
   // ── Derived values ────────────────────────────────────────────────
-  const activeTabs  = userType === 'freelance' ? FREELANCE_TABS : SALARIED_TABS;
+  const activeTabs = userType === 'freelance'
+    ? (selectedRegime === 'new' ? FREELANCE_TABS_NEW : FREELANCE_TABS_OLD)
+    : (selectedRegime === 'new' ? SALARIED_TABS_NEW  : SALARIED_TABS_OLD);
 
   // ── Tab filled detection (for sidebar ticks) ──────────────────────
   function hasTabData(tabId: string): boolean {
@@ -488,8 +503,8 @@ export default function App() {
             <p className="text-xs font-semibold text-[#004030]/50 uppercase tracking-wider mb-3">
               Tax & In-hand Salary
             </p>
-            <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" isFreelance={userType === 'freelance'} />
-            <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} />
+            <TaxRow label="New Regime" tax={result.new.total} inHand={newInHand} isHigher={newHigher} regime="new" isFreelance={userType === 'freelance'} selected={selectedRegime === 'new'} onClick={() => { setSelectedRegime('new'); setActiveDetailTab('perquisites'); setViewMode('detail'); }} />
+            <TaxRow label="Old Regime" tax={result.old.total} inHand={oldInHand} isHigher={oldHigher} regime="old" isFreelance={userType === 'freelance'} selected={selectedRegime === 'old'} onClick={() => { setSelectedRegime('old'); setActiveDetailTab('perquisites'); setViewMode('detail'); }} />
           </div>
 
 
@@ -505,10 +520,10 @@ export default function App() {
               onClick={() => {
                 setActiveDetailTab(activeTabs[0].id);
                 setViewMode('detail');
-                trackEvent('detail_opened', { userType });
+                trackEvent('detail_opened', { userType, regime: selectedRegime });
               }}
             >
-              {result ? 'Next →' : 'Add income details →'}
+              {result ? `Add ${selectedRegime === 'new' ? 'New' : 'Old'} Regime details →` : 'Add income details →'}
             </Button>
           </div>
         </div>
@@ -833,25 +848,32 @@ export default function App() {
 
 // ─── Helper components ─────────────────────────────────────────────────────
 
-function TaxRow({ label, tax, inHand, isHigher, regime, isFreelance }: {
-  label: string; tax: number; inHand: number; isHigher: boolean; regime: 'old' | 'new'; isFreelance?: boolean;
+function TaxRow({ label, tax, inHand, isHigher, regime, isFreelance, selected, onClick }: {
+  label: string; tax: number; inHand: number; isHigher: boolean; regime: 'old' | 'new';
+  isFreelance?: boolean; selected?: boolean; onClick?: () => void;
 }) {
-  const bg = regime === 'new' ? 'bg-[rgba(0,128,0,0.05)]' : 'bg-card ring-1 ring-foreground/10';
+  const bg = selected
+    ? 'bg-[#004030] ring-2 ring-[#004030]'
+    : regime === 'new' ? 'bg-[rgba(0,128,0,0.05)] ring-1 ring-foreground/10' : 'bg-card ring-1 ring-foreground/10';
   return (
-    <div className={`grid grid-cols-2 gap-2 mb-2 last:mb-0 rounded-xl px-4 py-4 ${bg}`}>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full grid grid-cols-2 gap-2 mb-2 last:mb-0 rounded-xl px-4 py-4 text-left transition-all active:scale-[0.995] ${bg} ${onClick ? 'cursor-pointer hover:ring-2 hover:ring-[#004030]/40' : ''}`}
+    >
       <div>
-        <p className="text-xs text-[#004030]/50 font-medium mb-1">{label}</p>
-        <p className={`text-[22px] md:text-2xl font-bold ${isHigher ? 'text-[#C44A3A]' : 'text-[#004030]'}`}>
+        <p className={`text-xs font-medium mb-1 ${selected ? 'text-white/60' : 'text-[#004030]/50'}`}>{label}</p>
+        <p className={`text-[22px] md:text-2xl font-bold ${selected ? 'text-white' : isHigher ? 'text-[#C44A3A]' : 'text-[#004030]'}`}>
           {fmt(tax)}
         </p>
       </div>
       <div className="text-right">
-        <p className="text-xs text-[#004030]/50 font-medium mb-1">
+        <p className={`text-xs font-medium mb-1 ${selected ? 'text-white/60' : 'text-[#004030]/50'}`}>
           {isFreelance ? 'Monthly Est.' : 'In-Hand Salary'}
         </p>
-        <p className="text-[22px] md:text-2xl font-bold text-[#004030]">{fmt(inHand)}</p>
+        <p className={`text-[22px] md:text-2xl font-bold ${selected ? 'text-white' : 'text-[#004030]'}`}>{fmt(inHand)}</p>
       </div>
-    </div>
+    </button>
   );
 }
 
