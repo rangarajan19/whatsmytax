@@ -511,23 +511,6 @@ export default function App() {
         </>
       )}
 
-      {/* Fixed CTA — always visible on main view */}
-      {viewMode === 'main' && (
-        <div className="no-print fixed bottom-0 left-0 right-0 bg-white border-t">
-          <div className="md:max-w-[35vw] mx-auto px-4 pt-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
-            <Button
-              className="w-full h-12 bg-[#004030] text-[#B6FF00] rounded-xl text-sm font-semibold hover:bg-[#004030]/90 transition-transform duration-100 ease-out active:scale-[0.995]"
-              onClick={() => {
-                setActiveDetailTab(activeTabs[0].id);
-                setViewMode('detail');
-                trackEvent('detail_opened', { userType, regime: selectedRegime });
-              }}
-            >
-              {result ? `Add ${selectedRegime === 'new' ? 'New' : 'Old'} Regime details →` : 'Add income details →'}
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* ── Summary view ── */}
       {viewMode === 'summary' && result && (
@@ -859,7 +842,7 @@ function TaxRow({ label, tax, inHand, isHigher, regime, isFreelance, selected, o
     <button
       type="button"
       onClick={onClick}
-      className={`w-full grid grid-cols-2 gap-2 mb-2 last:mb-0 rounded-xl px-4 py-4 text-left transition-all active:scale-[0.995] ${bg} ${onClick ? 'cursor-pointer hover:ring-2 hover:ring-[#004030]/40' : ''}`}
+      className={`w-full grid grid-cols-2 gap-2 mb-3 last:mb-0 rounded-xl px-4 py-4 text-left transition-all active:scale-[0.995] ${bg} ${onClick ? 'cursor-pointer hover:ring-2 hover:ring-[#004030]/40' : ''}`}
     >
       <div>
         <p className={`text-xs font-medium mb-1 ${selected ? 'text-white/60' : 'text-[#004030]/50'}`}>{label}</p>
