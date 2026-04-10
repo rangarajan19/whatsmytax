@@ -675,7 +675,7 @@ export default function App() {
           <div className="md:flex md:flex-row md:h-[calc(100vh-88px)] md:overflow-hidden">
 
             {/* ── Sidebar — desktop only ── */}
-            <aside className="hidden md:flex md:flex-col w-[172px] shrink-0 border-r border-[#004030]/10 pt-3 px-2 gap-0.5 bg-white">
+            <aside className="hidden md:flex md:flex-col w-[172px] shrink-0 border-r border-[#004030]/10 pt-3 px-2 gap-0.5">
               {activeTabs.map(tab => {
                 const filled = hasTabData(tab.id);
                 const isActive = activeDetailTab === tab.id;
@@ -762,6 +762,7 @@ export default function App() {
                     onEPFChange={handleEPFChange}
                     values={deductions.section80C}
                     onChange={handle80CChange}
+                    gross={result?.gross ?? 0}
                   />
                 )}
                 {activeDetailTab === 'hra' && (
