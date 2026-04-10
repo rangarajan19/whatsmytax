@@ -866,15 +866,17 @@ function TaxRow({ label, tax, inHand, isHigher, regime, isFreelance, selected, o
         <p className={`text-[22px] md:text-2xl font-bold ${selected ? 'text-white' : isHigher ? 'text-[#C44A3A]' : 'text-[#004030]'}`}>
           {fmt(tax)}
         </p>
-        <p className={`text-[11px] font-semibold mt-1.5 ${selected ? 'text-[#B6FF00]' : 'text-[#004030]/40'}`}>
-          Calculate tax →
-        </p>
       </div>
       <div className="text-right">
         <p className={`text-xs font-medium mb-1 ${selected ? 'text-white/60' : 'text-[#004030]/50'}`}>
           {isFreelance ? 'Monthly Est.' : 'In-Hand Salary'}
         </p>
         <p className={`text-[22px] md:text-2xl font-bold ${selected ? 'text-white' : 'text-[#004030]'}`}>{fmt(inHand)}</p>
+      </div>
+      <div className={`col-span-2 border-t mt-1 pt-2 ${selected ? 'border-white/20' : 'border-[#004030]/10'}`}>
+        <p className={`text-xs font-semibold ${selected ? 'text-[#B6FF00]' : 'text-[#004030]/40'}`}>
+          Calculate tax →
+        </p>
       </div>
     </button>
   );
