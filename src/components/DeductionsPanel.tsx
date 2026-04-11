@@ -7,7 +7,7 @@ import { Badge } from './ui/badge';
 
 // ─── EPF sub-panel ────────────────────────────────────────────────
 
-const BASIC_PRESETS = [30, 40, 50, 60];
+const BASIC_PRESETS = [50, 60]; // New Labour Code 2026: basic must be ≥ 50% of CTC
 const EPF_PRESETS   = [12, 10, 8];
 
 interface EPFPanelProps {
@@ -98,7 +98,7 @@ export function EPFPanel({ epfInput, onEPFChange, gross }: EPFPanelProps) {
             />
           </div>
           <p className="text-xs text-[#004030]/60 mt-1">
-            {gross > 0 ? 'Pick a % above or enter manually' : 'Enter your annual basic salary'}
+            {gross > 0 ? 'New Labour Code 2026: basic must be ≥ 50% of CTC' : 'Enter your annual basic salary'}
           </p>
         </div>
 

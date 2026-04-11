@@ -10,6 +10,7 @@ import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 interface Props {
   values: PerquisiteAllowances;
@@ -74,12 +75,17 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
           )}
         </div>
 
-        {/* How it works callout */}
-        <div className="bg-[#004030]/5 border border-[#004030]/15 rounded-xl px-4 py-3 text-xs text-[#004030] mb-6 leading-relaxed">
-          <strong>How this works:</strong> Your employer bears the actual cost of these perquisites.
-          Only a small <em>fixed perquisite value</em> (set by IT Rules) is added to your taxable income —
-          the rest is your employer's business expense, saving you significant tax in both regimes.
-        </div>
+        {/* How it works — accordion */}
+        <Accordion type="single" collapsible className="mb-4">
+          <AccordionItem value="how" className="border border-[#004030]/15 rounded-xl px-4 overflow-hidden">
+            <AccordionTrigger className="text-xs font-semibold text-[#004030]/60 hover:text-[#004030] hover:no-underline py-3">
+              How this works
+            </AccordionTrigger>
+            <AccordionContent className="text-xs text-[#004030]/70 leading-relaxed pb-3">
+              Your employer bears the actual cost of these perquisites. Only a small <em>fixed perquisite value</em> (set by IT Rules) is added to your taxable income — the rest is your employer's business expense, saving you significant tax in both regimes.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         <div className="space-y-6">
 

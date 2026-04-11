@@ -65,7 +65,7 @@ const FREELANCE_TABS_NEW = [
 ];
 
 function inferAnnualBasic(grossAnnual: number): number {
-  return Math.round(grossAnnual * 0.40);
+  return Math.round(grossAnnual * 0.50); // New Labour Code 2026: basic ≥ 50% of CTC
 }
 
 const STORAGE_KEY = 'whatsmytax_v1';
