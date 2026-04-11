@@ -62,7 +62,7 @@ export default function HRAPanel({ hraInput, onChange }: Props) {
             </ToggleGroup>
             <p className="text-xs text-muted-foreground mt-2">
               {hraInput.cityType === 'metro'
-                ? `Metro cities (${METRO_CITIES.join(', ')}) → 50% of basic`
+                ? `8 metros → 50% of basic: ${METRO_CITIES.join(', ')} (Income Tax Act 2025)`
                 : 'All other cities → 40% of basic'}
             </p>
           </div>

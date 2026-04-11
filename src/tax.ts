@@ -47,8 +47,8 @@ export function epfBreakdown(epf: EPFInput) {
 
 export type CityType = 'metro' | 'non-metro';
 
-/** Metros for 50% HRA rule: Delhi, Mumbai, Chennai, Kolkata */
-export const METRO_CITIES = ['Delhi', 'Mumbai', 'Chennai', 'Kolkata'];
+/** Metros for 50% HRA rule — expanded to 8 cities under new Income Tax Act 2025 (effective April 1, 2026) */
+export const METRO_CITIES = ['Delhi', 'Mumbai', 'Chennai', 'Kolkata', 'Bengaluru', 'Hyderabad', 'Pune', 'Ahmedabad'];
 
 export interface HRAInput {
   basicSalary: number;       // annual basic salary
