@@ -1,5 +1,5 @@
 import type { Deductions80C, EPFInput } from '../tax';
-import { total80C, MAX_80C, fmt, calcEPFContribution, EPF_RATE } from '../tax';
+import { total80C, MAX_80C, fmt, calcEPFContribution, EPF_RATE, EPF_WAGE_CEILING } from '../tax';
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -17,7 +17,7 @@ interface EPFPanelProps {
 }
 
 export function EPFPanel({ epfInput, onEPFChange, gross }: EPFPanelProps) {
-  const autoContrib = epfInput.basicSalary > 0
+  const autoContrib   = epfInput.basicSalary > 0
     ? Math.round(epfInput.basicSalary * EPF_RATE)
     : 0;
   const contribution  = calcEPFContribution(epfInput);
@@ -28,6 +28,10 @@ export function EPFPanel({ epfInput, onEPFChange, gross }: EPFPanelProps) {
   const epfPct        = epfInput.basicSalary > 0
     ? Math.round((contribution / epfInput.basicSalary) * 100)
     : null;
+  const monthlyBasic  = epfInput.basicSalary / 12;
+  const isAboveCeiling = monthlyBasic > EPF_WAGE_CEILING;
+  const mandatoryEPF  = Math.round(Math.min(epfInput.basicSalary, EPF_WAGE_CEILING * 12) * EPF_RATE);
+  const vpf           = Math.max(0, autoContrib - mandatoryEPF);
 
   function handleBasicChange(val: number) {
     onEPFChange({ ...epfInput, basicSalary: val, useCustomAmount: false, customAmount: 0 });
@@ -58,7 +62,7 @@ export function EPFPanel({ epfInput, onEPFChange, gross }: EPFPanelProps) {
         <h3 className="text-sm font-semibold text-[#004030]">EPF — Employee Provident Fund</h3>
       </div>
       <p className="text-xs text-[#004030]/60 mb-4">
-        Employee contributes {(EPF_RATE * 100).toFixed(0)}% of basic salary. Counts towards your 80C limit.
+        12% of basic salary, up to ₹15,000/month mandatory (Budget 2026 — ceiling unchanged). Above ₹15K/month is VPF. Both count towards 80C.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -163,6 +167,14 @@ export function EPFPanel({ epfInput, onEPFChange, gross }: EPFPanelProps) {
           <Stat label="Monthly deduction" value={fmt(Math.round(contribution / 12))} />
           <Stat label="Annual contribution" value={fmt(contribution)} />
           <Stat label="% of basic" value={epfInput.basicSalary > 0 ? `${((contribution / epfInput.basicSalary) * 100).toFixed(1)}%` : '—'} />
+        </div>
+      )}
+
+      {/* Mandatory vs VPF split — shown when basic > ₹15K/month */}
+      {!epfInput.useCustomAmount && isAboveCeiling && vpf > 0 && (
+        <div className="mt-3 border-t border-[#004030]/10 pt-3 flex justify-between text-xs text-[#004030]/60">
+          <span>Mandatory EPF <span className="font-semibold text-[#004030]">{fmt(mandatoryEPF)}</span></span>
+          <span>VPF (voluntary) <span className="font-semibold text-[#004030]">{fmt(vpf)}</span></span>
         </div>
       )}
     </div>
