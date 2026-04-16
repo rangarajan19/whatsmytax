@@ -5,6 +5,42 @@ export interface SlabRow {
   tax: number;
 }
 
+// ─── Fiscal Year config ───────────────────────────────────────────
+
+export type FiscalYear = '2025-26' | '2026-27';
+
+export interface FYConfig {
+  /** e.g. "FY 2025–26 (AY 2026–27)" */
+  label: string;
+  ayLabel: string;
+  metroCities: string[];
+  /** Annual taxable perquisite for car ≤1600cc (Rule 3(2)) */
+  carPerquisiteSmall: number;
+  /** Annual taxable perquisite for car >1600cc */
+  carPerquisiteLarge: number;
+  /** Annual taxable perquisite for driver */
+  driverPerquisite: number;
+}
+
+export const FY_CONFIGS: Record<FiscalYear, FYConfig> = {
+  '2025-26': {
+    label:   'FY 2025–26',
+    ayLabel: 'AY 2026–27',
+    metroCities: ['Delhi', 'Mumbai', 'Chennai', 'Kolkata'],
+    carPerquisiteSmall: 21_600,  // ₹1,800/mo × 12
+    carPerquisiteLarge: 28_800,  // ₹2,400/mo × 12
+    driverPerquisite:   10_800,  // ₹900/mo  × 12
+  },
+  '2026-27': {
+    label:   'FY 2026–27',
+    ayLabel: 'AY 2027–28',
+    metroCities: ['Delhi', 'Mumbai', 'Chennai', 'Kolkata', 'Bengaluru', 'Hyderabad', 'Pune', 'Ahmedabad'],
+    carPerquisiteSmall: 60_000,  // ₹5,000/mo × 12 — new Rule 3(2)
+    carPerquisiteLarge: 84_000,  // ₹7,000/mo × 12
+    driverPerquisite:   36_000,  // ₹3,000/mo × 12
+  },
+};
+
 // ─── EPF ─────────────────────────────────────────────────────────
 
 /** EPF employee contribution rate */
@@ -237,20 +273,22 @@ export const EMPTY_PERQUISITES: PerquisiteAllowances = {
  * Petrol/car: exempt = max(0, actual − car perquisite value).
  * Driver: exempt = max(0, actual − driver perquisite value).
  */
-export function calcPerquisiteDeduction(p: PerquisiteAllowances): number {
-  const carPerquisite = p.carEngineSize === 'large' ? CAR_PERQUISITE_LARGE : CAR_PERQUISITE_SMALL;
+export function calcPerquisiteDeduction(p: PerquisiteAllowances, fyConfig?: FYConfig): number {
+  const cfg = fyConfig ?? FY_CONFIGS['2025-26'];
+  const carPerquisite = p.carEngineSize === 'large' ? cfg.carPerquisiteLarge : cfg.carPerquisiteSmall;
   const petrolExempt  = p.petrolAllowance > 0 ? Math.max(0, p.petrolAllowance - carPerquisite) : 0;
-  const driverExempt  = p.driverSalary    > 0 ? Math.max(0, p.driverSalary    - DRIVER_PERQUISITE) : 0;
+  const driverExempt  = p.driverSalary    > 0 ? Math.max(0, p.driverSalary    - cfg.driverPerquisite) : 0;
   return Math.max(0, p.telephoneInternet) + petrolExempt + driverExempt;
 }
 
 /** Breakdown for UI display */
-export function perquisiteBreakdown(p: PerquisiteAllowances) {
-  const carPerquisite = p.carEngineSize === 'large' ? CAR_PERQUISITE_LARGE : CAR_PERQUISITE_SMALL;
+export function perquisiteBreakdown(p: PerquisiteAllowances, fyConfig?: FYConfig) {
+  const cfg = fyConfig ?? FY_CONFIGS['2025-26'];
+  const carPerquisite = p.carEngineSize === 'large' ? cfg.carPerquisiteLarge : cfg.carPerquisiteSmall;
   const petrolTaxable = p.petrolAllowance > 0 ? Math.min(p.petrolAllowance, carPerquisite) : 0;
   const petrolExempt  = p.petrolAllowance > 0 ? Math.max(0, p.petrolAllowance - carPerquisite) : 0;
-  const driverTaxable = p.driverSalary    > 0 ? Math.min(p.driverSalary,    DRIVER_PERQUISITE) : 0;
-  const driverExempt  = p.driverSalary    > 0 ? Math.max(0, p.driverSalary    - DRIVER_PERQUISITE) : 0;
+  const driverTaxable = p.driverSalary    > 0 ? Math.min(p.driverSalary,    cfg.driverPerquisite) : 0;
+  const driverExempt  = p.driverSalary    > 0 ? Math.max(0, p.driverSalary    - cfg.driverPerquisite) : 0;
   return {
     telephoneExempt: Math.max(0, p.telephoneInternet),
     petrolTaxable, petrolExempt,
@@ -641,6 +679,7 @@ export function calcOldRegime(
   deductions: Deductions = EMPTY_DEDUCTIONS,
   otherIncome: OtherIncome = EMPTY_OTHER_INCOME,
   freelance: FreelanceIncome = EMPTY_FREELANCE,
+  fyConfig?: FYConfig,
 ): RegimeResult {
   // Standard deduction only applies to salary/pension income (not freelance)
   const STD          = gross > 0 ? 50_000 : 0;
@@ -651,7 +690,7 @@ export function calcOldRegime(
   const dedNPS       = calcNPS80CCD1B(deductions.nps80CCD1B);
   const dedHomeLoan  = calcHomeLoanInterestDeduction(deductions.homeLoanInterest);
   const dedEduLoan   = calcEducationLoanDeduction(deductions.educationLoan);
-  const dedPerqs     = calcPerquisiteDeduction(deductions.perquisites);
+  const dedPerqs     = calcPerquisiteDeduction(deductions.perquisites, fyConfig);
   const oiResult     = calcOtherIncome(otherIncome);
   const flResult     = calcFreelanceIncome(freelance);
 
@@ -696,10 +735,11 @@ export function calcNewRegime(
   otherIncome: OtherIncome = EMPTY_OTHER_INCOME,
   perquisites: PerquisiteAllowances = EMPTY_PERQUISITES,
   freelance: FreelanceIncome = EMPTY_FREELANCE,
+  fyConfig?: FYConfig,
 ): RegimeResult {
   // Standard deduction only applies to salary/pension income (not freelance)
   const STD      = gross > 0 ? 75_000 : 0;
-  const dedPerqs = calcPerquisiteDeduction(perquisites);
+  const dedPerqs = calcPerquisiteDeduction(perquisites, fyConfig);
   const oiResult = calcOtherIncome(otherIncome);
   const flResult = calcFreelanceIncome(freelance);
   // Note: 80TTA deduction NOT available in New Regime — savings interest fully taxable

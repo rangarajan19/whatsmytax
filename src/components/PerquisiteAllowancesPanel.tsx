@@ -1,10 +1,8 @@
-import type { PerquisiteAllowances, CarEngineSize } from '../tax';
+import type { PerquisiteAllowances, CarEngineSize, FYConfig } from '../tax';
 import {
   fmt,
   perquisiteBreakdown,
-  CAR_PERQUISITE_SMALL,
-  CAR_PERQUISITE_LARGE,
-  DRIVER_PERQUISITE,
+  FY_CONFIGS,
 } from '../tax';
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
@@ -15,6 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './
 interface Props {
   values: PerquisiteAllowances;
   onChange: (updated: PerquisiteAllowances) => void;
+  fyConfig?: FYConfig;
 }
 
 function TaxBreakdownPill({ taxable, exempt }: { taxable: number; exempt: number }) {
@@ -35,8 +34,15 @@ function TaxBreakdownPill({ taxable, exempt }: { taxable: number; exempt: number
   );
 }
 
-export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
-  const bd = perquisiteBreakdown(values);
+export default function PerquisiteAllowancesPanel({ values, onChange, fyConfig }: Props) {
+  const cfg = fyConfig ?? FY_CONFIGS['2025-26'];
+  const bd = perquisiteBreakdown(values, cfg);
+
+  const carSmallMonthly  = Math.round(cfg.carPerquisiteSmall / 12);
+  const carLargeMonthly  = Math.round(cfg.carPerquisiteLarge / 12);
+  const driverMonthly    = Math.round(cfg.driverPerquisite   / 12);
+  const activeCarPerq    = values.carEngineSize === 'large' ? cfg.carPerquisiteLarge : cfg.carPerquisiteSmall;
+  const activeCarMonthly = values.carEngineSize === 'large' ? carLargeMonthly : carSmallMonthly;
 
   function setField<K extends keyof PerquisiteAllowances>(key: K, val: PerquisiteAllowances[K]) {
     onChange({ ...values, [key]: val });
@@ -76,7 +82,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
         </div>
 
         {/* How it works — accordion */}
-        <Accordion type="single" collapsible className="mb-4">
+        <Accordion className="mb-4">
           <AccordionItem value="how" className="border border-[#004030]/15 rounded-xl px-4 overflow-hidden">
             <AccordionTrigger className="text-xs font-semibold text-[#004030]/60 hover:text-[#004030] hover:no-underline py-3">
               How this works
@@ -149,17 +155,18 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
               >
                 <ToggleGroupItem value="small" className="flex-col py-2 px-3 h-auto text-xs font-semibold">
                   <span>≤ 1600cc</span>
-                  <span className="font-normal opacity-70">₹{(CAR_PERQUISITE_SMALL / 1000).toFixed(1)}K/yr taxable</span>
+                  <span className="font-normal opacity-70">₹{(cfg.carPerquisiteSmall / 1000).toFixed(1)}K/yr taxable</span>
                 </ToggleGroupItem>
                 <ToggleGroupItem value="large" className="flex-col py-2 px-3 h-auto text-xs font-semibold">
                   <span>&gt; 1600cc</span>
-                  <span className="font-normal opacity-70">₹{(CAR_PERQUISITE_LARGE / 1000).toFixed(1)}K/yr taxable</span>
+                  <span className="font-normal opacity-70">₹{(cfg.carPerquisiteLarge / 1000).toFixed(1)}K/yr taxable</span>
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
 
             <p className="text-xs text-muted-foreground mt-2">
-              Rule 3(2) — Only ₹{((values.carEngineSize === 'large' ? CAR_PERQUISITE_LARGE : CAR_PERQUISITE_SMALL) / 12).toLocaleString('en-IN')}/month is taxable regardless of actual spend.
+              Rule 3(2) — Only ₹{activeCarMonthly.toLocaleString('en-IN')}/month is taxable regardless of actual spend.
+              {activeCarPerq !== cfg.carPerquisiteSmall && activeCarPerq !== cfg.carPerquisiteLarge ? '' : ''}
             </p>
           </div>
 
@@ -186,7 +193,7 @@ export default function PerquisiteAllowancesPanel({ values, onChange }: Props) {
               <TaxBreakdownPill taxable={bd.driverTaxable} exempt={bd.driverExempt} />
             )}
             <p className="text-xs text-muted-foreground mt-2">
-              Rule 3(2) — Only ₹900/month (₹{(DRIVER_PERQUISITE / 1000).toFixed(1)}K/year) is taxable regardless of actual salary paid.
+              Rule 3(2) — Only ₹{driverMonthly.toLocaleString('en-IN')}/month (₹{(cfg.driverPerquisite / 1000).toFixed(1)}K/year) is taxable regardless of actual salary paid.
             </p>
           </div>
 

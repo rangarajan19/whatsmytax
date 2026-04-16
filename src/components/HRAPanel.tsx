@@ -1,5 +1,5 @@
-import type { HRAInput, CityType } from '../tax';
-import { calcHRAExemption, fmt, METRO_CITIES } from '../tax';
+import type { HRAInput, CityType, FYConfig } from '../tax';
+import { calcHRAExemption, fmt, FY_CONFIGS } from '../tax';
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -9,9 +9,12 @@ import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
 interface Props {
   hraInput: HRAInput;
   onChange: (updated: HRAInput) => void;
+  fyConfig?: FYConfig;
 }
 
-export default function HRAPanel({ hraInput, onChange }: Props) {
+export default function HRAPanel({ hraInput, onChange, fyConfig }: Props) {
+  const cfg = fyConfig ?? FY_CONFIGS['2025-26'];
+  const metroCities = cfg.metroCities;
   const { exemption, rule_a, rule_b, rule_c, cityPct } = calcHRAExemption(hraInput);
   const hasData  = hraInput.basicSalary > 0 && hraInput.rentPaid > 0;
   const limiting = hasData
@@ -62,7 +65,7 @@ export default function HRAPanel({ hraInput, onChange }: Props) {
             </ToggleGroup>
             <p className="text-xs text-muted-foreground mt-2">
               {hraInput.cityType === 'metro'
-                ? `4 metros → 50% of basic: ${METRO_CITIES.join(', ')}`
+                ? `${metroCities.length} metros → 50% of basic: ${metroCities.join(', ')}`
                 : 'All other cities → 40% of basic'}
             </p>
           </div>

@@ -5,12 +5,13 @@ import {
   EMPTY_DEDUCTIONS, EMPTY_OTHER_INCOME, EMPTY_FREELANCE,
   getRegimeRecommendation, total80C,
   MAX_80C, MAX_80D_SELF, MAX_80D_SELF_SENIOR, MAX_80D_PARENT, MAX_80D_PARENT_SENIOR,
-  MAX_HOME_LOAN_INTEREST,
+  MAX_HOME_LOAN_INTEREST, FY_CONFIGS,
 } from './tax';
 import type {
   TaxResult, Deductions, Deductions80C, EPFInput, HRAInput,
   Section80DInput, NPS80CCD1BInput, HomeLoanInterestInput,
   EducationLoanInput, PerquisiteAllowances, OtherIncome, FreelanceIncome,
+  FiscalYear, FYConfig,
 } from './tax';
 import DeductionsPanel from './components/DeductionsPanel';
 import HRAPanel from './components/HRAPanel';
@@ -28,6 +29,7 @@ import ChangelogPage from './components/ChangelogPage';
 import { trackEvent } from './analytics';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
+import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group';
 
 const SALARIED_TABS_OLD = [
   { id: 'perquisites',    label: 'Perquisites' },
@@ -96,6 +98,8 @@ export default function App() {
   const [viewMode, setViewMode]           = useState<'landing' | 'main' | 'detail' | 'summary' | 'changelog'>(saved?.userType ? 'main' : 'landing');
   const [activeDetailTab, setActiveDetailTab] = useState<string>('other-income');
   const [selectedRegime, setSelectedRegime]   = useState<'old' | 'new'>('old');
+  const [fy, setFY]                           = useState<FiscalYear>('2025-26');
+  const fyConfigRef                           = useRef<FYConfig>(FY_CONFIGS['2025-26']);
 
   const lastInferredBasic  = useRef<number>(0);
   const prefillTimer       = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -125,6 +129,7 @@ export default function App() {
 
   // ── Live recalculation ───────────────────────────────────────────
   const recalculate = useCallback((gross: number, ded: Deductions, oi: OtherIncome, fl: FreelanceIncome) => {
+    const cfg      = fyConfigRef.current;
     const oiResult = calcOtherIncome(oi);
     const flResult = calcFreelanceIncome(fl);
     setResult({
@@ -134,8 +139,8 @@ export default function App() {
       otherIncomeResult: oiResult,
       freelanceIncome: fl,
       freelanceResult: flResult,
-      old: calcOldRegime(gross, ded, oi, fl),
-      new: calcNewRegime(gross, oi, ded.perquisites, fl),
+      old: calcOldRegime(gross, ded, oi, fl, cfg),
+      new: calcNewRegime(gross, oi, ded.perquisites, fl, cfg),
     });
   }, []);
 
@@ -278,6 +283,15 @@ export default function App() {
     const gross = parseFloat(salary.replace(/,/g, '').trim()) || 0;
     recalculate(gross, deductions, otherIncomeRef.current, fl);
     trackFirstData('freelance', fl.grossReceipts > 0 || fl.manualProfit > 0);
+  }
+
+  function handleFYChange(newFY: FiscalYear) {
+    fyConfigRef.current = FY_CONFIGS[newFY];
+    setFY(newFY);
+    const gross = parseFloat(salary.replace(/,/g, '').trim()) || 0;
+    if (gross > 0 || freelanceIncomeRef.current.scheme !== 'none') {
+      recalculate(gross, deductions, otherIncomeRef.current, freelanceIncomeRef.current);
+    }
   }
 
   // ── Derived values ────────────────────────────────────────────────
@@ -465,9 +479,28 @@ export default function App() {
               </button>
             </div>
             <h1 className="text-2xl font-semibold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
-            <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
-              Income Tax Calculator — FY 2025–26 (AY 2026–27)
-            </p>
+            <p className="text-[#004030]/60 text-xs mt-0.5 mb-3 text-center">Income Tax Calculator</p>
+            {/* FY pill toggle */}
+            <div className="flex justify-center mb-4">
+              <ToggleGroup
+                value={fy}
+                onValueChange={v => v && handleFYChange(v as FiscalYear)}
+                className="bg-[#004030]/6 rounded-full p-0.5 gap-0"
+              >
+                <ToggleGroupItem
+                  value="2025-26"
+                  className="rounded-full px-4 py-1.5 text-xs font-semibold data-[state=on]:bg-[#004030] data-[state=on]:text-[#B6FF00] text-[#004030]/60 hover:text-[#004030] border-0"
+                >
+                  FY 2025–26
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="2026-27"
+                  className="rounded-full px-4 py-1.5 text-xs font-semibold data-[state=on]:bg-[#004030] data-[state=on]:text-[#B6FF00] text-[#004030]/60 hover:text-[#004030] border-0"
+                >
+                  FY 2026–27
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
             <p className="text-xs font-semibold text-[#004030]/70 mb-1.5">Gross Annual Salary</p>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#004030] font-semibold pointer-events-none">₹</span>
@@ -495,7 +528,7 @@ export default function App() {
         <>
           {/* Finance Act label */}
           <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-1">
-            FY 2025–26 · Based on Finance Act 2025
+            {FY_CONFIGS[fy].label} · {FY_CONFIGS[fy].ayLabel} · Based on Finance Act {fy === '2025-26' ? '2025' : '2025 (new IT Act)'}
           </p>
 
           {/* Tax & In-hand Salary */}
@@ -516,7 +549,7 @@ export default function App() {
       {viewMode === 'summary' && result && (
         <div className="md:max-w-[48vw] mx-auto pb-10">
           <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-4">
-            FY 2025–26 · Based on Finance Act 2025
+            {FY_CONFIGS[fy].label} · {FY_CONFIGS[fy].ayLabel} · Based on Finance Act {fy === '2025-26' ? '2025' : '2025 (new IT Act)'}
           </p>
 
           {/* 1 ── Old Regime breakdown */}
@@ -764,7 +797,7 @@ export default function App() {
                   />
                 )}
                 {activeDetailTab === 'hra' && (
-                  <HRAPanel hraInput={deductions.hraInput} onChange={handleHRAChange} />
+                  <HRAPanel hraInput={deductions.hraInput} onChange={handleHRAChange} fyConfig={FY_CONFIGS[fy]} />
                 )}
                 {activeDetailTab === '80d' && (
                   <Section80DPanel value={deductions.section80D} onChange={handle80DChange} />
@@ -779,7 +812,7 @@ export default function App() {
                   <EducationLoanPanel values={deductions.educationLoan} onChange={handleEducationLoanChange} />
                 )}
                 {activeDetailTab === 'perquisites' && (
-                  <PerquisiteAllowancesPanel values={deductions.perquisites} onChange={handlePerquisitesChange} />
+                  <PerquisiteAllowancesPanel values={deductions.perquisites} onChange={handlePerquisitesChange} fyConfig={FY_CONFIGS[fy]} />
                 )}
               </div>
             </div>
