@@ -33,7 +33,7 @@ export default function CapitalGainsPanel({ value, result, onChange }: Props) {
           Capital gains are taxed separately from your salary income — either at flat rates or at slab rates depending on the asset type.
         </p>
         <p className="text-xs text-[#004030] bg-[#004030]/5 border border-[#004030]/15 rounded-lg px-3 py-2 mb-6">
-          Rules updated per Finance Act 2024 (Budget July 2024). Cess of 4% applies on top of flat-rate taxes.
+          Rules updated per Finance Act 2025 (Budget July 2024 / Feb 2025). Cess of 4% applies on top of flat-rate taxes.
         </p>
 
         <div className="space-y-5">

@@ -79,7 +79,7 @@ export default function LandingPage({ onSelect, onChangelog }: Props) {
             className="text-sm font-semibold text-[#004030]/70 text-center"
             {...fadeUp(0.15)}
           >
-            Income Tax Calculator — FY 2024–25 (AY 2025–26)
+            Income Tax Calculator — FY 2025–26 (AY 2026–27)
           </motion.p>
           <motion.h1
             className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#004030]/80 text-center leading-tight"

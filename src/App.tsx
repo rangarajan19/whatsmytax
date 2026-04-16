@@ -430,7 +430,7 @@ export default function App() {
             </div>
             <h1 className="text-2xl font-semibold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
-              Freelancer · FY 2024–25 (AY 2025–26)
+              Freelancer · FY 2025–26 (AY 2026–27)
             </p>
             {flResult.taxableIncome > 0 ? (
               <div className="bg-white/70 rounded-xl px-4 py-3 border border-[#004030]/15">
@@ -466,7 +466,7 @@ export default function App() {
             </div>
             <h1 className="text-2xl font-semibold tracking-tight text-[#004030] text-center">What's My Tax?</h1>
             <p className="text-[#004030]/60 text-sm mt-0.5 mb-4 text-center">
-              Income Tax Calculator — FY 2024–25 (AY 2025–26)
+              Income Tax Calculator — FY 2025–26 (AY 2026–27)
             </p>
             <p className="text-xs font-semibold text-[#004030]/70 mb-1.5">Gross Annual Salary</p>
             <div className="relative">
@@ -495,7 +495,7 @@ export default function App() {
         <>
           {/* Finance Act label */}
           <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-1">
-            FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
+            FY 2025–26 · Based on Finance Act 2025
           </p>
 
           {/* Tax & In-hand Salary */}
@@ -516,7 +516,7 @@ export default function App() {
       {viewMode === 'summary' && result && (
         <div className="md:max-w-[48vw] mx-auto pb-10">
           <p className="text-center text-[10px] text-[#004030]/40 font-medium pt-3 pb-4">
-            FY 2024–25 · Based on Finance Act 2024 · Last updated March 2025
+            FY 2025–26 · Based on Finance Act 2025
           </p>
 
           {/* 1 ── Old Regime breakdown */}

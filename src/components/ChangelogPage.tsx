@@ -100,7 +100,7 @@ export default function ChangelogPage({ onBack }: Props) {
 
           {/* Footer note */}
           <p className="text-xs text-center text-[#004030]/30 pt-2">
-            Based on Finance Act 2024 · FY 2024–25 (AY 2025–26)
+            Based on Finance Act 2025 · FY 2025–26 (AY 2026–27)
           </p>
         </div>
 

@@ -47,8 +47,8 @@ export function epfBreakdown(epf: EPFInput) {
 
 export type CityType = 'metro' | 'non-metro';
 
-/** Metros for 50% HRA rule — expanded to 8 cities under new Income Tax Act 2025 (effective April 1, 2026) */
-export const METRO_CITIES = ['Delhi', 'Mumbai', 'Chennai', 'Kolkata', 'Bengaluru', 'Hyderabad', 'Pune', 'Ahmedabad'];
+/** Metros for 50% HRA rule — 4 cities under existing IT Act (FY 2025-26) */
+export const METRO_CITIES = ['Delhi', 'Mumbai', 'Chennai', 'Kolkata'];
 
 export interface HRAInput {
   basicSalary: number;       // annual basic salary
@@ -307,11 +307,11 @@ export const MAX_80TTA        = 10_000;   // non-senior savings interest deducti
 export const MAX_80TTB        = 50_000;   // senior citizen (covers FD + savings)
 
 /** TDS threshold for FD/RD interest (bank deducts TDS above this per bank per year) */
-export const FD_TDS_THRESHOLD         = 40_000;   // non-senior
+export const FD_TDS_THRESHOLD         = 50_000;   // non-senior (raised from ₹40K → ₹50K, Finance Act 2025)
 export const FD_TDS_THRESHOLD_SENIOR  = 50_000;   // senior
 
 /** TDS threshold for dividends (per company per year) */
-export const DIVIDEND_TDS_THRESHOLD   = 5_000;
+export const DIVIDEND_TDS_THRESHOLD   = 10_000;  // raised from ₹5K → ₹10K, Finance Act 2025
 
 /** LTCG exemption on listed equity / equity MFs */
 export const LTCG_EQUITY_EXEMPTION    = 125_000;  // ₹1.25L exempt (post Budget 2024)
