@@ -485,17 +485,17 @@ export default function App() {
               <ToggleGroup
                 value={fy}
                 onValueChange={v => v && handleFYChange(v as FiscalYear)}
-                className="bg-[#004030]/6 rounded-full p-0.5 gap-0"
+                className="bg-[#004030]/8 rounded-full p-1 gap-0 border-0 w-auto"
               >
                 <ToggleGroupItem
                   value="2025-26"
-                  className="rounded-full px-4 py-1.5 text-xs font-semibold data-[state=on]:bg-[#004030] data-[state=on]:text-[#B6FF00] text-[#004030]/60 hover:text-[#004030] border-0"
+                  className="rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap flex-none min-h-0 data-[state=on]:bg-[#004030] data-[state=on]:text-[#B6FF00] bg-transparent text-[#004030]/50 hover:text-[#004030] hover:bg-transparent border-0"
                 >
                   FY 2025–26
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   value="2026-27"
-                  className="rounded-full px-4 py-1.5 text-xs font-semibold data-[state=on]:bg-[#004030] data-[state=on]:text-[#B6FF00] text-[#004030]/60 hover:text-[#004030] border-0"
+                  className="rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap flex-none min-h-0 data-[state=on]:bg-[#004030] data-[state=on]:text-[#B6FF00] bg-transparent text-[#004030]/50 hover:text-[#004030] hover:bg-transparent border-0"
                 >
                   FY 2026–27
                 </ToggleGroupItem>
